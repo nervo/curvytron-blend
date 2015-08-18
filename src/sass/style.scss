@@ -1,10 +1,12 @@
-// Architecture based on http://www.sitepoint.com/architecture-sass-project/
-
-@charset "UTF-8";
+@import "base/reset";
+@import "base/variables";
+@import "helpers/mixins";
+@import "helpers/shortcuts";
+@import "base/typo";
+@import "base/fonts";
+@import "layout/layout";
 
 @import "components/render";
 
-body {
-    margin: 0;
-    background: #000000;
-}
+@import "pages/homepage";
+@import "pages/game";
