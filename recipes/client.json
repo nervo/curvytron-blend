@@ -1,0 +1,10 @@
+{
+    "name": "curvytron.js",
+    "path": "web/js/",
+    "files": [
+        "src/shared/**/*.js",
+        "src/client/manager/BonusManager.js",
+        "src/client/*/**/*.js",
+        "src/client/*.js"
+    ]
+}

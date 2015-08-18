@@ -1,0 +1,10 @@
+{
+    "name": "curvytron.js",
+    "path": "bin/",
+    "files": [
+        "src/server/dependencies.js",
+        "src/shared/**/*.js",
+        "src/server/*/**/*.js",
+        "src/server/launcher.js"
+    ]
+}
