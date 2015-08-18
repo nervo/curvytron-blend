@@ -74,8 +74,10 @@ Game.prototype.addAvatar = function (avatar)
         var position = this.world.getRandomPosition(avatar.radius, this.spawnMargin),
             angle    = this.world.getRandomDirection(avatar.x, avatar.y, this.spawnAngleMargin);
 
+        avatar.clear();
         avatar.setPosition(position[0], position[1]);
         avatar.setAngle(angle);
+        avatar.on('point', this.onPoint);
         setTimeout(avatar.printManager.start, this.warmupBeforePrint);
 
         this.emit('avatar:add', avatar);
