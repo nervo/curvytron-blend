@@ -5,7 +5,7 @@
  */
 function Avatar(player)
 {
-    BaseAvatar.call(this, player.id, player.name, player.color);
+    BaseAvatar.call(this, player.name, player.color);
 
     this.player       = player;
     this.body         = new AvatarBody(this.x, this.y, this);

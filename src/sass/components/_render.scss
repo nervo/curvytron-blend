@@ -1,0 +1,22 @@
+.game-render {
+    display: block;
+    position: relative;
+    margin: 0 auto;
+    border: 4px solid white;
+    background: #333333;
+    box-sizing: border-box;
+
+    &.borderless {
+        border-style: dashed;
+    }
+
+    & > * {
+        position: absolute;
+        display: block;
+    }
+
+    .game-background { z-index: 30; }
+    .game-bonus { z-index: 40; }
+    .game-front { z-index: 50; }
+    .game-effect { z-index: 60; }
+}

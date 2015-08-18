@@ -18,6 +18,7 @@ function Game()
     window.addEventListener('resize', this.onResize);
 
     this.onResize();
+    this.start();
 }
 
 Game.prototype = Object.create(BaseGame.prototype);
@@ -46,7 +47,12 @@ Game.prototype.addAvatar = function(avatar)
 {
     if (BaseGame.prototype.addAvatar.call(this, avatar)) {
         avatar.on('die', this.onDie);
+        this.setupAvatar(avatar);
+
+        return true;
     }
+
+    return false;
 };
 
 /**
@@ -58,7 +64,11 @@ Game.prototype.removeAvatar = function(avatar)
 {
     if (BaseGame.prototype.removeAvatar.call(this, avatar)) {
         avatar.off('die', this.onDie);
+
+        return true;
     }
+
+    return false;
 };
 
 /**
@@ -271,30 +281,38 @@ Game.prototype.onDie = function(event)
 };
 
 /**
+ * Setup avatar
+ *
+ * @param {Avatar} avatar
+ */
+Game.prototype.setupAvatar = function(avatar)
+{
+    avatar.setScale(this.canvas.scale);
+
+    if (typeof(avatar.input) !== 'undefined') {
+        avatar.input.setWidth(window.innerWidth);
+    }
+};
+
+/**
  * On resize
  */
 Game.prototype.onResize = function()
 {
-    var w=window,d=document,e=d.documentElement,g=document.body,x=w.innerWidth||e.clientWidth||g.clientWidth,y=w.innerHeight||e.clientHeight||g.clientHeight;
+    var width = Math.min(window.innerWidth, window.innerHeight);
 
-    var width = Math.min(x /*- this.gameInfos.clientWidth - 8*/, y/* - 8*/),
-        scale = width / this.size,
-        avatar;
+    this.render.style.width  = width + 'px';
+    this.render.style.height = width + 'px';
 
-    this.render.style.width  = (width/* + 8*/) + 'px';
-    this.render.style.height = (width/* + 8*/) + 'px';
-    this.canvas.setDimension(width, width, scale);
-    this.effect.setDimension(width, width, scale);
-    this.background.setDimension(width, width, scale, true);
-    this.bonusManager.setDimension(width, scale);
+    var innerWidth = this.render.clientWidth,
+        scale      = innerWidth / this.size;
+
+    this.canvas.setDimension(innerWidth, innerWidth, scale);
+    this.effect.setDimension(innerWidth, innerWidth, scale);
+    this.background.setDimension(innerWidth, innerWidth, scale, true);
+    this.bonusManager.setDimension(innerWidth, scale);
 
     for (var i = this.avatars.items.length - 1; i >= 0; i--) {
-        avatar = this.avatars.items[i];
-
-        avatar.setScale(scale);
-
-        if (typeof(avatar.input) !== 'undefined') {
-            avatar.input.setWidth(x);
-        }
+        this.setupAvatar(this.avatars.items[i]);
     }
 };

@@ -14,8 +14,6 @@ function PlayerInput(avatar, binding)
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp   = this.onKeyUp.bind(this);
-    this.onAxis    = this.onAxis.bind(this);
-    this.onButton  = this.onButton.bind(this);
     this.onTouch   = this.onTouch.bind(this);
 
     this.attachEvents();

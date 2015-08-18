@@ -8,11 +8,20 @@ function Game()
     this.world      = new World(this.size);
     this.bonusStack = new GameBonusStack(this);
 
+    this.avatars.index = true;
+
     this.onPoint = this.onPoint.bind(this);
 }
 
 Game.prototype = Object.create(BaseGame.prototype);
 Game.prototype.constructor = Game;
+
+/**
+ * Warmup before avatars start to print
+ *
+ * @type {Number}
+ */
+Game.prototype.warmupBeforePrint = 3000;
 
 /**
  * Update
@@ -61,15 +70,20 @@ Game.prototype.update = function(step)
  */
 Game.prototype.addAvatar = function (avatar)
 {
-    if (BaseGame.prototype.removeAvatar.call(this, avatar)) {
+    if (BaseGame.prototype.addAvatar.call(this, avatar)) {
         var position = this.world.getRandomPosition(avatar.radius, this.spawnMargin),
             angle    = this.world.getRandomDirection(avatar.x, avatar.y, this.spawnAngleMargin);
 
         avatar.setPosition(position[0], position[1]);
         avatar.setAngle(angle);
+        setTimeout(avatar.printManager.start, this.warmupBeforePrint);
 
-        this.emit('avatar:add', {avatar: avatar});
+        this.emit('avatar:add', avatar);
+
+        return true;
     }
+
+    return false;
 };
 
 /**
@@ -80,8 +94,12 @@ Game.prototype.addAvatar = function (avatar)
 Game.prototype.removeAvatar = function(avatar)
 {
     if (BaseGame.prototype.removeAvatar.call(this, avatar)) {
-        this.emit('avatar:remove', {avatar: avatar});
+        this.emit('avatar:remove', avatar);
+
+        return true;
     }
+
+    return false;
 };
 
 /**
@@ -125,13 +143,7 @@ Game.prototype.setSize = function()
 Game.prototype.onStart = function()
 {
     this.emit('game:start', {game: this});
-
-    for (var i = this.avatars.items.length - 1; i >= 0; i--) {
-        setTimeout(this.avatars.items[i].printManager.start, 3000);
-    }
-
     this.world.activate();
-
     BaseGame.prototype.onStart.call(this);
 };
 

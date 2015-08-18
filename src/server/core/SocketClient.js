@@ -11,7 +11,7 @@ function SocketClient(socket, interval, ip)
 
     this.ip         = ip;
     this.id         = null;
-    this.player     = new Player(this);
+    this.player     = new Player(this, this.ip);
     this.pingLogger = new PingLogger(this.socket);
 
     this.identify  = this.identify.bind(this);

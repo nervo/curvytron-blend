@@ -133,7 +133,7 @@ GameController.prototype.attachEvents = function(client)
 {
     client.on('close', this.callbacks.onLeave);
     client.on('ready', this.callbacks.onReady);
-    client.on('player:move', this.callbacks.onMove);
+    client.on('move', this.callbacks.onMove);
 
     client.player.avatar.on('die', this.onDie);
     client.player.avatar.on('position', this.onPosition);
@@ -152,7 +152,7 @@ GameController.prototype.detachEvents = function(client)
 {
     client.removeListener('close', this.callbacks.onLeave);
     client.removeListener('ready', this.callbacks.onReady);
-    client.removeListener('player:move', this.callbacks.onMove);
+    client.removeListener('move', this.callbacks.onMove);
 
     if (client.player.avatar) {
         client.player.avatar.removeListener('die', this.onDie);
@@ -195,7 +195,7 @@ GameController.prototype.onMove = function(client, data)
 {
     // No need for data.avatar anymore
     if (client.player.avatar) {
-        client.player.avatar.updateAngularVelocity(data.move);
+        client.player.avatar.updateAngularVelocity(data);
     }
 };
 

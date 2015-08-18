@@ -83,7 +83,7 @@ BaseGame.prototype.removeAvatar = function(avatar)
     if (this.avatars.exists(avatar)) {
         avatar.die();
         this.avatars.remove(avatar);
-        avatar.destroy();
+        avatar.clear();
 
         return true;
     }
@@ -134,7 +134,6 @@ BaseGame.prototype.loop = function()
  */
 BaseGame.prototype.onStart = function()
 {
-    console.log('Game started');
     this.rendered = new Date().getTime();
     this.bonusManager.start();
     this.fps.start();
@@ -145,7 +144,6 @@ BaseGame.prototype.onStart = function()
  */
 BaseGame.prototype.onStop = function()
 {
-    console.log('Game stoped');
     this.rendered = null;
     this.bonusManager.stop();
     this.fps.stop();

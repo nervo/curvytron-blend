@@ -12,7 +12,6 @@ function BasePlayer(client, name, color, ready)
     this.client = client;
     this.name   = name;
     this.color  = typeof(color) !== 'undefined' && this.validateColor(color) ? color : this.getRandomColor();
-    this.id     = null;
     this.avatar = null;
 }
 
@@ -58,18 +57,6 @@ BasePlayer.prototype.setColor = function(color)
 };
 
 /**
- * Equal
- *
- * @param {Player} player
- *
- * @return {Boolean}
- */
-BasePlayer.prototype.equal = function(player)
-{
-    return this.id === player.id;
-};
-
-/**
  * Get avatar
  *
  * @return {Avatar}
@@ -101,7 +88,6 @@ BasePlayer.prototype.serialize = function()
 {
     return {
         client: this.client.id,
-        id: this.id,
         name: this.name,
         color: this.color
     };

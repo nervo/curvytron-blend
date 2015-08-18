@@ -1,15 +1,14 @@
 /**
  * Base Avatar
  *
- * @param {Number} id
  * @param {String} name
  * @param {String} color
  */
-function BaseAvatar(id, name, color)
+function BaseAvatar(name, color)
 {
     EventEmitter.call(this);
 
-    this.id              = id;
+    this.id              = null;
     this.name            = name;
     this.defaultColor    = color;
     this.color           = color;

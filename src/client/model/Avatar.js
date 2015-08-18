@@ -1,10 +1,15 @@
 /**
  * Avatar
+ *
+ * @param {Number} id
+ * @param {String} name
+ * @param {String} color
  */
 function Avatar(id, name, color)
 {
-    BaseAvatar.call(this, id, name, color);
+    BaseAvatar.call(this, name, color);
 
+    this.id           = id;
     this.canvas       = new Canvas(100, 100);
     this.arrow        = new Canvas(this.arrowSize, this.arrowSize);
     this.width        = this.radius * 2;
@@ -62,7 +67,7 @@ Avatar.prototype.update = function(step)
 Avatar.prototype.setLocal = function(binding)
 {
     if (!this.local) {
-        this.local = local;
+        this.local = true;
         this.input = new PlayerInput(this, binding);
     }
 };

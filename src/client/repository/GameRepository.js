@@ -26,6 +26,8 @@ function GameRepository (controls)
     this.onEnd          = this.onEnd.bind(this);
     this.onAvatarAdd    = this.onAvatarAdd.bind(this);
     this.onAvatarRemove = this.onAvatarRemove.bind(this);
+    this.onMove         = this.onMove.bind(this);
+    this.onLoad         = this.onLoad.bind(this);
 
     this.client.on('connected', this.onConnect);
     this.client.on('disconnected', this.onDisconnect);
@@ -36,8 +38,10 @@ function GameRepository (controls)
  */
 GameRepository.prototype.onConnect = function()
 {
+    console.info('Connected to server');
     this.game = new Game();
     this.attachEvents();
+    this.game.bonusManager.on('load', this.onLoad);
 };
 
 
@@ -46,8 +50,17 @@ GameRepository.prototype.onConnect = function()
  */
 GameRepository.prototype.onDisconnect = function()
 {
+    console.info('Disconnected from server');
     this.detachEvents();
     this.game = null;
+};
+
+/**
+ * On load
+ */
+GameRepository.prototype.onLoad = function()
+{
+    this.client.addEvent('ready');
 };
 
 /**
@@ -74,7 +87,7 @@ GameRepository.prototype.attachEvents = function()
 /**
  * Attach events
  */
-GameRepository.prototype.attachEvents = function()
+GameRepository.prototype.detachEvents = function()
 {
     this.client.off('property', this.onProperty);
     this.client.off('position', this.onPosition);
@@ -248,6 +261,8 @@ GameRepository.prototype.onAvatarAdd = function(e)
             this.controls[0].mapper.value,
             this.controls[1].mapper.value
         ]);
+
+        avatar.input.on('move', this.onMove);
     }
 };
 
@@ -260,9 +275,21 @@ GameRepository.prototype.onAvatarRemove = function(e)
 {
     var avatar = this.game.avatars.getById(e.detail);
 
+    console.info('onAvatarRemove', avatar);
+
     if (avatar) {
         this.game.removeAvatar(avatar);
     }
+};
+
+/**
+ * On move
+ *
+ * @param {Event} e
+ */
+GameRepository.prototype.onMove = function(e)
+{
+    this.client.addEvent('move', e.detail.move ? e.detail.move : 0);
 };
 
 /**
