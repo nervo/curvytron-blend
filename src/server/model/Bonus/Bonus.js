@@ -8,13 +8,27 @@ function Bonus(x, y)
 {
     BaseBonus.call(this, x, y);
 
-    this.body    = new Body(this.x, this.y, this.radius, this);
+    this.body    = null;
     this.target  = null;
     this.timeout = null;
 }
 
 Bonus.prototype = Object.create(BaseBonus.prototype);
 Bonus.prototype.constructor = Bonus;
+
+/**
+ * Get body
+ *
+ * @return {Body}
+ */
+Bonus.prototype.getBody = function()
+{
+    if (!this.body) {
+        this.body = new Body(this.x, this.y, this.radius, this.id);
+    }
+
+    return this.body;
+};
 
 /**
  * Apply bonus callback

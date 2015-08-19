@@ -61,3 +61,21 @@ SocketGroup.prototype.addEvent = function(name, data, callback, force)
         this.clients.items[i].addEvent(name, data, callback, force);
     }
 };
+
+/**
+ * Add an event to the list targeted to a specific client
+ *
+ * @param {SocketClient} target
+ * @param {String} name
+ * @param {Object} data
+ * @param {Function} callback
+ * @param {Boolean} force
+ */
+SocketGroup.prototype.addExcludeTargetEvent = function(target, name, data, callback, force)
+{
+    for (var i = this.clients.items.length - 1; i >= 0; i--) {
+        if (this.clients.items[i].id !== target.id) {
+            this.clients.items[i].addEvent(name, data, callback, force);
+        }
+    }
+};

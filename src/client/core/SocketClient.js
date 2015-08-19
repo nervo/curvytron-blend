@@ -5,12 +5,10 @@ function SocketClient()
 {
     var Socket = window.MozWebSocket || window.WebSocket;
 
-    this.id        = null;
     this.connected = false;
 
-    this.onError      = this.onError.bind(this);
-    this.onOpen       = this.onOpen.bind(this);
-    this.onConnection = this.onConnection.bind(this);
+    this.onError = this.onError.bind(this);
+    this.onOpen  = this.onOpen.bind(this);
 
     BaseSocketClient.call(this, new Socket('ws://' + document.location.host + document.location.pathname, ['websocket']));
 
@@ -29,22 +27,8 @@ SocketClient.prototype.constructor = SocketClient;
  */
 SocketClient.prototype.onOpen = function(e)
 {
-    console.info('Socket open.');
-    this.addEvent('whoami', null, this.onConnection);
-};
-
-/**
- * On open
- *
- * @param {Event} e
- */
-SocketClient.prototype.onConnection = function(id)
-{
-    console.info('Connected with id "%s".', id);
-
-    this.id        = id;
+    console.info('Connected.');
     this.connected = true;
-
     this.start();
     this.emit('connected');
 };

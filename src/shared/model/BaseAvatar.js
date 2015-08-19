@@ -12,7 +12,7 @@ function BaseAvatar(name, color)
     this.name            = name;
     this.defaultColor    = color;
     this.color           = color;
-    this.trail           = new Trail(this);
+    this.trail           = new Trail();
     this.bonusStack      = new BonusStack(this);
     this.x               = 0;
     this.y               = 0;
@@ -47,13 +47,6 @@ BaseAvatar.prototype.angularVelocityBase = 2.8/1000;
  * @type {Number}
  */
 BaseAvatar.prototype.radius = 0.6;
-
-/**
- * Number of trail points that don't kill the avatar
- *
- * @type {Number}
- */
-BaseAvatar.prototype.trailLatency = 3;
 
 /**
  * Inverted controls
@@ -297,10 +290,6 @@ BaseAvatar.prototype.setPrinting = function(printing)
         this.printing = printing;
 
         this.addPoint(this.x, this.y, true);
-
-        if (!this.printing) {
-            this.trail.clear();
-        }
     }
 };
 

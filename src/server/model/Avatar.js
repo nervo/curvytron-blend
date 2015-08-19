@@ -8,8 +8,8 @@ function Avatar(player)
     BaseAvatar.call(this, player.name, player.color);
 
     this.player       = player;
-    this.body         = new AvatarBody(this.x, this.y, this);
     this.printManager = new PrintManager(this);
+    this.body         = null;
     this.bodyCount    = 0;
 }
 
@@ -31,6 +31,20 @@ Avatar.prototype.update = function(step)
             this.addPoint(this.x, this.y);
         }
     }
+};
+
+/**
+ * Get body
+ *
+ * @return {Avatarbody}
+ */
+Avatar.prototype.getBody = function()
+{
+    if (!this.body) {
+        this.body = new AvatarBody(this, 0, 0, false);
+    }
+
+    return this.body;
 };
 
 /**
@@ -176,17 +190,14 @@ Avatar.prototype.setPrinting = function(printing)
 /**
  * Die
  *
- * @param {Bodynull} body
+ * @param {Avatar} killer
+ * @param {Boolean} old
  */
-Avatar.prototype.die = function(body)
+Avatar.prototype.die = function(killer, old)
 {
     BaseAvatar.prototype.die.call(this);
     this.printManager.stop();
-    this.emit('die', {
-        avatar: this,
-        killer: body ? body.data : null,
-        old: body ? body.isOld() : null
-    });
+    this.emit('die', {avatar: this, killer: killer, old: old});
 };
 
 /**

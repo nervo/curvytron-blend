@@ -30,7 +30,7 @@ Game.prototype.warmupBeforePrint = 3000;
  */
 Game.prototype.update = function(step)
 {
-    for (var avatar, border, position, killer, i = this.avatars.items.length - 1; i >= 0; i--) {
+    for (var avatar, border, position, body, i = this.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.avatars.items[i];
 
         if (avatar.alive) {
@@ -47,10 +47,10 @@ Game.prototype.update = function(step)
                 }
             } else {
                 if (!avatar.invincible) {
-                    killer = this.world.getBody(avatar.body);
+                    body = this.world.getBody(avatar.body);
 
-                    if (killer) {
-                        avatar.die(killer);
+                    if (body) {
+                        avatar.die(this.avatars.getById(body.data), body.isOld());
                     }
                 }
             }
@@ -75,6 +75,7 @@ Game.prototype.addAvatar = function (avatar)
             angle    = this.world.getRandomDirection(avatar.x, avatar.y, this.spawnAngleMargin);
 
         avatar.clear();
+        avatar.getBody();
         avatar.setPosition(position[0], position[1]);
         avatar.setAngle(angle);
         avatar.on('point', this.onPoint);
@@ -112,7 +113,7 @@ Game.prototype.removeAvatar = function(avatar)
 Game.prototype.onPoint = function(data)
 {
     if (this.world.active) {
-        this.world.addBody(new AvatarBody(data.x, data.y, data.avatar));
+        this.world.addBody(new AvatarBody(data.avatar, data.x, data.y, data.important));
     }
 };
 

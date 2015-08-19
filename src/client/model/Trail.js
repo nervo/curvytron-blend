@@ -1,13 +1,13 @@
 /**
  * Trail
  */
-function Trail(avatar)
+function Trail()
 {
-    BaseTrail.call(this, avatar);
+    BaseTrail.call(this);
 
+    this.current    = [];
+    this.segments   = [];
     this.clearAsked = false;
-    this.queueX     = null;
-    this.queueY     = null;
 }
 
 Trail.prototype = Object.create(BaseTrail.prototype);
@@ -27,24 +27,17 @@ Trail.prototype.tolerance = 1;
  */
 Trail.prototype.getLastSegment = function()
 {
-    var length = this.points.length,
-        points = null;
-
-    if (length) {
-        points = this.points.slice(0);
-
-        if (this.clearAsked) {
-            BaseTrail.prototype.clear.call(this);
-            if (this.queueX !== null) {
-                BaseTrail.prototype.addPoint.call(this, this.queueX, this.queueY);
-                this.queueX = null;
-                this.queueY = null;
-            }
-            this.clearAsked = false;
-        } else if(length > 1) {
-            this.points.splice(0, length - 1);
-        }
+    if (this.segments.length) {
+        return this.segments.shift();
     }
+
+    if (this.current.length < 2) {
+        return false;
+    }
+
+    var points = this.current.slice(0);
+
+    this.current.splice(0, this.current.length - 1);
 
     return points;
 };
@@ -57,21 +50,40 @@ Trail.prototype.getLastSegment = function()
  */
 Trail.prototype.addPoint = function(x, y)
 {
-    if (this.lastX !== null && (Math.abs(this.lastX - x) > this.tolerance || Math.abs(this.lastY - y) > this.tolerance)) {
+    if (this.isFar(x, y)) {
         this.clear();
-        this.queueX = x;
-        this.queueY = y;
-    } else {
-        BaseTrail.prototype.addPoint.call(this, x, y);
     }
+
+    BaseTrail.prototype.addPoint.call(this, x, y);
+    this.current.push([x, y]);
+};
+
+/**
+ * Is far
+ *
+ * @param {Number} x
+ * @param {Number} y
+ *
+ * @return {Boolean}
+ */
+Trail.prototype.isFar = function(x, y)
+{
+    if (this.lastX === null) {
+        return false;
+    }
+
+    return Math.abs(this.lastX - x) > this.tolerance || Math.abs(this.lastY - y) > this.tolerance;
 };
 
 /**
  * Clear
- *
- * @param {Array} point
  */
 Trail.prototype.clear = function()
 {
-    this.clearAsked = true;
+    if (this.current.length > 1) {
+        this.segments.push(this.current.splice(0));
+    }
+
+    BaseTrail.prototype.clear.call(this);
+    this.current.length = 0;
 };

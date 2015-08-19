@@ -9,6 +9,7 @@ function Game()
     this.canvas     = new Canvas(0, 0, document.getElementById('game'));
     this.background = new Canvas(0, 0, document.getElementById('background'));
     this.effect     = new Canvas(0, 0, document.getElementById('effect'));
+    this.trails     = new Collection();
     this.animations = [];
 
     this.onResize = this.onResize.bind(this);
@@ -142,6 +143,8 @@ Game.prototype.setSize = function()
  */
 Game.prototype.draw = function(step)
 {
+    var avatar, points, trail, i;
+
     for (var animation, a = this.animations.length - 1; a >= 0; a--) {
         animation = this.animations[a];
         animation.draw();
@@ -150,7 +153,7 @@ Game.prototype.draw = function(step)
         }
     }
 
-    for (var avatar, i = this.avatars.items.length - 1; i >= 0; i--) {
+    for (i = this.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.avatars.items[i];
         if (avatar.alive || avatar.changed) {
             this.clearAvatar(avatar);
@@ -158,20 +161,36 @@ Game.prototype.draw = function(step)
         }
     }
 
-    for (avatar, i = this.avatars.items.length - 1; i >= 0; i--) {
+    for (i = this.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.avatars.items[i];
         if (avatar.alive || avatar.changed) {
             if (avatar.alive) {
                 avatar.update(this.frame ? step : 0);
             }
 
-            this.drawTail(avatar);
+            points = avatar.trail.getLastSegment();
+
+            if (points) {
+                this.drawTail(points, avatar.width, avatar.color);
+            }
+
             this.drawAvatar(avatar);
             this.drawBonusStack(avatar);
 
             /*if (!this.frame && avatar.local) {
                 this.drawArrow(avatar);
             }*/
+        }
+    }
+
+    for (i = this.trails.items.length - 1; i >= 0; i--) {
+        trail  = this.trails.items[i];
+        points = trail.getLastSegment();
+
+        if (points) {
+            this.drawTail(points, trail.width, trail.color);
+        } else {
+            this.trails.remove(trail);
         }
     }
 
@@ -183,13 +202,9 @@ Game.prototype.draw = function(step)
  *
  * @param {Avatar} avatar
  */
-Game.prototype.drawTail = function(avatar)
+Game.prototype.drawTail = function(points, width, color)
 {
-    var points = avatar.trail.getLastSegment();
-
-    if (points) {
-        this.background.drawLineScaled(points, avatar.width, avatar.color, 'round');
-    }
+    this.background.drawLineScaled(points, width, color, 'round');
 };
 
 /**
@@ -292,6 +307,26 @@ Game.prototype.setupAvatar = function(avatar)
     if (typeof(avatar.input) !== 'undefined') {
         avatar.input.setWidth(window.innerWidth);
     }
+};
+
+/**
+ * Get trail
+ *
+ * @param {Number} avatar
+ * @param {Number} radius
+ * @param {String} color
+ *
+ * @return {Trail}
+ */
+Game.prototype.getTrail = function(avatar, radius, color)
+{
+    var id = OrphanTrail.prototype.getId(avatar, radius, color);
+
+    if (!this.trails.indexExists(id)) {
+        this.trails.add(new OrphanTrail(avatar, radius, color));
+    }
+
+    return this.trails.getById(id);
 };
 
 /**

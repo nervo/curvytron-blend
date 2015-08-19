@@ -125,7 +125,7 @@ BonusManager.prototype.testCatch = function(avatar)
 {
     if (avatar.body) {
         var body  = this.world.getBody(avatar.body),
-            bonus = body ? body.data : null;
+            bonus = body ? this.bonuses.getById(body.data) : null;
 
         if (bonus && this.remove(bonus)) {
             bonus.applyTo(avatar, this.game);
@@ -141,7 +141,7 @@ BonusManager.prototype.testCatch = function(avatar)
 BonusManager.prototype.add = function (bonus)
 {
     if (BaseBonusManager.prototype.add.call(this, bonus)) {
-        this.world.addBody(bonus.body);
+        this.world.addBody(bonus.getBody());
         this.emit('bonus:pop', bonus);
 
         return true;

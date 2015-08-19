@@ -195,7 +195,6 @@ Avatar.prototype.updateWidth = function()
  */
 Avatar.prototype.destroy = function()
 {
-    this.trail.clear();
     this.canvas.clear();
     this.arrow.clear();
 

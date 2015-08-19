@@ -8,12 +8,12 @@
  */
 function Body (x, y, radius, data)
 {
+    this.id      = null;
     this.x       = x;
     this.y       = y;
     this.radius  = radius;
     this.data    = data;
     this.islands = new Collection();
-    this.id      = null;
 }
 
 /**

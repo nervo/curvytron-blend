@@ -1,19 +1,10 @@
 /**
  * Trail
  */
-function Trail(avatar)
+function Trail()
 {
-    BaseTrail.call(this, avatar);
+    BaseTrail.call(this);
 }
 
 Trail.prototype = Object.create(BaseTrail.prototype);
 Trail.prototype.constructor = Trail;
-
-/**
- * Clear
- */
-Trail.prototype.clear = function()
-{
-    BaseTrail.prototype.clear.call(this);
-    this.emit('clear', {avatar: this.avatar});
-};

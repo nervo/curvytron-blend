@@ -6,10 +6,10 @@ function World(size, islands)
     islands = typeof(islands) === 'number' ? islands : Math.round(size / this.islandGridSize);
 
     this.size       = size;
+    this.bodies     = new Collection([], 'id', true);
     this.islands    = new Collection();
     this.islandSize = this.size / islands;
     this.active     = false;
-    this.bodyCount  = 0;
 
     for (var id, x, y = islands - 1; y >= 0; y--) {
         for (x = islands- 1; x >= 0; x--) {
@@ -54,12 +54,12 @@ World.prototype.addBody = function(body)
         return;
     }
 
-    body.id = this.bodyCount++;
-
-    this.addBodyByPoint(body, body.x - body.radius, body.y - body.radius);
-    this.addBodyByPoint(body, body.x + body.radius, body.y - body.radius);
-    this.addBodyByPoint(body, body.x - body.radius, body.y + body.radius);
-    this.addBodyByPoint(body, body.x + body.radius, body.y + body.radius);
+    if (this.bodies.add(body)) {
+        this.addBodyByPoint(body, body.x - body.radius, body.y - body.radius);
+        this.addBodyByPoint(body, body.x + body.radius, body.y - body.radius);
+        this.addBodyByPoint(body, body.x - body.radius, body.y + body.radius);
+        this.addBodyByPoint(body, body.x + body.radius, body.y + body.radius);
+    }
 };
 
 /**
@@ -356,8 +356,8 @@ World.prototype.getDistanceToBorder = function(border, x, y)
  */
 World.prototype.clear = function()
 {
-    this.active    = false;
-    this.bodyCount = 0;
+    this.active = false;
+    this.bodies.clear();
 
     for (var i = this.islands.items.length - 1; i >= 0; i--) {
         this.islands.items[i].clear();

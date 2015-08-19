@@ -113,7 +113,7 @@ GameController.prototype.onAvatarAdd = function(data)
     var avatar = [data.id, data.name, data.color];
 
     data.player.client.addEvent('avatar:me', avatar);
-    this.socketGroup.addEvent('avatar:add', avatar);
+    this.socketGroup.addExcludeTargetEvent(data.player.client, 'avatar:add', avatar);
 };
 
 /**
@@ -164,6 +164,57 @@ GameController.prototype.detachEvents = function(client)
 };
 
 /**
+ * Sum up situation
+ *
+ * @param {Client} client
+ */
+GameController.prototype.sumUp = function(client)
+{
+    var properties = {
+            angle: 'angle',
+            radius: 'radius',
+            color: 'color',
+            printing: 'printing'
+        },
+        events = [];
+
+    for (var avatar, i = this.game.avatars.items.length - 1; i >= 0; i--) {
+        avatar = this.game.avatars.items[i];
+
+        events.push(['avatar:add', [avatar.id, avatar.name, avatar.color]]);
+        events.push(['position', [avatar.id, this.compressor.compress(avatar.x), this.compressor.compress(avatar.y)]]);
+
+        for (var property in properties) {
+            if (properties.hasOwnProperty(property)) {
+                events.push(['property', {avatar: avatar.id, property: property, value: avatar[properties[property]]}]);
+            }
+        }
+    }
+
+    for (var bonus, j = this.game.bonusManager.bonuses.items.length - 1; j >= 0; j--) {
+        bonus = this.game.bonusManager.bonuses.items[j];
+        events.push(['bonus:pop', [bonus.id, this.compressor.compress(bonus.x), this.compressor.compress(bonus.y), bonus.constructor.name]]);
+    }
+
+    for (var point, k = this.game.world.bodies.items.length - 1; k >= 0; k--) {
+        body = this.game.world.bodies.items[k];
+        events.push(['point', [
+            this.compressor.compress(body.x),
+            this.compressor.compress(body.y),
+            this.compressor.compress(body.radius),
+            body.color,
+            body.data
+        ]]);
+    }
+
+    if (this.game.borderless) {
+        events.push(['borderless', true]);
+    }
+
+    client.addEvents(events);
+};
+
+/**
  * On client leave
  *
  * @param {SocketClient} client
@@ -181,6 +232,7 @@ GameController.prototype.onLeave = function(client)
 GameController.prototype.onReady = function(client)
 {
     if (client.player.avatar) {
+        this.sumUp(client);
         this.game.addAvatar(client.player.avatar);
     }
 };
@@ -193,7 +245,6 @@ GameController.prototype.onReady = function(client)
  */
 GameController.prototype.onMove = function(client, data)
 {
-    // No need for data.avatar anymore
     if (client.player.avatar) {
         client.player.avatar.updateAngularVelocity(data);
     }
@@ -207,7 +258,7 @@ GameController.prototype.onMove = function(client, data)
 GameController.prototype.onPoint = function(data)
 {
     if (data.important) {
-        this.socketGroup.addEvent('point', data.avatar.id);
+        this.socketGroup.addEvent('avatar:point', data.avatar.id);
     }
 };
 

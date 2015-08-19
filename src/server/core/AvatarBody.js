@@ -1,16 +1,19 @@
 /**
  * Avatar body
  *
+ * @param {Avatar} avatar
  * @param {Number} x
  * @param {Number} y
- * @param {Avatar} avatar
+ * @param {Boolean} important
  */
-function AvatarBody(x, y, avatar)
+function AvatarBody(avatar, x, y, important)
 {
-    Body.call(this, x, y, avatar.radius, avatar);
+    Body.call(this, x, y, avatar.radius, avatar.id);
 
-    this.num   = avatar.bodyCount++;
-    this.birth = new Date().getTime();
+    this.important = important;
+    this.color     = avatar.color;
+    this.num       = avatar.bodyCount++;
+    this.birth     = new Date().getTime();
 }
 
 AvatarBody.prototype = Object.create(Body.prototype);
@@ -24,6 +27,13 @@ AvatarBody.prototype.constructor = AvatarBody;
 AvatarBody.prototype.oldAge = 2000;
 
 /**
+ * Number of trail points that don't kill the avatar
+ *
+ * @type {Number}
+ */
+AvatarBody.prototype.trailLatency = 3;
+
+/**
  * Match?
  *
  * @param {Body} body
@@ -32,8 +42,8 @@ AvatarBody.prototype.oldAge = 2000;
  */
 AvatarBody.prototype.match = function(body)
 {
-    if ((body instanceof AvatarBody) && this.data.equal(body.data)) {
-        return body.num - this.num > this.data.trailLatency;
+    if ((body instanceof AvatarBody) && this.data === body.data) {
+        return (body.num - this.num) > this.trailLatency;
     }
 
     return true;

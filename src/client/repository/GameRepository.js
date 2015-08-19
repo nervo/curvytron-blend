@@ -19,6 +19,7 @@ function GameRepository (controls)
     this.onPosition     = this.onPosition.bind(this);
     this.onAngle        = this.onAngle.bind(this);
     this.onPoint        = this.onPoint.bind(this);
+    this.onAvatarPoint  = this.onAvatarPoint.bind(this);
     this.onDie          = this.onDie.bind(this);
     this.onProperty     = this.onProperty.bind(this);
     this.onClear        = this.onClear.bind(this);
@@ -38,7 +39,6 @@ function GameRepository (controls)
  */
 GameRepository.prototype.onConnect = function()
 {
-    console.info('Connected to server');
     this.game = new Game();
     this.attachEvents();
     this.game.bonusManager.on('load', this.onLoad);
@@ -50,7 +50,6 @@ GameRepository.prototype.onConnect = function()
  */
 GameRepository.prototype.onDisconnect = function()
 {
-    console.info('Disconnected from server');
     this.detachEvents();
     this.game = null;
 };
@@ -71,6 +70,7 @@ GameRepository.prototype.attachEvents = function()
     this.client.on('property', this.onProperty);
     this.client.on('position', this.onPosition);
     this.client.on('angle', this.onAngle);
+    this.client.on('avatar:point', this.onAvatarPoint);
     this.client.on('point', this.onPoint);
     this.client.on('die', this.onDie);
     this.client.on('bonus:pop', this.onBonusPop);
@@ -142,6 +142,22 @@ GameRepository.prototype.onPosition = function(e)
  * @param {Event} e
  */
 GameRepository.prototype.onPoint = function(e)
+{
+    var x      = this.compressor.decompress(e.detail[0]),
+        y      = this.compressor.decompress(e.detail[1]),
+        radius = this.compressor.decompress(e.detail[2]),
+        color  = e.detail[3],
+        avatar = e.detail[4];
+
+    this.game.getTrail(avatar, radius, color).addPoint(x, y);
+};
+
+/**
+ * On avatar point
+ *
+ * @param {Event} e
+ */
+GameRepository.prototype.onAvatarPoint = function(e)
 {
     var avatar = this.game.avatars.getById(e.detail);
 
@@ -257,11 +273,7 @@ GameRepository.prototype.onAvatarAdd = function(e)
     var avatar = new Avatar(e.detail[0], e.detail[1], e.detail[2]);
 
     if (this.game.addAvatar(avatar) && e.type === 'avatar:me') {
-        avatar.setLocal([
-            this.controls[0].mapper.value,
-            this.controls[1].mapper.value
-        ]);
-
+        avatar.setLocal([this.controls[0].mapper.value, this.controls[1].mapper.value]);
         avatar.input.on('move', this.onMove);
     }
 };
@@ -274,8 +286,6 @@ GameRepository.prototype.onAvatarAdd = function(e)
 GameRepository.prototype.onAvatarRemove = function(e)
 {
     var avatar = this.game.avatars.getById(e.detail);
-
-    console.info('onAvatarRemove', avatar);
 
     if (avatar) {
         this.game.removeAvatar(avatar);

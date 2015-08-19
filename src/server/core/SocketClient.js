@@ -14,10 +14,8 @@ function SocketClient(socket, interval, ip)
     this.player     = new Player(this, this.ip);
     this.pingLogger = new PingLogger(this.socket);
 
-    this.identify  = this.identify.bind(this);
     this.onLatency = this.onLatency.bind(this);
 
-    this.on('whoami', this.identify);
     this.pingLogger.on('latency', this.onLatency);
 }
 
@@ -39,14 +37,6 @@ SocketClient.prototype.pingInterval = 1000;
 SocketClient.prototype.onLatency = function(latency)
 {
     this.addEvent('latency', latency, null, true);
-};
-
-/**
- * Who am I?
- */
-SocketClient.prototype.identify = function(event)
-{
-    event[1](this.id);
 };
 
 /**
