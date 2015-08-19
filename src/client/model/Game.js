@@ -17,9 +17,6 @@ function Game()
 
     window.addEventListener('error', this.stop);
     window.addEventListener('resize', this.onResize);
-
-    this.onResize();
-    this.start();
 }
 
 Game.prototype = Object.create(BaseGame.prototype);
@@ -104,6 +101,7 @@ Game.prototype.onFrame = function(step)
  */
 Game.prototype.onStart = function()
 {
+    this.onResize();
     this.effect.clear();
     BaseGame.prototype.onStart.call(this);
 };
@@ -303,10 +301,6 @@ Game.prototype.onDie = function(event)
 Game.prototype.setupAvatar = function(avatar)
 {
     avatar.setScale(this.canvas.scale);
-
-    if (typeof(avatar.input) !== 'undefined') {
-        avatar.input.setWidth(window.innerWidth);
-    }
 };
 
 /**
@@ -341,6 +335,8 @@ Game.prototype.onResize = function()
 
     var innerWidth = this.render.clientWidth,
         scale      = innerWidth / this.size;
+
+    console.log(width, innerWidth);
 
     this.canvas.setDimension(innerWidth, innerWidth, scale);
     this.effect.setDimension(innerWidth, innerWidth, scale);

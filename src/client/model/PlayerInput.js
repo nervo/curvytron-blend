@@ -1,22 +1,23 @@
 /**
  * Player input
  */
-function PlayerInput(avatar, binding)
+function PlayerInput()
 {
     EventEmitter.call(this);
 
-    this.avatar  = avatar;
-    this.key     = false;
-    this.active  = [false, false];
-    this.move    = 0;
-    this.width   = 0;
-    this.binding = typeof(binding) !== 'undefined' ? binding : this.defaultBinding;
+    this.key    = false;
+    this.active = [false, false];
+    this.move   = 0;
+    this.width  = 0;
+    this.center = 0;
 
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onKeyUp   = this.onKeyUp.bind(this);
     this.onTouch   = this.onTouch.bind(this);
+    this.onResize  = this.onResize.bind(this);
 
     this.attachEvents();
+    this.onResize();
 }
 
 PlayerInput.prototype = Object.create(EventEmitter.prototype);
@@ -25,36 +26,23 @@ PlayerInput.prototype.constructor = PlayerInput;
 /**
  * Key binding
  *
- * @type {Object}
+ * @type {Array}
  */
-PlayerInput.prototype.defaultBinding = [37, 39];
+PlayerInput.prototype.keyBinding = [37, 39];
 
 /**
  * Attach events
  */
 PlayerInput.prototype.attachEvents = function()
 {
-    var listening = [],
-        binding, type;
-
-    for (var i = this.binding.length - 1; i >= 0; i--) {
-        binding = this.binding[i];
-        type = this.getBindingType(binding);
-
-        if (listening.indexOf(type) < 0) {
-            listening.push(type);
-
-            if (type === 'keyboard') {
-                window.addEventListener('keydown', this.onKeyDown);
-                window.addEventListener('keyup', this.onKeyUp);
-            } else if (type === 'touch') {
-                window.addEventListener('touchstart', this.onTouch);
-                window.addEventListener('touchend', this.onTouch);
-                window.addEventListener('touchleave', this.onTouch);
-                window.addEventListener('touchcancel', this.onTouch);
-            }
-        }
-    }
+    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keyup', this.onKeyUp);
+    window.addEventListener('touchstart', this.onTouch);
+    window.addEventListener('touchend', this.onTouch);
+    window.addEventListener('touchleave', this.onTouch);
+    window.addEventListener('touchmove', this.onTouch);
+    window.addEventListener('touchcancel', this.onTouch);
+    window.addEventListener('resize', this.onResize);
 };
 
 /**
@@ -62,42 +50,14 @@ PlayerInput.prototype.attachEvents = function()
  */
 PlayerInput.prototype.detachEvents = function()
 {
-    var listening = [];
-
-    for (var binding, type, i = this.binding.length - 1; i >= 0; i--) {
-        binding = this.binding[i];
-        type    = this.getBindingType(binding);
-
-        if (listening.indexOf(type) < 0) {
-            listening.push(type);
-
-            if (type === 'keyboard') {
-                window.removeEventListener('keydown', this.onKeyDown);
-                window.removeEventListener('keyup', this.onKeyUp);
-            } else if (type === 'touch') {
-                window.removeEventListener('touchstart', this.onTouch);
-                window.removeEventListener('touchend', this.onTouch);
-                window.removeEventListener('touchleave', this.onTouch);
-                window.removeEventListener('touchcancel', this.onTouch);
-            }
-        }
-    }
-};
-
-/**
- * Get binding type
- *
- * @param {String} binding
- *
- * @return {String}
- */
-PlayerInput.prototype.getBindingType = function(binding)
-{
-    if (typeof(Touch) !== 'undefined' && binding instanceof Touch) {
-        return 'touch';
-    }
-
-    return 'keyboard';
+    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('keyup', this.onKeyUp);
+    window.removeEventListener('touchstart', this.onTouch);
+    window.removeEventListener('touchend', this.onTouch);
+    window.removeEventListener('touchleave', this.onTouch);
+    window.removeEventListener('touchmove', this.onTouch);
+    window.removeEventListener('touchcancel', this.onTouch);
+    window.removeEventListener('resize', this.onResize);
 };
 
 /**
@@ -107,10 +67,11 @@ PlayerInput.prototype.getBindingType = function(binding)
  */
 PlayerInput.prototype.onKeyDown = function(e)
 {
-    var index = this.binding.indexOf(e.keyCode);
+    var index = this.keyBinding.indexOf(e.keyCode);
 
     if (index >= 0) {
         this.setActive(index, true);
+        this.resolve();
     }
 };
 
@@ -121,44 +82,43 @@ PlayerInput.prototype.onKeyDown = function(e)
  */
 PlayerInput.prototype.onKeyUp = function(e)
 {
-    var index = this.binding.indexOf(e.keyCode);
+    var index = this.keyBinding.indexOf(e.keyCode);
 
     if (index >= 0) {
         this.setActive(index, false);
+        this.resolve();
     }
 };
 
 /**
  * On touch start
  *
- * @param {Event} e
+ * @param {Event} event
  */
-PlayerInput.prototype.onTouch = function(e)
+PlayerInput.prototype.onTouch = function(event)
 {
-    e.preventDefault();
+    event.preventDefault();
 
-    var center = this.width/2,
-        tests = [],
-        t, i, x;
+    var left  = false,
+        right = false;
 
-    for (i = this.binding.length - 1; i >= 0; i--) {
-        if (this.binding[i] instanceof Touch) {
-            tests.push({index: i, result: false});
+    for (var x, i = event.touches.length - 1; i >= 0; i--) {
+        if (left && right) { break; }
+
+        x = event.touches[i].screenX;
+
+        if (x < this.center) {
+            left = true;
+        }
+
+        if (x >= this.center) {
+            right = true;
         }
     }
 
-    for (i = e.touches.length - 1; i >= 0; i--) {
-        for (t = tests.length - 1; t >= 0; t--) {
-            x = e.touches[i].screenX;
-            if (tests[t].index === 0 ? x < center : x >= center) {
-                tests[t].result = true;
-            }
-        }
-    }
-
-    for (i = tests.length - 1; i >= 0; i--) {
-        this.setActive(tests[i].index, tests[i].result);
-    }
+    this.setActive(0, left);
+    this.setActive(1, right);
+    this.resolve();
 };
 
 /**
@@ -171,7 +131,6 @@ PlayerInput.prototype.setActive = function(index, pressed)
 {
     if (this.active[index] !== pressed) {
         this.active[index] = pressed;
-        this.resolve();
     }
 };
 
@@ -195,15 +154,14 @@ PlayerInput.prototype.resolve = function()
 PlayerInput.prototype.setMove = function(move)
 {
     this.move = move;
-    this.emit('move', {avatar: this.avatar, move: move});
+    this.emit('move', move);
 };
 
 /**
  * Set width
- *
- * @param {Number} width
  */
-PlayerInput.prototype.setWidth = function(width)
+PlayerInput.prototype.onResize = function()
 {
-    this.width = width;
+    this.width  = window.innerWidth;
+    this.center = this.width/2;
 };

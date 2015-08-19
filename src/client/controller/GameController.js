@@ -3,26 +3,54 @@
  */
 function GameController ()
 {
-    this.controls = [
-        new PlayerControl(37, 'icon-left-dir'),
-        new PlayerControl(39, 'icon-right-dir')
-    ];
-
     this.repository = new GameRepository(this.controls);
+    this.container  = document.body;
+    this.controls   = document.getElementsByClassName('controller');
+    this.input      = null;
 
-    for (var i = this.controls.length - 1; i >= 0; i--) {
-        this.controls[i].on('change', this.onControlChange);
-    }
+    console.log(this.controls, this.controls[0].classList);
+
+    this.onMove  = this.onMove.bind(this);
+    this.onStart = this.onStart.bind(this);
+    this.onStop  = this.onStop.bind(this);
+
+    this.repository.on('start', this.onStart);
+    this.repository.on('stop', this.onStop);
 }
 
 /**
- * Set touch
+ * On connection
  */
-GameController.prototype.setTouch = function()
+GameController.prototype.onStart = function()
 {
-    var touch = document.createTouch(window, window, new Date().getTime(), 0, 0, 0, 0);
+    document.body.className = 'connected';
 
-    for (var i = this.controls.length - 1; i >= 0; i--) {
-        this.controls[i].mappers.getById('touch').setValue(touch);
+    this.input = new PlayerInput();
+    this.input.on('move', this.onMove);
+};
+
+/**
+ * On stop
+ */
+GameController.prototype.onStop = function()
+{
+    this.container.className = 'disconnected';
+
+    this.input.off('move', this.onMove);
+    this.input.detachEvents();
+    this.input = null;
+};
+
+/**
+ * On move
+ *
+ * @param {Event} event
+ */
+GameController.prototype.onMove = function(event)
+{
+    this.repository.move(event.detail ? event.detail : 0);
+
+    for (var i = this.input.active.length - 1; i >= 0; i--) {
+        this.controls[i].classList.toggle('active', this.input.active[i]);
     }
 };

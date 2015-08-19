@@ -61,14 +61,11 @@ Avatar.prototype.update = function(step)
 
 /**
  * Set local
- *
- * @param {Array} binding
  */
-Avatar.prototype.setLocal = function(binding)
+Avatar.prototype.setLocal = function()
 {
     if (!this.local) {
         this.local = true;
-        this.input = new PlayerInput(this, binding);
     }
 };
 
@@ -197,11 +194,6 @@ Avatar.prototype.destroy = function()
 {
     this.canvas.clear();
     this.arrow.clear();
-
-    if (this.input) {
-        this.input.detachEvents();
-        this.input = null;
-    }
 
     BaseAvatar.prototype.destroy.call(this);
 };

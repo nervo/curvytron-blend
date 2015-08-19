@@ -1,14 +1,13 @@
 /**
  * Game Repository
- *
- * @param {Array} controls
  */
-function GameRepository (controls)
+function GameRepository ()
 {
+    EventEmitter.call(this);
+
     this.client     = new SocketClient();
     this.compressor = new Compressor();
     this.sound      = new SoundManager();
-    this.controls   = controls;
     this.game       = null;
 
     this.onConnect      = this.onConnect.bind(this);
@@ -27,12 +26,14 @@ function GameRepository (controls)
     this.onEnd          = this.onEnd.bind(this);
     this.onAvatarAdd    = this.onAvatarAdd.bind(this);
     this.onAvatarRemove = this.onAvatarRemove.bind(this);
-    this.onMove         = this.onMove.bind(this);
     this.onLoad         = this.onLoad.bind(this);
 
     this.client.on('connected', this.onConnect);
     this.client.on('disconnected', this.onDisconnect);
 }
+
+GameRepository.prototype = Object.create(EventEmitter.prototype);
+GameRepository.prototype.constructor = GameRepository;
 
 /**
  * On socket connected
@@ -52,6 +53,7 @@ GameRepository.prototype.onDisconnect = function()
 {
     this.detachEvents();
     this.game = null;
+    this.emit('stop');
 };
 
 /**
@@ -59,7 +61,9 @@ GameRepository.prototype.onDisconnect = function()
  */
 GameRepository.prototype.onLoad = function()
 {
+    this.emit('start');
     this.client.addEvent('ready');
+    this.game.start();
 };
 
 /**
@@ -103,6 +107,16 @@ GameRepository.prototype.detachEvents = function()
     this.client.off('avatar:me', this.onAvatarAdd);
     this.client.off('avatar:add', this.onAvatarAdd);
     this.client.off('avatar:remove', this.onAvatarRemove);
+};
+
+/**
+ * Move
+ *
+ * @param {Number} move
+ */
+GameRepository.prototype.move = function(move)
+{
+    this.client.addEvent('move', move);
 };
 
 /**
@@ -273,8 +287,7 @@ GameRepository.prototype.onAvatarAdd = function(e)
     var avatar = new Avatar(e.detail[0], e.detail[1], e.detail[2]);
 
     if (this.game.addAvatar(avatar) && e.type === 'avatar:me') {
-        avatar.setLocal([this.controls[0].mapper.value, this.controls[1].mapper.value]);
-        avatar.input.on('move', this.onMove);
+        avatar.setLocal();
     }
 };
 
@@ -290,16 +303,6 @@ GameRepository.prototype.onAvatarRemove = function(e)
     if (avatar) {
         this.game.removeAvatar(avatar);
     }
-};
-
-/**
- * On move
- *
- * @param {Event} e
- */
-GameRepository.prototype.onMove = function(e)
-{
-    this.client.addEvent('move', e.detail.move ? e.detail.move : 0);
 };
 
 /**
