@@ -185,6 +185,7 @@ GameController.prototype.sumUp = function(client)
         avatar = this.game.avatars.items[i];
 
         events.push(['avatar:add', [avatar.id, avatar.name, avatar.color]]);
+        events.push(['spawn', avatar.id]);
         events.push(['position', [avatar.id, this.compressor.compress(avatar.x), this.compressor.compress(avatar.y)]]);
 
         for (var property in properties) {
