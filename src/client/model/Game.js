@@ -30,13 +30,6 @@ Game.prototype.constructor = Game;
 Game.prototype.stackMargin = 15;
 
 /**
- * Background color
- *
- * @type {String}
- */
-Game.prototype.backgroundColor = '#222222';
-
-/**
  * Add an avatar to the game
  *
  * @param {Avatar} avatar
@@ -132,6 +125,16 @@ Game.prototype.setSize = function()
 {
     BaseGame.prototype.setSize.call(this);
     this.onResize();
+};
+
+/**
+ * Set borderless
+ *
+ * @param {Boolean} borderless
+ */
+Game.prototype.setBorderless = function(borderless) {
+    BaseGame.prototype.setBorderless.call(this, borderless);
+    this.render.classList.toggle('borderless', this.borderless);
 };
 
 /**
@@ -280,7 +283,7 @@ Game.prototype.drawArrow = function(avatar)
  */
 Game.prototype.clearBackground = function()
 {
-    this.background.color(this.backgroundColor);
+    this.background.clear();
 };
 
 /**
@@ -335,8 +338,6 @@ Game.prototype.onResize = function()
 
     var innerWidth = this.render.clientWidth,
         scale      = innerWidth / this.size;
-
-    console.log(width, innerWidth);
 
     this.canvas.setDimension(innerWidth, innerWidth, scale);
     this.effect.setDimension(innerWidth, innerWidth, scale);

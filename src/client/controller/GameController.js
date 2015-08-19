@@ -8,8 +8,6 @@ function GameController ()
     this.controls   = document.getElementsByClassName('controller');
     this.input      = null;
 
-    console.log(this.controls, this.controls[0].classList);
-
     this.onMove  = this.onMove.bind(this);
     this.onStart = this.onStart.bind(this);
     this.onStop  = this.onStop.bind(this);

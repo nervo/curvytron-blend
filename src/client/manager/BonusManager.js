@@ -130,6 +130,6 @@ BonusManager.prototype.clearBonus = function(bonus)
  */
 BonusManager.prototype.setDimension = function(width, scale)
 {
-    this.canvas.setDimension(width, width, scale);
+    this.canvas.setDimension(width, width, scale, true);
     this.draw();
 };
