@@ -14,14 +14,16 @@ function BaseAvatar(name, color)
     this.color           = color;
     this.trail           = new Trail();
     this.bonusStack      = new BonusStack(this);
-    this.x               = 0;
-    this.y               = 0;
+    this.x               = this.radius;
+    this.y               = this.radius;
     this.angle           = 0;
     this.velocityX       = 0;
     this.velocityY       = 0;
     this.angularVelocity = 0;
-    this.alive           = true;
+    this.alive           = false;
     this.printing        = false;
+
+    this.spawn = this.spawn.bind(this);
 }
 
 BaseAvatar.prototype = Object.create(EventEmitter.prototype);
@@ -268,13 +270,22 @@ BaseAvatar.prototype.getDistance = function(fromX, fromY, toX, toY)
 };
 
 /**
+ * Spawn
+ */
+BaseAvatar.prototype.spawn = function()
+{
+    this.clear();
+    this.alive = true;
+};
+
+/**
  * Die
  */
 BaseAvatar.prototype.die = function()
 {
     this.alive = false;
-    this.bonusStack.clear();
     this.addPoint(this.x, this.y);
+    this.bonusStack.clear();
 };
 
 /**
@@ -317,7 +328,7 @@ BaseAvatar.prototype.clear = function()
     this.velocityY           = 0;
     this.angularVelocity     = 0;
     this.velocity            = BaseAvatar.prototype.velocity;
-    this.alive               = true;
+    this.alive               = false;
     this.printing            = false;
     this.color               = this.defaultColor;
     this.radius              = BaseAvatar.prototype.radius;

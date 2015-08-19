@@ -36,20 +36,6 @@ BaseGame.prototype.framerate = 1/60 * 1000;
 BaseGame.prototype.perPlayerSize = 80;
 
 /**
- * Margin from borders
- *
- * @type {Number}
- */
-BaseGame.prototype.spawnMargin = 0.05;
-
-/**
- * Angle margin from borders
- *
- * @type {Number}
- */
-BaseGame.prototype.spawnAngleMargin = 0.3;
-
-/**
  * Borderless
  *
  * @type {Boolean}

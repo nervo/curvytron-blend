@@ -10,6 +10,8 @@ function Game()
 
     this.avatars.index = true;
 
+    this.onSpawn = this.onSpawn.bind(this);
+    this.onDie   = this.onDie.bind(this);
     this.onPoint = this.onPoint.bind(this);
 }
 
@@ -17,11 +19,25 @@ Game.prototype = Object.create(BaseGame.prototype);
 Game.prototype.constructor = Game;
 
 /**
- * Warmup before avatars start to print
+ * Margin from borders
  *
  * @type {Number}
  */
-Game.prototype.warmupBeforePrint = 3000;
+Game.prototype.spawnMargin = 0.05;
+
+/**
+ * Angle margin from borders
+ *
+ * @type {Number}
+ */
+Game.prototype.spawnAngleMargin = 0.3;
+
+/**
+ * Respawn time
+ *
+ * @type {Number}
+ */
+Game.prototype.respawnTime = 5000;
 
 /**
  * Update
@@ -71,17 +87,13 @@ Game.prototype.update = function(step)
 Game.prototype.addAvatar = function (avatar)
 {
     if (BaseGame.prototype.addAvatar.call(this, avatar)) {
-        var position = this.world.getRandomPosition(avatar.radius, this.spawnMargin),
-            angle    = this.world.getRandomDirection(avatar.x, avatar.y, this.spawnAngleMargin);
-
-        avatar.clear();
-        avatar.getBody();
-        avatar.setPosition(position[0], position[1]);
-        avatar.setAngle(angle);
+        avatar.on('die', this.onDie);
+        avatar.on('spawn', this.onSpawn);
         avatar.on('point', this.onPoint);
-        setTimeout(avatar.printManager.start, this.warmupBeforePrint);
-
         this.emit('avatar:add', avatar);
+
+        avatar.getBody();
+        avatar.spawn();
 
         return true;
     }
@@ -97,12 +109,38 @@ Game.prototype.addAvatar = function (avatar)
 Game.prototype.removeAvatar = function(avatar)
 {
     if (BaseGame.prototype.removeAvatar.call(this, avatar)) {
+        avatar.removeListener('die', this.onDie);
+        avatar.removeListener('spawn', this.onSpawn);
+        avatar.removeListener('point', this.onPoint);
         this.emit('avatar:remove', avatar);
 
         return true;
     }
 
     return false;
+};
+
+/**
+ * On avatar spawn
+ *
+ * @param {Avatar} avatar
+ */
+Game.prototype.onSpawn = function(avatar)
+{
+    var position = this.world.getRandomPosition(avatar.radius, this.spawnMargin);
+
+    avatar.setPosition(position[0], position[1]);
+    avatar.setAngle(this.world.getRandomDirection(avatar.x, avatar.y, this.spawnAngleMargin));
+};
+
+/**
+ * On avatar die
+ *
+ * @param {Object} data
+ */
+Game.prototype.onDie = function(data)
+{
+    setTimeout(data.avatar.spawn, this.respawnTime);
 };
 
 /**

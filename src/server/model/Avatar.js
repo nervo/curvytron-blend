@@ -17,6 +17,13 @@ Avatar.prototype = Object.create(BaseAvatar.prototype);
 Avatar.prototype.constructor = Avatar;
 
 /**
+ * Warmup before avatars start to print
+ *
+ * @type {Number}
+ */
+Avatar.prototype.warmupBeforePrint = 3000;
+
+/**
  * Update
  *
  * @param {Number} step
@@ -185,6 +192,16 @@ Avatar.prototype.setPrinting = function(printing)
 {
     BaseAvatar.prototype.setPrinting.call(this, printing);
     this.emit('property', {avatar: this, property: 'printing', value: this.printing});
+};
+
+/**
+ * Spawn
+ */
+Avatar.prototype.spawn = function()
+{
+    BaseAvatar.prototype.spawn.call(this);
+    setTimeout(this.printManager.start, this.warmupBeforePrint);
+    this.emit('spawn', this);
 };
 
 /**

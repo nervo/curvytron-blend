@@ -12,6 +12,7 @@ function GameController()
 
     this.onGameStart    = this.onGameStart.bind(this);
     this.onGameStop     = this.onGameStop.bind(this);
+    this.onSpawn        = this.onSpawn.bind(this);
     this.onDie          = this.onDie.bind(this);
     this.onPosition     = this.onPosition.bind(this);
     this.onAngle        = this.onAngle.bind(this);
@@ -136,6 +137,7 @@ GameController.prototype.attachEvents = function(client)
     client.on('move', this.callbacks.onMove);
 
     client.player.avatar.on('die', this.onDie);
+    client.player.avatar.on('spawn', this.onSpawn);
     client.player.avatar.on('position', this.onPosition);
     client.player.avatar.on('angle', this.onAngle);
     client.player.avatar.on('point', this.onPoint);
@@ -156,6 +158,7 @@ GameController.prototype.detachEvents = function(client)
 
     if (client.player.avatar) {
         client.player.avatar.removeListener('die', this.onDie);
+        client.player.avatar.removeListener('spawn', this.onSpawn);
         client.player.avatar.removeListener('position', this.onPosition);
         client.player.avatar.removeListener('point', this.onPoint);
         client.player.avatar.removeListener('property', this.onProperty);
@@ -287,6 +290,16 @@ GameController.prototype.onAngle = function(avatar)
         avatar.id,
         this.compressor.compress(avatar.angle)
     ]);
+};
+
+/**
+ * On spawn
+ *
+ * @param {Avatar} avatar
+ */
+GameController.prototype.onSpawn = function(avatar)
+{
+    this.socketGroup.addEvent('spawn', avatar.id);
 };
 
 /**

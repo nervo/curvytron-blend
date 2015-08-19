@@ -19,6 +19,7 @@ function GameRepository ()
     this.onAngle        = this.onAngle.bind(this);
     this.onPoint        = this.onPoint.bind(this);
     this.onAvatarPoint  = this.onAvatarPoint.bind(this);
+    this.onSpawn        = this.onSpawn.bind(this);
     this.onDie          = this.onDie.bind(this);
     this.onProperty     = this.onProperty.bind(this);
     this.onClear        = this.onClear.bind(this);
@@ -77,6 +78,7 @@ GameRepository.prototype.attachEvents = function()
     this.client.on('avatar:point', this.onAvatarPoint);
     this.client.on('point', this.onPoint);
     this.client.on('die', this.onDie);
+    this.client.on('spawn', this.onSpawn);
     this.client.on('bonus:pop', this.onBonusPop);
     this.client.on('bonus:clear', this.onBonusClear);
     this.client.on('bonus:stack', this.onBonusStack);
@@ -98,6 +100,7 @@ GameRepository.prototype.detachEvents = function()
     this.client.off('angle', this.onAngle);
     this.client.off('point', this.onPoint);
     this.client.off('die', this.onDie);
+    this.client.off('spawn', this.onSpawn);
     this.client.off('bonus:pop', this.onBonusPop);
     this.client.off('bonus:clear', this.onBonusClear);
     this.client.off('bonus:stack', this.onBonusStack);
@@ -193,6 +196,22 @@ GameRepository.prototype.onAngle = function(e)
         avatar.setAngle(this.compressor.decompress(e.detail[1]));
     }
 };
+
+/**
+ * On spawn
+ *
+ * @param {Event} e
+ */
+GameRepository.prototype.onSpawn = function(e)
+{
+    var avatar = this.game.avatars.getById(e.detail);
+
+    if (avatar) {
+        avatar.spawn();
+        //this.sound.play('death');
+    }
+};
+
 
 /**
  * On die
