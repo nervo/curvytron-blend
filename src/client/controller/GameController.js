@@ -21,7 +21,7 @@ function GameController ()
  */
 GameController.prototype.onStart = function()
 {
-    document.body.className = 'connected';
+    this.container.className = 'connected';
 
     this.input = new PlayerInput();
     this.input.on('move', this.onMove);
