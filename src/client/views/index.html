@@ -9,12 +9,23 @@
         <link rel="stylesheet" href="css/style.css">
         <!-- Google Analytics -->
     </head>
-    <body>
-        <div id="render" class="game-render">
-            <canvas id="background" class="game-background"></canvas>
-            <canvas id="bonus" class="game-bonus"></canvas>
-            <canvas id="game" class="game-front"></canvas>
-            <canvas id="effect" class="game-effect"></canvas>
+    <body class="disconnected">
+        <div class="container">
+            <div class="logo"><img src="images/logo.png" alt=""></div>
+            <div class="login-form">
+                <button class="color-button" type="button"></button>
+                <input type="text" placeholder="Enter your username" class="username" />
+                <button class="submit" type="submit">Play</button>
+            </div>
+            <div id="render" class="game-render">
+                <canvas id="background" class="game-background"></canvas>
+                <canvas id="bonus" class="game-bonus"></canvas>
+                <canvas id="game" class="game-front"></canvas>
+                <canvas id="effect" class="game-effect"></canvas>
+            </div>
+            <button class="controller left" type="button"></button>
+            <button class="controller right" type="button"></button>
+            <div class="score">742</div>
         </div>
         <script src="js/dependencies.js"></script>
         <script src="js/curvytron.js"></script>

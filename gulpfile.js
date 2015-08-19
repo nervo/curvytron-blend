@@ -1,18 +1,19 @@
-var fs        = require('fs'),
-    gulp      = require('gulp'),
-    concat    = require('gulp-concat'),
-    uglify    = require('gulp-uglify'),
-    header    = require('gulp-header'),
-    jshint    = require('gulp-jshint'),
-    sass      = require('gulp-sass'),
-    rename    = require('gulp-rename'),
-    plumber   = require('gulp-plumber'),
-    gutil     = require('gulp-util'),
-    minifyCSS = require('gulp-minify-css'),
-    htmlmin   = require('gulp-html-minifier'),
-    replace   = require('gulp-replace'),
-    wrap      = require('gulp-wrap'),
-    meta      = require('./package.json'),
+var fs           = require('fs'),
+    gulp         = require('gulp'),
+    concat       = require('gulp-concat'),
+    uglify       = require('gulp-uglify'),
+    header       = require('gulp-header'),
+    jshint       = require('gulp-jshint'),
+    sass         = require('gulp-sass'),
+    rename       = require('gulp-rename'),
+    plumber      = require('gulp-plumber'),
+    gutil        = require('gulp-util'),
+    minifyCSS    = require('gulp-minify-css'),
+    htmlmin      = require('gulp-html-minifier'),
+    replace      = require('gulp-replace'),
+    wrap         = require('gulp-wrap'),
+    autoprefixer = require('gulp-autoprefixer'),
+    meta         = require('./package.json'),
     config;
 
     try {
@@ -115,6 +116,7 @@ gulp.task('sass-full', function() {
     return gulp.src(sassDir + 'style.scss')
         .pipe(plumber({ errorHandler: onError }))
         .pipe(sass())
+        .pipe(autoprefixer())
         .pipe(rename('style.css'))
         .pipe(gulp.dest(cssDir));
 });
@@ -123,6 +125,7 @@ gulp.task('sass-min', function() {
     return gulp.src(sassDir + 'style.scss')
         .pipe(plumber({ errorHandler: onError }))
         .pipe(sass())
+        .pipe(autoprefixer())
         .pipe(minifyCSS())
         .pipe(rename('style.css'))
         .pipe(gulp.dest(cssDir));
