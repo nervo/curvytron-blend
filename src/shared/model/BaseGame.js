@@ -7,7 +7,7 @@ function BaseGame()
 
     this.frame        = null;
     this.avatars      = new Collection();
-    this.size         = this.getSize(100);
+    this.size         = this.getSize(this.baseSize);
     this.bonusManager = new BonusManager(this);
     this.fps          = new FPSLogger();
     this.rendered     = null;
@@ -26,7 +26,7 @@ BaseGame.prototype.constructor = BaseGame;
  *
  * @type {Number}
  */
-BaseGame.prototype.framerate = 1/60 * 1000;
+BaseGame.prototype.framerate = 1/30 * 1000;
 
 /**
  * Map size factor per player
@@ -41,6 +41,13 @@ BaseGame.prototype.perPlayerSize = 80;
  * @type {Boolean}
  */
 BaseGame.prototype.borderless = false;
+
+/**
+ * Base size
+ *
+ * @type {Number}
+ */
+BaseGame.prototype.baseSize = 100;
 
 /**
  * Update

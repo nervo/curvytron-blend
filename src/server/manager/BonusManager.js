@@ -23,17 +23,17 @@ BonusManager.prototype.constructor = BonusManager;
  */
 BonusManager.prototype.bonusTypes = [
     BonusSelfSmall,
-    BonusSelfSlow,
+    /*BonusSelfSlow,
     BonusSelfFast,
     BonusSelfMaster,
     BonusEnemySlow,
-    BonusEnemyFast,
-    BonusEnemyBig,
+    BonusEnemyFast,*/
+    BonusEnemyBig/*,
     BonusEnemyInverse,
     BonusEnemyStraightAngle,
     BonusGameBorderless,
     BonusAllColor,
-    BonusGameClear
+    BonusGameClear*/
 ];
 
 /**

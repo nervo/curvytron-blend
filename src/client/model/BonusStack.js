@@ -7,10 +7,8 @@ function BonusStack(avatar)
 {
     BaseBonusStack.call(this, avatar);
 
-    this.canvas     = new Canvas(this.width, this.width);
-    this.changed    = true;
-    this.lastWidth  = this.width;
-    this.lastHeight = this.width;
+    this.canvas  = new Canvas();
+    this.changed = true;
 
     this.draw = this.draw.bind(this);
 }
@@ -98,7 +96,7 @@ BonusStack.prototype.draw = function(e)
                 this.canvas.clearZone(x, 0, this.bonusWidth, this.bonusWidth);
             }
             this.canvas.setOpacity(bonus.opacity);
-            this.canvas.drawImage(bonus.asset, x, 0, this.bonusWidth, this.bonusWidth);
+            this.canvas.drawImageToAt(bonus.asset, x, 0, this.bonusWidth, this.bonusWidth);
             bonus.changed = false;
         }
     }

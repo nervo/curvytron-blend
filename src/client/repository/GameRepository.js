@@ -53,6 +53,7 @@ GameRepository.prototype.onConnect = function()
 GameRepository.prototype.onDisconnect = function()
 {
     this.detachEvents();
+    this.game.stop();
     this.game = null;
     this.emit('stop');
 };
@@ -64,7 +65,6 @@ GameRepository.prototype.onLoad = function()
 {
     this.emit('start');
     this.client.addEvent('ready');
-    this.game.start();
 };
 
 /**
@@ -307,6 +307,8 @@ GameRepository.prototype.onAvatarAdd = function(e)
 
     if (this.game.addAvatar(avatar) && e.type === 'avatar:me') {
         avatar.setLocal();
+        this.game.renderer.camera.setSubject(avatar);
+        this.game.start();
     }
 };
 

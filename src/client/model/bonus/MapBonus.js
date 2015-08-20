@@ -19,8 +19,6 @@ function MapBonus(id, x, y, type)
     this.drawWidth  = 0;
     this.drawX      = 0;
     this.drawY      = 0;
-
-    this.update();
 }
 
 MapBonus.prototype = Object.create(BaseBonus.prototype);
@@ -32,14 +30,3 @@ MapBonus.prototype.constructor = MapBonus;
  * @type {Object}
  */
 MapBonus.prototype.assets = BonusManager.prototype.assets;
-
-/**
- * Update bonus for drawing
- */
-MapBonus.prototype.update = function()
-{
-    this.drawRadius = this.radius * this.animation.getValue();
-    this.drawWidth  = this.drawRadius * 2;
-    this.drawX      = this.x - this.drawRadius;
-    this.drawY      = this.y - this.drawRadius;
-};

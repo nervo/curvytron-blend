@@ -7,7 +7,6 @@ function BonusManager(game)
 {
     BaseBonusManager.call(this, game);
 
-    this.canvas = new Canvas(0, 0, document.getElementById('bonus'));
     this.sprite = new SpriteAsset('images/bonus.png', 3, 4, this.onLoad.bind(this), true);
     this.loaded = false;
 
@@ -57,79 +56,4 @@ BonusManager.prototype.onLoad = function()
 
     this.loaded = true;
     this.emit('load');
-};
-
-/**
- * Remove bonus
- *
- * @param {Bonus} bonus
- */
-BonusManager.prototype.remove = function(bonus)
-{
-    this.clearBonus(bonus);
-    BaseBonusManager.prototype.remove.call(this, bonus);
-};
-
-/**
- * Clear
- */
-BonusManager.prototype.clear = function()
-{
-    this.canvas.clear();
-    BaseBonusManager.prototype.clear.call(this);
-};
-
-/**
- * Draw
- *
- * @param {Canvas} canvas
- */
-BonusManager.prototype.draw = function()
-{
-    for (var bonus, i = this.bonuses.items.length - 1; i >= 0; i--) {
-        bonus = this.bonuses.items[i];
-        if (!bonus.animation.done && bonus.drawWidth) {
-            this.clearBonus(bonus);
-        }
-    }
-
-    for (bonus, i = this.bonuses.items.length - 1; i >= 0; i--) {
-        bonus = this.bonuses.items[i];
-        if (!bonus.animation.done) {
-            bonus.update();
-            this.drawBonus(bonus);
-        }
-    }
-};
-
-/**
- * Draw bonus
- *
- * @param {Bonus} bonus
- */
-BonusManager.prototype.drawBonus = function(bonus)
-{
-    this.canvas.drawImageScaled(bonus.asset, bonus.drawX, bonus.drawY, bonus.drawWidth, bonus.drawWidth);
-};
-
-/**
- * Clear bonus from the canvas
- *
- * @param {Bonus} bonus
- */
-BonusManager.prototype.clearBonus = function(bonus)
-{
-    this.canvas.clearZoneScaled(bonus.drawX, bonus.drawY, bonus.drawWidth, bonus.drawWidth);
-};
-
-/**
- * Set dimension
- *
- * @param {Number} width
- * @param {Float} scale
- */
-BonusManager.prototype.setDimension = function(width, scale)
-{
-    this.canvas.setDimension(width, width, scale, true);
-    this.draw();
 };

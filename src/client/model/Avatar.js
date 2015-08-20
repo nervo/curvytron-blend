@@ -9,18 +9,13 @@ function Avatar(id, name, color)
 {
     BaseAvatar.call(this, name, color);
 
-    this.id           = id;
-    this.canvas       = new Canvas(100, 100);
-    this.arrow        = new Canvas(this.arrowSize, this.arrowSize);
-    this.width        = this.radius * 2;
-    this.canvasWidth  = this.canvas.element.width;
-    this.canvasRadius = this.canvasWidth/2;
-    this.clearWidth   = this.canvasWidth;
-    this.local        = false;
-    this.startX       = 0;
-    this.startY       = 0;
-    this.clearX       = 0;
-    this.clearY       = 0;
+    this.id          = id;
+    this.canvas      = new Canvas();
+    this.arrow       = new Canvas(this.arrowSize, this.arrowSize);
+    this.width       = this.radius * 2;
+    this.local       = false;
+    this.changed     = false;
+    this.viewChanged = false;
 
     this.drawArrow();
 }
@@ -54,8 +49,11 @@ Avatar.prototype.update = function(step)
         this.updatePosition(step);
     }
 
-    this.startX  = this.canvas.round(this.x * this.canvas.scale - this.canvasRadius);
-    this.startY  = this.canvas.round(this.y * this.canvas.scale - this.canvasRadius);
+    if (this.viewChanged) {
+        this.updateWidth();
+        this.viewChanged = false;
+    }
+
     this.changed = false;
 };
 
@@ -87,18 +85,29 @@ Avatar.prototype.setPositionFromServer = function(x, y)
 };
 
 /**
+ * Update scale
+ */
+Avatar.prototype.updateWidth = function()
+{
+    var width = Math.ceil(this.width * this.canvas.scale);
+
+    if (this.canvas.element.width != width) {
+        this.canvas.setWidth(width);
+        this.canvas.setHeight(width);
+    }
+
+    this.drawHead();
+};
+
+/**
  * Set scale
  *
  * @param {Number} scale
  */
 Avatar.prototype.setScale = function(scale)
 {
-    var width = Math.ceil(this.width * scale);
-    this.canvas.setDimension(width, width, scale);
-    this.changed      = true;
-    this.canvasWidth  = this.canvas.element.width;
-    this.canvasRadius = this.canvas.element.width/2;
-    this.drawHead();
+    this.canvas.setScale(scale);
+    this.viewChanged = true;
 };
 
 /**
@@ -109,8 +118,8 @@ Avatar.prototype.setScale = function(scale)
 Avatar.prototype.setRadius = function(radius)
 {
     BaseAvatar.prototype.setRadius.call(this, radius);
-    this.updateWidth();
-    this.drawHead();
+    this.width       = this.radius * 2;
+    this.viewChanged = true;
 };
 
 /**
@@ -121,21 +130,7 @@ Avatar.prototype.setRadius = function(radius)
 Avatar.prototype.setColor = function(color)
 {
     BaseAvatar.prototype.setColor.call(this, color);
-    this.drawHead();
-};
-
-/**
- * Set score
- *
- * @param {Number} score
- */
-Avatar.prototype.setScore = function(score)
-{
-    var diff = score - this.score;
-
-    BaseAvatar.prototype.setScore.call(this, score);
-
-    this.roundScore = diff;
+    this.viewChanged = true;
 };
 
 /**
@@ -153,11 +148,11 @@ Avatar.prototype.die = function()
 Avatar.prototype.drawHead = function()
 {
     this.canvas.clear();
+    this.canvas.setFill(this.color);
     this.canvas.drawCircle(
-        this.canvasRadius,
-        this.canvasRadius,
-        this.radius * this.canvas.scale,
-        this.color
+        this.canvas.element.width/2,
+        this.canvas.element.height/2,
+        this.radius * this.canvas.scale
     );
 };
 
@@ -179,15 +174,6 @@ Avatar.prototype.drawArrow = function()
 };
 
 /**
- * Update width
- */
-Avatar.prototype.updateWidth = function()
-{
-    this.width = this.radius * 2;
-    this.setScale(this.canvas.scale);
-};
-
-/**
  * Destroy
  */
 Avatar.prototype.destroy = function()
@@ -205,7 +191,6 @@ Avatar.prototype.clear = function()
 {
     BaseAvatar.prototype.clear.call(this);
     this.updateWidth();
-    this.drawHead();
 };
 
 /**
