@@ -213,10 +213,10 @@ Renderer.prototype.drawBonus = function(bonus)
         bonus.update(this.camera.scale);
     }
 
-    this.canvas.drawImageTo(
+    this.canvas.drawImageToAt(
         bonus.asset,
-        this.camera.x(bonus.drawX - bonus.drawRadius),
-        this.camera.y(bonus.drawY - bonus.drawRadius),
+        this.camera.x(bonus.drawX),
+        this.camera.y(bonus.drawY),
         bonus.drawWidth,
         bonus.drawWidth
     );
