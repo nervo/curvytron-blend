@@ -46,6 +46,7 @@ Profile.prototype.setColor = function(color)
     this.color.value            = color;
     this.color.style.background = color;
     this.join.style.background  = color;
+    this.name.style.borderColor = color;
 };
 
 /**

@@ -1,0 +1,72 @@
+@media (orientation : landscape) {
+
+}
+
+@media (max-height: 380px) {
+    body {
+        .logo {
+            margin-bottom: 10px;
+
+            img {
+                max-height: 80px;
+                width: auto;
+            }
+        }
+
+        .player-form {
+            .username {
+                margin-bottom: 20px;
+            }
+        }
+    }
+
+    .game {
+        .controller {
+            bottom: 15%;
+        }
+    }
+}
+
+
+@media (max-width: 400px) {
+    body {
+        .player-form {
+            .username {
+                font-size: 20px;
+                padding-right: 35px;
+            }
+
+            .color-button {
+                width: 24px;
+                height: 24px;
+                top: 15px;
+                right: 5px;
+            }
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .game {
+        .score {
+            font-size: 20px;
+        }
+
+        .logo {
+            min-width: 120px;
+        }
+
+        .controller {
+            bottom: 15%;
+        }
+    }
+}
+
+
+@media (orientation: portrait) {
+
+}
+
+@media (orientation: portrait) and (max-height: 720px) {
+
+}
