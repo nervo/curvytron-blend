@@ -124,9 +124,9 @@ Avatar.prototype.setAngularVelocity = function(angularVelocity)
 };
 
 /**
- * Set angular velocity
+ * Set radius
  *
- * @param {Float} velocity
+ * @param {Float} radius
  */
 Avatar.prototype.setRadius = function(radius)
 {

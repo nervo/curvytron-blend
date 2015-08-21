@@ -23,6 +23,10 @@ function Server(config)
     this.server.listen(config.port);
 
     console.info('Listening on port %s', config.port);
+
+    /*for (var i = 0; i < 10; i++) {
+        this.onSocketConnection(new MockedSocket(Math.random() * 5000), '192.168.0.' + i);
+    }*/
 }
 
 Server.prototype = Object.create(EventEmitter.prototype);

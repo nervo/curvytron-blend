@@ -58,44 +58,53 @@ Canvas.prototype.setScale = function(scale)
 };
 
 /**
+ * Set opacity
+ *
+ * @param {Float} opacity
+ */
+Canvas.prototype.setOpacity = function(opacity)
+{
+    this.context.globalAlpha = opacity;
+};
+
+/**
+ * Set fill color
+ *
+ * @param {String} color
+ */
+Canvas.prototype.setFill = function(color)
+{
+    this.context.fillStyle = color;
+};
+
+/**
  * Set dimension
  *
  * @param {Number} width
  * @param {Number} height
  * @param {Number} scale
  */
-Canvas.prototype.setDimension = function(width, height, scale, update)
+Canvas.prototype.setDimension = function(width, height, scale)
 {
-    var save;
-
-    width  = Math.ceil(width);
-    height = Math.ceil(height);
-
-    if (update) {
-        save = new Canvas(this.element.width, this.element.height);
-        save.pastImage(this.element);
-    }
-
-    this.element.width  = width;
-    this.element.height = height;
-
-    if (typeof(scale) !== 'undefined') {
-        this.setScale(scale);
-    }
-
-    if (update) {
-        this.drawImage(save.element, 0, 0, this.element.width, this.element.height);
-        save = null;
-    }
+    this.setWidth(width);
+    this.setHeight(height);
+    this.setScale(scale);
 };
 
 /**
- * Set opacity
+ * Set dimension with content
  *
- * @param {Float} opacity
+ * @param {Number} width
+ * @param {Number} height
+ * @param {Number} scale
  */
-Canvas.prototype.setOpacity = function(opacity) {
-    this.context.globalAlpha = opacity;
+Canvas.prototype.setDimensionWithContent = function(width, height, scale)
+{
+    var save = new Canvas(this.element.width, this.element.height);
+
+    save.pastImage(this.element);
+    this.setDimension(width, height, scale);
+    this.drawImage(save.element, 0, 0, this.element.width, this.element.height);
 };
 
 /**
@@ -104,6 +113,14 @@ Canvas.prototype.setOpacity = function(opacity) {
 Canvas.prototype.clear = function()
 {
     this.context.clearRect(0, 0, this.element.width, this.element.height);
+};
+
+/**
+ * Clear rectangular zone
+ */
+Canvas.prototype.clearZone = function(x, y, width, height)
+{
+    this.context.clearRect(x, y, width, height);
 };
 
 /**
@@ -116,11 +133,64 @@ Canvas.prototype.color = function(color)
 };
 
 /**
- * Clear rectangular zone
+ * Draw image
+ *
+ * @param {Resource} image
  */
-Canvas.prototype.clearZone = function(x, y, width, height)
+Canvas.prototype.drawImage = function(image) {
+    this.context.drawImage(image, 0, 0);
+};
+
+/**
+ * Draw image to position
+ *
+ * @param {Resource} image
+ * @param {Number} x
+ * @param {Number} y
+ */
+Canvas.prototype.drawImageTo = function(image, x, y) {
+    this.context.drawImage(image, x, y);
+};
+
+/**
+ * Draw image to position
+ *
+ * @param {Resource} image
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ */
+Canvas.prototype.drawImageToAt = function(image, x, y, width, height) {
+    this.context.drawImage(image, x, y, width, height);
+};
+
+/**
+ * Draw image to position
+ *
+ * @param {Resource} image
+ * @param {Number} srcX
+ * @param {Number} srcY
+ * @param {Number} srcWidth
+ * @param {Number} srcHeight
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} width
+ * @param {Number} height
+ */
+Canvas.prototype.drawImageSizeToAt = function(image, srcX, srcY, srcWidth, srcheight, x, y, width, height)
 {
-    this.context.clearRect(x, y, width, height);
+    this.context.drawImage(image, srcX, srcY, srcWidth, srcheight, x, y, width, height);
+};
+
+/**
+ * Reverse image
+ */
+Canvas.prototype.reverse = function()
+{
+    this.context.save();
+    this.context.translate(this.element.width, 0);
+    this.context.scale(-1, 1);
 };
 
 /**
@@ -134,32 +204,6 @@ Canvas.prototype.clearZoneScaled = function(x, y, width, height)
         this.round(width * this.scale),
         this.round(height * this.scale)
     );
-};
-
-/**
- * Save context
- */
-Canvas.prototype.save = function()
-{
-    this.context.save();
-};
-
-/**
- * Restore context
- */
-Canvas.prototype.restore = function()
-{
-    this.context.restore();
-};
-
-/**
- * Reverse image
- */
-Canvas.prototype.reverse = function()
-{
-    this.context.save();
-    this.context.translate(this.element.width, 0);
-    this.context.scale(-1, 1);
 };
 
 /**
@@ -194,50 +238,16 @@ Canvas.prototype.drawImageScaled = function(image, x, y, width, height)
  */
 Canvas.prototype.drawImageScaledAngle = function(image, x, y, width, height, angle)
 {
-    x      = this.round(x * this.scale);
-    y      = this.round(y * this.scale);
-    width  = this.round(width / 2 * this.scale);
-    height = this.round(height / 2 * this.scale);
-
-    var centerX = x + width,
-        centerY = y + height;
-
-    x = -width;
-    y = -height;
+    var centerWidth  = this.round(width / 2 * this.scale);
+        centerHeight = this.round(height / 2 * this.scale);
+        centerX      = this.round(x * this.scale) + width,
+        centerY      = this.round(y * this.scale) + height;
 
     this.context.save();
     this.context.translate(centerX, centerY);
     this.context.rotate(angle);
-    this.context.drawImage(image, x, y, width * 2, height * 2);
+    this.context.drawImage(image, -centerWidth, -centerHeight, centerWidth * 2, centerHeight * 2);
     this.context.restore();
-};
-
-/**
- * Draw image to size
- *
- * @param {Resource} image
- * @param {Number} x
- * @param {Number} y
- * @param {Number} width
- * @param {Number} height
- */
-Canvas.prototype.drawImage = function(image, x, y, width, height)
-{
-    this.context.drawImage(image, x, y, width, height);
-};
-
-/**
- * Draw image to size
- *
- * @param {Resource} image
- * @param {Number} x
- * @param {Number} y
- * @param {Number} width
- * @param {Number} height
- */
-Canvas.prototype.drawImageTo = function(image, x, y)
-{
-    this.context.drawImage(image, x, y);
 };
 
 /**
@@ -256,13 +266,11 @@ Canvas.prototype.pastImage = function(image)
  * @param {Number} x
  * @param {Number} y
  * @param {Number} radius
- * @param {String} color
  */
-Canvas.prototype.drawCircle = function(x, y, radius, color)
+Canvas.prototype.drawCircle = function(x, y, radius)
 {
     this.context.beginPath();
     this.context.arc(x, y, radius, 0, this.twoPi, false);
-    this.context.fillStyle = color;
     this.context.fill();
 };
 
@@ -305,6 +313,14 @@ Canvas.prototype.drawLineScaled = function(points, width, color, style)
 {
     var length = points.length;
 
+    if (!length) {
+        return;
+    }
+
+    if (length === 1) {
+        return this.drawCircle(points[0][0] * this.scale, points[0][1] * this.scale, width / 2 * this.scale);
+    }
+
     if (length > 1) {
         this.context.lineCap     = style;
         this.context.strokeStyle = color;
@@ -318,6 +334,24 @@ Canvas.prototype.drawLineScaled = function(points, width, color, style)
 
         this.context.stroke();
     }
+};
+
+/**
+ * Draw full vertical line
+ *
+ * @param {Number} y
+ */
+Canvas.prototype.drawHorizontalLine = function(y) {
+    this.context.fillRect(0, y, this.element.width, 1);
+};
+
+/**
+ * Draw full vertical line
+ *
+ * @param {Number} x
+ */
+Canvas.prototype.drawVerticalLine = function(x) {
+    this.context.fillRect(x , 0, 1, this.element.height);
 };
 
 /**

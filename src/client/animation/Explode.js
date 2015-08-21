@@ -2,30 +2,34 @@
  * Explosion animation
  *
  * @param {Avatar} avatar
- * @param {Canvas} effect
  */
-function Explode(avatar, effect)
+function Explode(avatar)
 {
-    this.effect    = effect;
-    this.particles = new Array(this.particleTotal);
+    this.id        = null;
+    this.particles = [];
     this.canvas    = new Canvas(this.width, this.width);
     this.created   = new Date().getTime();
     this.done      = false;
-    this.cleared   = false;
 
-    var width = this.width/2;
+    this.end = this.end.bind(this);
 
-    this.canvas.drawCircle(width, width, width, avatar.color);
+    var width = this.width/2,
+        gap   = this.particleTotal/2;
 
-    for (var i = this.particles.length - 1; i >= 0; i--) {
-        this.particles[i] = new ExplodeParticle(
-            avatar.x * this.effect.scale,
-            avatar.y * this.effect.scale,
-            this.randomize(avatar.velocity / 750 * this.effect.scale, 0.1),
-            avatar.angle + this.angleVariation * (Math.random() * 2 - 1),
-            this.effect.round(this.randomize(avatar.radius, 0.5) * this.effect.scale)
-        );
+    this.canvas.setFill(avatar.color);
+    this.canvas.drawCircle(width, width, width);
+
+    for (var i = 1; i <= this.particleTotal; i++) {
+        this.particles.push(new ExplodeParticle(
+            avatar.x,
+            avatar.y,
+            this.randomize(avatar.velocity, 0.05),
+            this.randomize(avatar.angle + this.angleVariation * (i / gap - 1), 0.01),
+            this.randomize(avatar.radius, 0.3)
+        ));
     }
+
+    setTimeout(this.end, this.duration);
 }
 
 /**
@@ -40,14 +44,14 @@ Explode.prototype.width = 10;
  *
  * @type {Float}
  */
-Explode.prototype.angleVariation = Math.PI / 8;
+Explode.prototype.angleVariation = Math.PI / 4;
 
 /**
  * Number of particles to generate
  *
  * @type {Number}
  */
-Explode.prototype.particleTotal = 20;
+Explode.prototype.particleTotal = 9;
 
 /**
  * Animation duration
@@ -55,6 +59,13 @@ Explode.prototype.particleTotal = 20;
  * @type {Number}
  */
 Explode.prototype.duration = 500;
+
+/**
+ * Opacity
+ *
+ * @type {Number}
+ */
+Explode.prototype.opacity = 1.2;
 
 /**
  * Randomize value
@@ -70,48 +81,48 @@ Explode.prototype.randomize = function(value, factor)
 };
 
 /**
- * Draw particles
+ * Get opacity
+ *
+ * @param {Number} time
+ *
+ * @return {Number}
  */
-Explode.prototype.draw = function ()
+Explode.prototype.getOpacity = function (time)
 {
-    if (this.done) { return; }
-
-    this.clear();
-
-    this.lastRender = new Date().getTime();
-    this.cleared    = false;
-
-    var age = this.lastRender - this.created;
-
-    if (age <= this.duration) {
-        var step = age / this.duration;
-
-        this.effect.setOpacity(ExplodeParticle.prototype.opacity * (1.2-step));
-
-        for (var particle, i = this.particles.length - 1; i >= 0; i--) {
-            particle = this.particles[i];
-            particle.update(age);
-            this.effect.drawImage(this.canvas.element, particle.x, particle.y, particle.radius, particle.radius);
-        }
-
-        this.effect.setOpacity(1);
-    } else {
-        this.clear();
-        this.done = true;
-    }
+    return this.opacity - time / this.duration;
 };
 
 /**
- * Clear particles from cache
+ * Draw animation for the given time
+ *
+ * @param {Canvas} canvas
+ * @param {Camera} camera
+ * @param {Number} now
  */
-Explode.prototype.clear = function ()
+Explode.prototype.draw = function(canvas, camera, now)
 {
-    if (this.cleared) { return; }
+    var age = now - this.created;
 
-    for (var particle, width, i = this.particles.length - 1; i >= 0; i--) {
+    canvas.setOpacity(this.getOpacity(age));
+
+    for (var particle, width, x, y, i = this.particles.length - 1; i >= 0; i--) {
         particle = this.particles[i];
-        this.effect.clearZone(particle.x, particle.y, particle.radius, particle.radius);
+        x        = particle.getX(age);
+        y        = particle.getY(age);
+        width    = particle.radius * camera.scale;
+
+        if (camera.isVisible(x, y)) {
+            canvas.drawImageToAt(this.canvas.element, camera.x(x), camera.y(y), width, width);
+        }
     }
 
-    this.cleared = true;
+    canvas.setOpacity(1);
+};
+
+/**
+ * End animation
+ */
+Explode.prototype.end = function()
+{
+    this.done = true;
 };

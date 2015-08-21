@@ -23,14 +23,14 @@ Game.prototype.constructor = Game;
  *
  * @type {Number}
  */
-Game.prototype.spawnMargin = 0.05;
+Game.prototype.spawnMargin = 0.03;
 
 /**
  * Angle margin from borders
  *
  * @type {Number}
  */
-Game.prototype.spawnAngleMargin = 0.3;
+Game.prototype.spawnAngleMargin = 0.2;
 
 /**
  * Respawn time
