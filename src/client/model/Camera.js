@@ -1,9 +1,11 @@
 /**
  * Camera
+ *
+ * @param {Object} subject
  */
-function Camera()
+function Camera(subject)
 {
-    this.subject = null;
+    this.subject = subject;
     this.width   = 0;
     this.height  = 0;
     this.xMin    = 0;
@@ -41,7 +43,7 @@ Camera.prototype.setDimension = function(width, height, scale)
     this.width       = width;
     this.height      = height;
     this.scale       = scale;
-    this.scaleWidth  = this.width / this.scale / 2,
+    this.scaleWidth  = this.width / this.scale / 2;
     this.scaleHeight = this.height / this.scale / 2;
 };
 

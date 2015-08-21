@@ -5,13 +5,13 @@
  * @param {String} name
  * @param {String} color
  */
-function BasePlayer(client, name, color, ready)
+function BasePlayer(client, name, ready)
 {
     EventEmitter.call(this);
 
     this.client = client;
     this.name   = name;
-    this.color  = typeof(color) !== 'undefined' && this.validateColor(color) ? color : this.getRandomColor();
+    this.color  = this.getRandomColor();
     this.avatar = null;
 }
 
@@ -26,32 +26,25 @@ BasePlayer.prototype.constructor = BasePlayer;
 BasePlayer.prototype.maxLength = 25;
 
 /**
- * Max length for color
- *
- * @type {Number}
- */
-BasePlayer.prototype.colorMaxLength = 20;
-
-/**
  * Set name
  *
  * @param {String} name
  */
 BasePlayer.prototype.setName = function(name)
 {
+    if (!this.validateName(name)) { return false; }
+
     this.name = name;
+
+    return true;
 };
 
 /**
- * Set name
- *
- * @param {String} name
+ * Set color
  */
-BasePlayer.prototype.setColor = function(color)
+BasePlayer.prototype.setColor = function()
 {
-    if (!this.validateColor(color, true)) { return false; }
-
-    this.color = color;
+    this.color = this.getRandomColor();
 
     return true;
 };
@@ -100,8 +93,8 @@ BasePlayer.prototype.serialize = function()
  */
 BasePlayer.prototype.getRandomColor = function()
 {
-    var color = '',
-        randomNum = function () { return Math.ceil(Math.random() * 255).toString(16); };
+    var randomNum = function () { return Math.ceil(Math.random() * 255).toString(16); },
+        color     = '#' + randomNum() + randomNum() + randomNum();
 
     while (!this.validateColor(color, true)) {
         color = '#' + randomNum() + randomNum() + randomNum();
@@ -130,4 +123,18 @@ BasePlayer.prototype.validateColor = function(color, yiq)
     }
 
     return matches ? true : false;
+};
+
+/**
+ * Validate name
+ *
+ * @param {String} name
+ *
+ * @return {Boolean}
+ */
+BasePlayer.prototype.validateName = function(name)
+{
+    var length = name.length;
+
+    return length && length <= this.maxLength;
 };

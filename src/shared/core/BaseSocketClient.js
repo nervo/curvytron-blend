@@ -207,7 +207,7 @@ BaseSocketClient.prototype.flush = function ()
  */
 BaseSocketClient.prototype.onMessage = function (e)
 {
-    var data = JSON.parse(e.data),
+    var data   = JSON.parse(e.data),
         length = data.length,
         name, source;
 

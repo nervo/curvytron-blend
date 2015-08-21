@@ -91,7 +91,6 @@ Game.prototype.addAvatar = function (avatar)
         avatar.on('spawn', this.onSpawn);
         avatar.on('point', this.onPoint);
         this.emit('avatar:add', avatar);
-
         avatar.getBody();
         avatar.spawn();
 

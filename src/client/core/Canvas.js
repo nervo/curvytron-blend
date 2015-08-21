@@ -238,8 +238,8 @@ Canvas.prototype.drawImageScaled = function(image, x, y, width, height)
  */
 Canvas.prototype.drawImageScaledAngle = function(image, x, y, width, height, angle)
 {
-    var centerWidth  = this.round(width / 2 * this.scale);
-        centerHeight = this.round(height / 2 * this.scale);
+    var centerWidth  = this.round(width / 2 * this.scale),
+        centerHeight = this.round(height / 2 * this.scale),
         centerX      = this.round(x * this.scale) + width,
         centerY      = this.round(y * this.scale) + height;
 

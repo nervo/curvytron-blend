@@ -13,14 +13,14 @@
         <link rel="stylesheet" href="css/style.css">
         <!-- Google Analytics -->
     </head>
-    <body class="disconnected">
+    <body>
         <div class="container">
             <div class="logo"><img src="images/logo.png" alt=""></div>
-            <div class="login-form">
-                <button class="color-button" type="button"></button>
-                <input type="text" placeholder="Enter your username" class="username" />
-                <button class="submit" type="submit">Play</button>
-            </div>
+            <form name="player" class="player-form" action="#play">
+                <button type="button" name="color" class="color-button"></button>
+                <input type="text" name="name" required placeholder="Enter your username" class="username" />
+                <button name="join" class="submit" type="submit">Play</button>
+            </form>
             <canvas id="render" class="game-render"></canvas>
             <button class="controller left" type="button"></button>
             <button class="controller right" type="button"></button>

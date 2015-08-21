@@ -27,6 +27,7 @@ function GameRepository ()
     this.onEnd          = this.onEnd.bind(this);
     this.onAvatarAdd    = this.onAvatarAdd.bind(this);
     this.onAvatarRemove = this.onAvatarRemove.bind(this);
+    this.onReady        = this.onReady.bind(this);
     this.onLoad         = this.onLoad.bind(this);
 
     this.client.on('connected', this.onConnect);
@@ -46,6 +47,16 @@ GameRepository.prototype.onConnect = function()
     this.game.bonusManager.on('load', this.onLoad);
 };
 
+/**
+ * On load
+ */
+GameRepository.prototype.onLoad = function()
+{
+    this.game.bonusManager.off('load', this.onLoad);
+    this.emit('start');
+    this.client.addEvent('ready', null, this.onReady);
+    this.game.start();
+};
 
 /**
  * On sockect diconnected
@@ -59,13 +70,13 @@ GameRepository.prototype.onDisconnect = function()
 };
 
 /**
- * On load
+ * On ready
+ *
+ * @param {Array} data
  */
-GameRepository.prototype.onLoad = function()
+GameRepository.prototype.onReady = function(data)
 {
-    this.emit('start');
-    this.client.addEvent('ready');
-    this.game.start();
+    this.emit('ready', data);
 };
 
 /**
@@ -121,6 +132,35 @@ GameRepository.prototype.detachEvents = function()
 GameRepository.prototype.move = function(move)
 {
     this.client.addEvent('move', move);
+};
+
+/**
+ * Join
+ */
+GameRepository.prototype.join = function()
+{
+    this.client.addEvent('join');
+};
+
+/**
+ * Set name
+ *
+ * @param {String} name
+ * @param {Function} callback
+ */
+GameRepository.prototype.setName = function(name, callback)
+{
+    this.client.addEvent('name', name, callback);
+};
+
+/**
+ * Set color
+ *
+ * @param {Function} callback
+ */
+GameRepository.prototype.setColor = function(callback)
+{
+    this.client.addEvent('color', null, callback);
 };
 
 /**
@@ -309,6 +349,7 @@ GameRepository.prototype.onAvatarAdd = function(e)
     if (this.game.addAvatar(avatar) && e.type === 'avatar:me') {
         avatar.setLocal();
         this.game.renderer.camera.setSubject(avatar);
+        this.emit('play');
     }
 };
 
