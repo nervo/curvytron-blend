@@ -3,7 +3,7 @@
 }
 
 @media (max-height: 380px) {
-    .disconnected {
+    .lobby {
         .logo {
             margin-bottom: 10px;
 
@@ -13,18 +13,24 @@
             }
         }
 
-        .login-form {
+        .player-form {
             .username {
                 margin-bottom: 20px;
             }
         }
     }
+
+    .game {
+        .controller {
+            bottom: 15%;
+        }
+    }
 }
 
 
-@media (max-width: 450px) {
-    .disconnected {
-        .login-form {
+@media (max-width: 400px) {
+    .lobby {
+        .player-form {
             .username {
                 font-size: 20px;
                 padding-right: 35px;
@@ -40,7 +46,27 @@
     }
 }
 
+@media (max-width: 480px) {
+    .game {
+        .score {
+            font-size: 20px;
+        }
+
+        .logo {
+            min-width: 120px;
+        }
+
+        .controller {
+            bottom: 15%;
+        }
+    }
+}
+
 
 @media (orientation: portrait) {
+
+}
+
+@media (orientation: portrait) and (max-height: 720px) {
 
 }
