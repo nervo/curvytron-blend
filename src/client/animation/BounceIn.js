@@ -46,7 +46,7 @@ BounceIn.prototype.start = function()
  */
 BounceIn.prototype.getValue = function()
 {
-    return this.easeOutBack(this.getAge(), 0, this.target, this.duration, this.factor);
+    return this.done ? 1 : this.easeOutBack(this.getAge(), 0, this.target, this.duration, this.factor);
 };
 
 /**
