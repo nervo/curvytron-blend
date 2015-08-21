@@ -36,7 +36,7 @@ MockedSocket.prototype.send = function() {};
  */
 MockedSocket.prototype.ready = function()
 {
-    this.emit('ready');
+    this.emit('ready', null, function () {});
 };
 
 /**
@@ -45,12 +45,16 @@ MockedSocket.prototype.ready = function()
  * @param {String} name
  * @param {Mixed} data
  */
-MockedSocket.prototype.emit = function(name, data)
+MockedSocket.prototype.emit = function(name, data, callback)
 {
     var event = [name];
 
     if (typeof(data) !== 'undefined') {
         event.push(data);
+    }
+
+    if (typeof(callback) !== 'undefined') {
+        event.push(callback);
     }
 
     this.events.message({
