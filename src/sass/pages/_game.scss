@@ -14,6 +14,7 @@
     }
 
     .score {
+        display: block;
         position: absolute;
         top: 30px;
         right: 25px;
@@ -23,8 +24,8 @@
         line-height: 1;
     }
 
-    .player-form {
-        display: none;
+    .game-render {
+        opacity: 1;
     }
 
     .container {
@@ -39,7 +40,12 @@
         z-index: 50;
     }
 
+    .player-form {
+        display: none;
+    }
+
     .controller {
+        display: block;
         width: 70px;
         height: 70px;
         border-radius: 50%;

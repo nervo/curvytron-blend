@@ -3,7 +3,7 @@
 }
 
 @media (max-height: 380px) {
-    .lobby {
+    body {
         .logo {
             margin-bottom: 10px;
 
@@ -29,7 +29,7 @@
 
 
 @media (max-width: 400px) {
-    .lobby {
+    body {
         .player-form {
             .username {
                 font-size: 20px;
