@@ -124,6 +124,34 @@ GameRepository.prototype.move = function(move)
 };
 
 /**
+ * Join
+ */
+GameRepository.prototype.join = function()
+{
+    this.client.addEvent('join');
+};
+
+/**
+ * Set name
+ *
+ * @param {String} name
+ */
+GameRepository.prototype.setName = function(name, callback)
+{
+    this.client.addEvent('name', name, callback);
+};
+
+/**
+ * Set color
+ *
+ * @param {String} color
+ */
+GameRepository.prototype.setColor = function(color, callback)
+{
+    this.client.addEvent('color', color, callback);
+};
+
+/**
  * On property
  *
  * @param {Event} e
@@ -309,6 +337,7 @@ GameRepository.prototype.onAvatarAdd = function(e)
     if (this.game.addAvatar(avatar) && e.type === 'avatar:me') {
         avatar.setLocal();
         this.game.renderer.camera.setSubject(avatar);
+        this.emit('play');
     }
 };
 

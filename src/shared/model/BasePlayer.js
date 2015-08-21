@@ -26,20 +26,17 @@ BasePlayer.prototype.constructor = BasePlayer;
 BasePlayer.prototype.maxLength = 25;
 
 /**
- * Max length for color
- *
- * @type {Number}
- */
-BasePlayer.prototype.colorMaxLength = 20;
-
-/**
  * Set name
  *
  * @param {String} name
  */
 BasePlayer.prototype.setName = function(name)
 {
+    if (!this.validateName(name)) { return false; }
+
     this.name = name;
+
+    return true;
 };
 
 /**
@@ -130,4 +127,18 @@ BasePlayer.prototype.validateColor = function(color, yiq)
     }
 
     return matches ? true : false;
+};
+
+/**
+ * Validate name
+ *
+ * @param {String} name
+ *
+ * @return {Boolean}
+ */
+BasePlayer.prototype.validateName = function(name)
+{
+    var length = name.length;
+
+    return length && length <= this.maxLength;
 };

@@ -30,6 +30,9 @@ function GameController()
     this.callbacks = {
         onLeave: function () { controller.onLeave(this); },
         onReady: function () { controller.onReady(this); },
+        onJoin: function () { controller.onJoin(this); },
+        onColor: function (data) { controller.onColor(this, data[0], data[1]); },
+        onName: function (data) { controller.onName(this, data[0], data[1]); },
         onMove: function (data) { controller.onMove(this, data); }
     };
 
@@ -86,7 +89,7 @@ GameController.prototype.unloadGame = function()
 GameController.prototype.attach = function(client)
 {
     if (this.clients.add(client)) {
-        client.player.getAvatar();
+        client.getPlayer();
         this.attachEvents(client);
         client.pingLogger.start();
     }
@@ -101,7 +104,11 @@ GameController.prototype.detach = function(client)
 {
     if (this.clients.remove(client)) {
         this.detachEvents(client);
-        this.game.removeAvatar(client.player.avatar);
+
+        if (client.player.avatar) {
+            this.game.removeAvatar(client.player.avatar);
+        }
+
         client.pingLogger.stop();
     }
 };
@@ -113,6 +120,7 @@ GameController.prototype.onAvatarAdd = function(data)
 {
     var avatar = [data.id, data.name, data.color];
 
+    this.attachAvatarEvents(data);
     data.player.client.addEvent('avatar:me', avatar);
     this.socketGroup.addExcludeTargetEvent(data.player.client, 'avatar:add', avatar);
 };
@@ -122,6 +130,7 @@ GameController.prototype.onAvatarAdd = function(data)
  */
 GameController.prototype.onAvatarRemove = function(data)
 {
+    this.detachAvatarEvents(data);
     this.socketGroup.addEvent('avatar:remove', data.id);
 };
 
@@ -134,15 +143,10 @@ GameController.prototype.attachEvents = function(client)
 {
     client.on('close', this.callbacks.onLeave);
     client.on('ready', this.callbacks.onReady);
+    client.on('color', this.callbacks.onColor);
+    client.on('name', this.callbacks.onName);
+    client.on('join', this.callbacks.onJoin);
     client.on('move', this.callbacks.onMove);
-
-    client.player.avatar.on('die', this.onDie);
-    client.player.avatar.on('spawn', this.onSpawn);
-    client.player.avatar.on('position', this.onPosition);
-    client.player.avatar.on('angle', this.onAngle);
-    client.player.avatar.on('point', this.onPoint);
-    client.player.avatar.on('property', this.onProperty);
-    client.player.avatar.bonusStack.on('change', this.onBonusStack);
 };
 
 /**
@@ -154,16 +158,41 @@ GameController.prototype.detachEvents = function(client)
 {
     client.removeListener('close', this.callbacks.onLeave);
     client.removeListener('ready', this.callbacks.onReady);
+    client.removeListener('color', this.callbacks.onColor);
+    client.removeListener('name', this.callbacks.onName);
+    client.removeListener('join', this.callbacks.onJoin);
     client.removeListener('move', this.callbacks.onMove);
+};
 
-    if (client.player.avatar) {
-        client.player.avatar.removeListener('die', this.onDie);
-        client.player.avatar.removeListener('spawn', this.onSpawn);
-        client.player.avatar.removeListener('position', this.onPosition);
-        client.player.avatar.removeListener('point', this.onPoint);
-        client.player.avatar.removeListener('property', this.onProperty);
-        client.player.avatar.bonusStack.removeListener('change', this.onBonusStack);
-    }
+/**
+ * Attach avatar events
+ *
+ * @param {Avatar} avatar
+ */
+GameController.prototype.attachAvatarEvents = function(avatar)
+{
+    avatar.on('die', this.onDie);
+    avatar.on('spawn', this.onSpawn);
+    avatar.on('position', this.onPosition);
+    avatar.on('angle', this.onAngle);
+    avatar.on('point', this.onPoint);
+    avatar.on('property', this.onProperty);
+    avatar.bonusStack.on('change', this.onBonusStack);
+};
+
+/**
+ * Detach avatar events
+ *
+ * @param {Avatar} avatar
+ */
+GameController.prototype.detachAvatarEvents = function(avatar)
+{
+    avatar.removeListener('die', this.onDie);
+    avatar.removeListener('spawn', this.onSpawn);
+    avatar.removeListener('position', this.onPosition);
+    avatar.removeListener('point', this.onPoint);
+    avatar.removeListener('property', this.onProperty);
+    avatar.bonusStack.removeListener('change', this.onBonusStack);
 };
 
 /**
@@ -229,16 +258,54 @@ GameController.prototype.onLeave = function(client)
 };
 
 /**
- * On game loaded
+ * On client ready
  *
  * @param {SocketClient} client
  */
 GameController.prototype.onReady = function(client)
 {
-    if (client.player.avatar) {
-        this.sumUp(client);
-        this.game.addAvatar(client.player.avatar);
+    this.sumUp(client);
+};
+
+/**
+ * On join
+ *
+ * @param {SocketClient} client
+ */
+GameController.prototype.onJoin = function(client)
+{
+    if (!client.player.avatar) {
+        this.game.addAvatar(client.player.getAvatar());
     }
+};
+
+/**
+ * On color
+ *
+ * @param {SocketClient} client
+ * @param {String} data
+ * @param {Function} callback
+ */
+GameController.prototype.onColor = function(client, data, callback)
+{
+    client.player.setColor(data);
+    callback(client.player.color);
+};
+
+/**
+ * On name
+ *
+ * @param {SocketClient} client
+ * @param {String} data
+ * @param {Function} callback
+ */
+GameController.prototype.onName = function(client, data, callback)
+{
+    if (this.isNameAvailable(data)) {
+        client.player.setName(data);
+    }
+
+    callback(client.player.name);
 };
 
 /**
@@ -425,4 +492,18 @@ GameController.prototype.onEnd = function(data)
 {
     this.socketGroup.addEvent('end');
     this.unloadGame();
+};
+
+/**
+ * Is name available
+ *
+ * @param {String} name
+ *
+ * @return {Boolean}
+ */
+GameController.prototype.isNameAvailable = function(name)
+{
+    return this.clients.match(function () {
+        return this.player.name.toLowerCase() === name.toLowerCase();
+    }) === null;
 };
