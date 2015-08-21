@@ -3,11 +3,10 @@
  *
  * @param {SocketClient} client
  * @param {String} name
- * @param {String} color
  */
-function Player(client, name, color)
+function Player(client, name)
 {
-    BasePlayer.call(this, client, name, color);
+    BasePlayer.call(this, client, name);
 }
 
 Player.prototype = Object.create(BasePlayer.prototype);

@@ -29,11 +29,11 @@ function GameController()
 
     this.callbacks = {
         onLeave: function () { controller.onLeave(this); },
-        onReady: function () { controller.onReady(this); },
         onJoin: function () { controller.onJoin(this); },
-        onColor: function (data) { controller.onColor(this, data[0], data[1]); },
-        onName: function (data) { controller.onName(this, data[0], data[1]); },
-        onMove: function (data) { controller.onMove(this, data); }
+        onReady: function (data) { if (data.length == 2) { controller.onReady(this, data[1]); }},
+        onColor: function (data) { if (data.length == 2) { controller.onColor(this, data[1]); }},
+        onName: function (data) { if (data.length == 2) { controller.onName(this, data[0], data[1]); }},
+        onMove: function (data) { if (data.length == 1) { controller.onMove(this, data); }}
     };
 
     this.loadGame();
@@ -262,8 +262,9 @@ GameController.prototype.onLeave = function(client)
  *
  * @param {SocketClient} client
  */
-GameController.prototype.onReady = function(client)
+GameController.prototype.onReady = function(client, callback)
 {
+    callback([client.player.name, client.player.color]);
     this.sumUp(client);
 };
 
@@ -283,12 +284,11 @@ GameController.prototype.onJoin = function(client)
  * On color
  *
  * @param {SocketClient} client
- * @param {String} data
  * @param {Function} callback
  */
-GameController.prototype.onColor = function(client, data, callback)
+GameController.prototype.onColor = function(client, callback)
 {
-    client.player.setColor(data);
+    client.player.setColor();
     callback(client.player.color);
 };
 

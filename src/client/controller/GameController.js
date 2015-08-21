@@ -9,16 +9,18 @@ function GameController ()
     this.profile    = new Profile();
     this.input      = null;
 
-    this.onMove  = this.onMove.bind(this);
+    this.onReady = this.onReady.bind(this);
     this.onStart = this.onStart.bind(this);
     this.onStop  = this.onStop.bind(this);
     this.onPlay  = this.onPlay.bind(this);
     this.onJoin  = this.onJoin.bind(this);
+    this.onMove  = this.onMove.bind(this);
     this.onName  = this.onName.bind(this);
     this.onColor = this.onColor.bind(this);
 
     this.repository.on('start', this.onStart);
     this.repository.on('stop', this.onStop);
+    this.repository.on('ready', this.onReady);
     this.repository.on('play', this.onPlay);
     this.profile.on('name', this.onName);
     this.profile.on('color', this.onColor);
@@ -31,7 +33,18 @@ function GameController ()
 GameController.prototype.onStart = function()
 {
     this.container.classList.toggle('connected', true);
+};
+
+/**
+ * On ready
+ *
+ * @param {Event} event
+ */
+GameController.prototype.onReady = function(event)
+{
     this.container.classList.toggle('lobby', true);
+    this.profile.setName(event.detail[0]);
+    this.profile.setColor(event.detail[1]);
 };
 
 /**
@@ -39,6 +52,7 @@ GameController.prototype.onStart = function()
  */
 GameController.prototype.onStop = function()
 {
+    this.container.classList.toggle('error', true);
     this.container.classList.toggle('connected', false);
 
     if (this.input) {
@@ -93,7 +107,7 @@ GameController.prototype.onName = function(event)
  */
 GameController.prototype.onColor = function(event)
 {
-    this.repository.setColor(event.detail, this.profile.setColor);
+    this.repository.setColor(this.profile.setColor);
 };
 
 /**

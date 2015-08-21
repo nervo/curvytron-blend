@@ -8,6 +8,7 @@ function Profile()
     this.element = document.forms.player;
     this.name    = this.element.elements.name;
     this.color   = this.element.elements.color;
+    this.join    = this.element.elements.join;
 
     this.onName   = this.onName.bind(this);
     this.onColor  = this.onColor.bind(this);
@@ -16,7 +17,7 @@ function Profile()
     this.setColor = this.setColor.bind(this);
 
     this.name.addEventListener('change', this.onName);
-    this.color.addEventListener('change', this.onColor);
+    this.color.addEventListener('click', this.onColor);
     this.element.addEventListener('submit', this.onSubmit);
 }
 
@@ -42,9 +43,9 @@ Profile.prototype.setName = function(name)
  */
 Profile.prototype.setColor = function(color)
 {
-    this.color.removeEventListener('change', this.onColor);
-    this.color.value = color;
-    this.color.addEventListener('change', this.onColor);
+    this.color.value            = color;
+    this.color.style.background = color;
+    this.join.style.background  = color;
 };
 
 /**
@@ -64,7 +65,8 @@ Profile.prototype.onName = function(event)
  */
 Profile.prototype.onColor = function(event)
 {
-    this.emit('color', this.color.value);
+    event.preventDefault();
+    this.emit('color');
 };
 
 /**

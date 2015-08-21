@@ -27,6 +27,7 @@ function GameRepository ()
     this.onEnd          = this.onEnd.bind(this);
     this.onAvatarAdd    = this.onAvatarAdd.bind(this);
     this.onAvatarRemove = this.onAvatarRemove.bind(this);
+    this.onReady        = this.onReady.bind(this);
     this.onLoad         = this.onLoad.bind(this);
 
     this.client.on('connected', this.onConnect);
@@ -64,8 +65,18 @@ GameRepository.prototype.onDisconnect = function()
 GameRepository.prototype.onLoad = function()
 {
     this.emit('start');
-    this.client.addEvent('ready');
+    this.client.addEvent('ready', null, this.onReady);
     this.game.start();
+};
+
+/**
+ * On ready
+ *
+ * @param {Array} data
+ */
+GameRepository.prototype.onReady = function(data)
+{
+    this.emit('ready', data);
 };
 
 /**
@@ -135,6 +146,7 @@ GameRepository.prototype.join = function()
  * Set name
  *
  * @param {String} name
+ * @param {Function} callback
  */
 GameRepository.prototype.setName = function(name, callback)
 {
@@ -144,11 +156,11 @@ GameRepository.prototype.setName = function(name, callback)
 /**
  * Set color
  *
- * @param {String} color
+ * @param {Function} callback
  */
-GameRepository.prototype.setColor = function(color, callback)
+GameRepository.prototype.setColor = function(callback)
 {
-    this.client.addEvent('color', color, callback);
+    this.client.addEvent('color', null, callback);
 };
 
 /**
