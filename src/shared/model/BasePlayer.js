@@ -26,6 +26,13 @@ BasePlayer.prototype.constructor = BasePlayer;
 BasePlayer.prototype.maxLength = 25;
 
 /**
+ * Color light ratio
+ *
+ * @type {Number}
+ */
+BasePlayer.prototype.colorRatio = 0.6;
+
+/**
  * Set name
  *
  * @param {String} name
@@ -117,9 +124,9 @@ BasePlayer.prototype.validateColor = function(color, yiq)
     var matches = color.match(new RegExp('^#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$'));
 
     if (matches && yiq) {
-        var ratio = ((parseInt(matches[1], 16) * 0.4) + (parseInt(matches[2], 16) * 0.5) + (parseInt(matches[3], 16) * 0.3)) / 255;
+        var ratio = ((parseInt(matches[1], 16) * 299) + (parseInt(matches[2], 16) * 587) + (parseInt(matches[3], 16) * 114)) / 1000 / 255;
 
-        return ratio > 0.3;
+        return ratio > this.colorRatio;
     }
 
     return matches ? true : false;
