@@ -1,0 +1,46 @@
+@media (orientation : landscape) {
+
+}
+
+@media (max-height: 380px) {
+    .disconnected {
+        .logo {
+            margin-bottom: 10px;
+
+            img {
+                max-height: 80px;
+                width: auto;
+            }
+        }
+
+        .login-form {
+            .username {
+                margin-bottom: 20px;
+            }
+        }
+    }
+}
+
+
+@media (max-width: 450px) {
+    .disconnected {
+        .login-form {
+            .username {
+                font-size: 20px;
+                padding-right: 35px;
+            }
+
+            .color-button {
+                width: 24px;
+                height: 24px;
+                top: 15px;
+                right: 5px;
+            }
+        }
+    }
+}
+
+
+@media (orientation: portrait) {
+
+}

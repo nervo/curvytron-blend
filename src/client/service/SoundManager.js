@@ -16,7 +16,7 @@ function SoundManager ()
  *
  * @type {Number}
  */
-SoundManager.prototype.volume = 0.5;
+SoundManager.prototype.volume = 0;
 
 /**
  * Sounds
