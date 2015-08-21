@@ -17,7 +17,7 @@ function MapBonus(id, x, y, type)
     this.drawRadius = 0;
     this.drawWidth  = 0;
     this.drawX      = 0;
-    this.drawY      = 0
+    this.drawY      = 0;
     this.fixed      = false;
 }
 
