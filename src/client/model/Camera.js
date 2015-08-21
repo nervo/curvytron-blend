@@ -17,7 +17,7 @@ function Camera()
  *
  * @type {Number}
  */
-Camera.prototype.zoom = 5;
+Camera.prototype.zoom = 3;
 
 /**
  * Set subject

@@ -2,16 +2,18 @@
  * Explosion animation
  *
  * @param {Avatar} avatar
- * @param {Canvas} effect
+ * @param {Number} scale
  */
-function Explode(avatar, effect)
+function Explode(avatar, scale)
 {
-    this.effect    = effect;
+    this.id        = null;
     this.particles = new Array(this.particleTotal);
     this.canvas    = new Canvas(this.width, this.width);
     this.created   = new Date().getTime();
+    this.scale     = scale;
     this.done      = false;
-    this.cleared   = false;
+
+    this.end = this.end.bind(this);
 
     var width = this.width/2;
 
@@ -19,13 +21,15 @@ function Explode(avatar, effect)
 
     for (var i = this.particles.length - 1; i >= 0; i--) {
         this.particles[i] = new ExplodeParticle(
-            avatar.x * this.effect.scale,
-            avatar.y * this.effect.scale,
-            this.randomize(avatar.velocity / 750 * this.effect.scale, 0.1),
+            avatar.x * this.scale,
+            avatar.y * this.scale,
+            this.randomize(avatar.velocity / 750 * this.scale, 0.1),
             avatar.angle + this.angleVariation * (Math.random() * 2 - 1),
-            this.effect.round(this.randomize(avatar.radius, 0.5) * this.effect.scale)
+            Canvas.prototype.round(this.randomize(avatar.radius, 0.5) * this.scale)
         );
     }
+
+    setTimeout(this.end, this.duration);
 }
 
 /**
@@ -47,7 +51,7 @@ Explode.prototype.angleVariation = Math.PI / 8;
  *
  * @type {Number}
  */
-Explode.prototype.particleTotal = 20;
+Explode.prototype.particleTotal = 5;
 
 /**
  * Animation duration
@@ -70,48 +74,47 @@ Explode.prototype.randomize = function(value, factor)
 };
 
 /**
- * Draw particles
+ * Get opacity
+ *
+ * @param {Number} time
+ *
+ * @return {Number}
  */
-Explode.prototype.draw = function ()
+Explode.prototype.getOpacity = function (time)
 {
-    if (this.done) { return; }
-
-    this.clear();
-
-    this.lastRender = new Date().getTime();
-    this.cleared    = false;
-
-    var age = this.lastRender - this.created;
-
-    if (age <= this.duration) {
-        var step = age / this.duration;
-
-        this.effect.setOpacity(ExplodeParticle.prototype.opacity * (1.2-step));
-
-        for (var particle, i = this.particles.length - 1; i >= 0; i--) {
-            particle = this.particles[i];
-            particle.update(age);
-            this.effect.drawImage(this.canvas.element, particle.x, particle.y, particle.radius, particle.radius);
-        }
-
-        this.effect.setOpacity(1);
-    } else {
-        this.clear();
-        this.done = true;
-    }
+    return this.opacity * (1.4 - time / this.duration);
 };
 
 /**
- * Clear particles from cache
+ * Draw animation for the given time
+ *
+ * @param {Canvas} canvas
+ * @param {Camera} camera
+ * @param {Number} now
  */
-Explode.prototype.clear = function ()
+Explode.prototype.draw = function(canvas, camera, now)
 {
-    if (this.cleared) { return; }
+    var age = now - this.created;
 
-    for (var particle, width, i = this.particles.length - 1; i >= 0; i--) {
+    canvas.setOpacity(this.getOpacity(age));
+
+    for (var particle, x, y, i = this.particles.length - 1; i >= 0; i--) {
         particle = this.particles[i];
-        this.effect.clearZone(particle.x, particle.y, particle.radius, particle.radius);
+        x        = particle.getX(age);
+        y        = particle.getY(age);
+
+        if (camera.isVisible(x, y)) {
+            canvas.drawImageToAt(this.canvas.element, x, y, particle.radius, particle.radius);
+        }
     }
 
-    this.cleared = true;
+    canvas.setOpacity(1);
+};
+
+/**
+ * End animation
+ */
+Explode.prototype.end = function()
+{
+    this.done = true;
 };

@@ -11,7 +11,7 @@ function Renderer(game)
     this.background = new Canvas();
     this.map        = new Canvas();
     this.mapChanged = true;
-    this.animations = [];
+    this.animations = new Collection([], 'id', true);
 
     this.onResize = this.onResize.bind(this);
 }
@@ -45,7 +45,7 @@ Renderer.prototype.setMapChanged = function()
  */
 Renderer.prototype.explode = function(avatar)
 {
-    //this.animations.push(new Explode(avatar, this.canvas));
+    this.animations.add(new Explode(avatar, this.camera.scale));
 };
 
 /**
@@ -96,11 +96,15 @@ Renderer.prototype.draw = function(step)
 
     this.updateAvatar(this.camera.subject, step);
     this.camera.updateScene();
+    this.drawMap()
 
     for (i = this.game.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.game.avatars.items[i];
-        if (avatar.id !== this.camera.subject && this.updateAvatar(avatar, step)) {
-            avatars.push(avatar);
+        if (avatar.id !== this.camera.subject && (avatar.alive || avatar.changed)) {
+            this.updateAvatar(this.camera.subject, step);
+            if (this.camera.isVisible(avatar.x, avatar.y)) {
+                avatars.push(avatar);
+            }
         }
     }
 
@@ -109,7 +113,7 @@ Renderer.prototype.draw = function(step)
         points = trail.getLastSegment();
 
         if (points) {
-            this.drawTail(points, trail.width, trail.color);
+            this.drawTrail(points, trail.width, trail.color);
         } else {
             this.game.trails.remove(trail);
         }
@@ -120,7 +124,7 @@ Renderer.prototype.draw = function(step)
         width  = this.camera.width,
         height = this.camera.height;
 
-    this.canvas.drawImageSizeToAt(this.drawMap(), x, y, width, height, 0, 0, width, height);
+    this.canvas.drawImageSizeToAt(this.map.element, x, y, width, height, 0, 0, width, height);
     this.canvas.drawImageSizeToAt(this.background.element, x, y, width, height, 0, 0, width, height);
 
     for (i = this.game.bonusManager.bonuses.items.length - 1; i >= 0; i--) {
@@ -129,6 +133,19 @@ Renderer.prototype.draw = function(step)
 
     for (i = avatars.length - 1; i >= 0; i--) {
         this.drawAvatar(avatars[i]);
+    }
+
+    if (!this.animations.isEmpty()) {
+        var now = new Date().getTime(), animation;
+
+        for (i = this.animations.items.length - 1; i >= 0; i--) {
+            animation = this.animations.items[i];
+            if (animation.done) {
+                this.animations.remove(animation);
+            } else {
+                this.drawAnimation(now, animation);
+            }
+        }
     }
 };
 
@@ -140,19 +157,15 @@ Renderer.prototype.draw = function(step)
  */
 Renderer.prototype.updateAvatar = function(avatar, step)
 {
-    if (avatar.alive || avatar.changed) {
-        if (avatar.alive) {
-            avatar.update(this.frame ? step : 0);
-        }
-
-        var points = avatar.trail.getLastSegment();
-
-        if (points) {
-            this.drawTail(points, avatar.width, avatar.color);
-        }
+    if (avatar.alive) {
+        avatar.update(this.frame ? step : 0);
     }
 
-    return this.camera.isVisible(avatar.x, avatar.y);
+    var points = avatar.trail.getLastSegment();
+
+    if (points) {
+        this.drawTrail(points, avatar.width, avatar.color);
+    }
 };
 
 /**
@@ -160,7 +173,7 @@ Renderer.prototype.updateAvatar = function(avatar, step)
  *
  * @param {Avatar} avatar
  */
-Renderer.prototype.drawTail = function(points, width, color)
+Renderer.prototype.drawTrail = function(points, width, color)
 {
     this.background.drawLineScaled(points, width, color, 'round');
 };
@@ -189,15 +202,18 @@ Renderer.prototype.drawAvatar = function(avatar)
  */
 Renderer.prototype.drawBonus = function(bonus)
 {
-    if (!bonus.animation.done) {
-        bonus.drawRadius = this.canvas.round(bonus.radius * bonus.animation.getValue());
-        bonus.drawWidth  = bonus.drawRadius * 2;
+    if (!this.camera.isVisible(bonus.x, bonus.y)) {
+        return;
+    }
+
+    if (!bonus.drawRadius || !bonus.animation.done) {
+        bonus.update(this.camera.scale);
     }
 
     this.canvas.drawImageTo(
         bonus.asset,
-        this.camera.x(bonus.x - bonus.drawRadius),
-        this.camera.y(bonus.y - bonus.drawRadius),
+        this.camera.x(bonus.drawX - bonus.drawRadius),
+        this.camera.y(bonus.drawY - bonus.drawRadius),
         bonus.drawWidth,
         bonus.drawWidth
     );
@@ -225,6 +241,16 @@ Renderer.prototype.drawMap = function()
     }
 
     return this.map.element;
+};
+
+/**
+ * Draw animation
+ *
+ * @param {Animation} animation
+ */
+Renderer.prototype.drawAnimation = function(now, animation)
+{
+    animation.draw(this.canvas, this.camera, now);
 };
 
 /**

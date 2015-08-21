@@ -191,6 +191,7 @@ Avatar.prototype.clear = function()
 {
     BaseAvatar.prototype.clear.call(this);
     this.updateWidth();
+    this.drawHead();
 };
 
 /**

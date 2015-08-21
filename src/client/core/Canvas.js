@@ -319,28 +319,18 @@ Canvas.prototype.drawLineScaled = function(points, width, color, style)
     }
 
     if (length === 1) {
-        return this.drawCircle(
-            this.round(points[0][0] * this.scale),
-            this.round(points[0][1] * this.scale),
-            this.round(width / 2 * this.scale)
-        );
+        return this.drawCircle(points[0][0] * this.scale, points[0][1] * this.scale, width / 2 * this.scale);
     }
 
     if (length > 1) {
         this.context.lineCap     = style;
         this.context.strokeStyle = color;
-        this.context.lineWidth   = this.round(width * this.scale);
+        this.context.lineWidth   = width * this.scale;
         this.context.beginPath();
-        this.context.moveTo(
-            this.round(points[0][0] * this.scale),
-            this.round(points[0][1] * this.scale)
-        );
+        this.context.moveTo(points[0][0] * this.scale, points[0][1] * this.scale);
 
         for (var i = 1; i < length; i++) {
-            this.context.lineTo(
-                this.round(points[i][0] * this.scale),
-                this.round(points[i][1] * this.scale)
-            );
+            this.context.lineTo(points[i][0] * this.scale, points[i][1] * this.scale);
         }
 
         this.context.stroke();

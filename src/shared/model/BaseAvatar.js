@@ -14,8 +14,8 @@ function BaseAvatar(name, color)
     this.color           = color;
     this.trail           = new Trail();
     this.bonusStack      = new BonusStack(this);
-    this.x               = this.radius;
-    this.y               = this.radius;
+    this.x               = 0;
+    this.y               = 0;
     this.angle           = 0;
     this.velocityX       = 0;
     this.velocityY       = 0;

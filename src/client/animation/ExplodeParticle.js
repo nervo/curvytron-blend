@@ -1,10 +1,14 @@
 /**
  * Explode particle
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} velocity
+ * @param {Number} angle
+ * @param {Number} radius
  */
 function ExplodeParticle (x, y, velocity, angle, radius)
 {
-    this.x         = this.round(x);
-    this.y         = this.round(y);
     this.originX   = x;
     this.originY   = y;
     this.velocityX = Math.cos(angle) * velocity;
@@ -13,31 +17,25 @@ function ExplodeParticle (x, y, velocity, angle, radius)
 }
 
 /**
- * Opacity
+ * Get x
  *
- * @type {Number}
- */
-ExplodeParticle.prototype.opacity = 1;
-
-/**
- * Update
- *
- * @param {Number} step
- */
-ExplodeParticle.prototype.update = function (time)
-{
-    this.x = this.round(this.originX + this.velocityX * time);
-    this.y = this.round(this.originY + this.velocityY * time);
-};
-
-/**
- * Round
- *
- * @param {Number} value
+ * @param {Number} time
  *
  * @return {Number}
  */
-ExplodeParticle.prototype.round = function (value)
+ExplodeParticle.prototype.getX = function (time)
 {
-    return (0.5 + value) | 0;
+    return Canvas.prototype.round(this.originX + this.velocityX * time);
+};
+
+/**
+ * Get y
+ *
+ * @param {Number} time
+ *
+ * @return {Number}
+ */
+ExplodeParticle.prototype.getY = function(time)
+{
+    return Canvas.prototype.round(this.originY + this.velocityY * time);
 };
