@@ -9,10 +9,10 @@
  */
 function ExplodeParticle (x, y, velocity, angle, radius)
 {
-    this.originX   = x;
-    this.originY   = y;
-    this.velocityX = Math.cos(angle) * velocity;
-    this.velocityY = Math.sin(angle) * velocity;
+    this.x         = x;
+    this.y         = y;
+    this.velocityX = Math.cos(angle) * velocity / 1000;
+    this.velocityY = Math.sin(angle) * velocity / 1000;
     this.radius    = radius;
 }
 
@@ -25,7 +25,7 @@ function ExplodeParticle (x, y, velocity, angle, radius)
  */
 ExplodeParticle.prototype.getX = function (time)
 {
-    return Canvas.prototype.round(this.originX + this.velocityX * time);
+    return this.x + this.velocityX * time;
 };
 
 /**
@@ -37,5 +37,5 @@ ExplodeParticle.prototype.getX = function (time)
  */
 ExplodeParticle.prototype.getY = function(time)
 {
-    return Canvas.prototype.round(this.originY + this.velocityY * time);
+    return this.y + this.velocityY * time;
 };

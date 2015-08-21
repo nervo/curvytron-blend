@@ -45,7 +45,7 @@ Renderer.prototype.setMapChanged = function()
  */
 Renderer.prototype.explode = function(avatar)
 {
-    this.animations.add(new Explode(avatar, this.camera.scale));
+    this.animations.add(new Explode(avatar));
 };
 
 /**

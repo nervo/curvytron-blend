@@ -266,9 +266,8 @@ Canvas.prototype.pastImage = function(image)
  * @param {Number} x
  * @param {Number} y
  * @param {Number} radius
- * @param {String} color
  */
-Canvas.prototype.drawCircle = function(x, y, radius, color)
+Canvas.prototype.drawCircle = function(x, y, radius)
 {
     this.context.beginPath();
     this.context.arc(x, y, radius, 0, this.twoPi, false);
