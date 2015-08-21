@@ -73,9 +73,7 @@ Game.prototype.clearFrame = function()
  */
 Game.prototype.onFrame = function(step)
 {
-    console.time('frame');
     this.renderer.draw(step);
-    console.timeEnd('frame');
 };
 
 /**
