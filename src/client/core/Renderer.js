@@ -6,12 +6,13 @@
 function Renderer(game)
 {
     this.game       = game;
-    this.camera     = new Camera();
+    this.camera     = new Camera({x: game.size/2, y:  game.size/2});
     this.canvas     = new Canvas(0, 0, document.getElementById('render'));
     this.background = new Canvas();
     this.map        = new Canvas();
-    this.mapChanged = true;
     this.animations = new Collection([], 'id', true);
+    this.mapChanged = true;
+    this.drawn      = false;
 
     this.onResize = this.onResize.bind(this);
 }
@@ -88,20 +89,22 @@ Renderer.prototype.setAvatarScale = function(avatar)
  */
 Renderer.prototype.draw = function(step)
 {
-    if (!this.camera.subject) {
-        return;
+    var avatars         = [],
+        subjectIsPlayer = this.camera.subject instanceof Avatar,
+        i, points, avatar, bonus, trail;
+
+    if (subjectIsPlayer) {
+        this.updateAvatar(this.camera.subject, step);
+        avatars.push(this.camera.subject);
     }
 
-    var avatars = [this.camera.subject], i, points, avatar, bonus, trail;
-
-    this.updateAvatar(this.camera.subject, step);
     this.camera.updateScene();
-    this.drawMap()
+    this.drawMap();
 
     for (i = this.game.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.game.avatars.items[i];
-        if (avatar.id !== this.camera.subject && (avatar.alive || avatar.changed)) {
-            this.updateAvatar(this.camera.subject, step);
+        if ((!subjectIsPlayer || avatar.id !== this.camera.subject.id) && (avatar.alive || avatar.changed)) {
+            this.updateAvatar(avatar, step);
             if (this.camera.isVisible(avatar.x, avatar.y)) {
                 avatars.push(avatar);
             }

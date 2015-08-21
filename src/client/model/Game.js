@@ -73,7 +73,9 @@ Game.prototype.clearFrame = function()
  */
 Game.prototype.onFrame = function(step)
 {
+    console.time('frame');
     this.renderer.draw(step);
+    console.timeEnd('frame');
 };
 
 /**
@@ -110,7 +112,7 @@ Game.prototype.end = function()
 Game.prototype.setSize = function()
 {
     BaseGame.prototype.setSize.call(this);
-    this.rendere.onResize();
+    this.renderer.onResize();
 };
 
 /**

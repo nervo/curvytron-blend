@@ -50,7 +50,7 @@ SocketClient.prototype.getPlayer = function()
         this.player = new Player(this, 'Player ' + this.id);
     }
 
-    return this.player
+    return this.player;
 };
 
 /**

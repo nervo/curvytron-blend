@@ -91,7 +91,7 @@ Avatar.prototype.updateWidth = function()
 {
     var width = Math.ceil(this.width * this.canvas.scale);
 
-    if (this.canvas.element.width != width) {
+    if (this.canvas.element.width !== width) {
         this.canvas.setWidth(width);
         this.canvas.setHeight(width);
     }

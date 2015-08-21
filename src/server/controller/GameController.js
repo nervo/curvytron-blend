@@ -30,10 +30,10 @@ function GameController()
     this.callbacks = {
         onLeave: function () { controller.onLeave(this); },
         onJoin: function () { controller.onJoin(this); },
-        onReady: function (data) { if (data.length == 2) { controller.onReady(this, data[1]); }},
-        onColor: function (data) { if (data.length == 2) { controller.onColor(this, data[1]); }},
-        onName: function (data) { if (data.length == 2) { controller.onName(this, data[0], data[1]); }},
-        onMove: function (data) { if (data.length == 1) { controller.onMove(this, data); }}
+        onReady: function (data) { if (typeof(data) === 'object' && data.length === 2) { controller.onReady(this, data[1]); }},
+        onColor: function (data) { if (typeof(data) === 'object' && data.length === 2) { controller.onColor(this, data[1]); }},
+        onName: function (data) { if (typeof(data) === 'object' && data.length === 2) { controller.onName(this, data[0], data[1]); }},
+        onMove: function (data) { if (typeof(data) === 'number') { controller.onMove(this, data); }}
     };
 
     this.loadGame();

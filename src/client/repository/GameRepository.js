@@ -47,6 +47,16 @@ GameRepository.prototype.onConnect = function()
     this.game.bonusManager.on('load', this.onLoad);
 };
 
+/**
+ * On load
+ */
+GameRepository.prototype.onLoad = function()
+{
+    this.game.bonusManager.off('load', this.onLoad);
+    this.emit('start');
+    this.client.addEvent('ready', null, this.onReady);
+    this.game.start();
+};
 
 /**
  * On sockect diconnected
@@ -57,16 +67,6 @@ GameRepository.prototype.onDisconnect = function()
     this.game.stop();
     this.game = null;
     this.emit('stop');
-};
-
-/**
- * On load
- */
-GameRepository.prototype.onLoad = function()
-{
-    this.emit('start');
-    this.client.addEvent('ready', null, this.onReady);
-    this.game.start();
 };
 
 /**
