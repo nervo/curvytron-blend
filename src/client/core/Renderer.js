@@ -127,6 +127,7 @@ Renderer.prototype.draw = function(step)
         width  = this.camera.width,
         height = this.camera.height;
 
+    this.cleanBorder(x, y);
     this.canvas.drawImageSizeToAt(this.map.element, x, y, width, height, 0, 0, width, height);
     this.canvas.drawImageSizeToAt(this.background.element, x, y, width, height, 0, 0, width, height);
 
@@ -149,6 +150,30 @@ Renderer.prototype.draw = function(step)
                 this.drawAnimation(now, animation);
             }
         }
+    }
+};
+
+/**
+ * Clean map border
+ *
+ * @param {Number} x
+ * @param {Number} y
+ */
+Renderer.prototype.cleanBorder = function(x, y)
+{
+    if (x < 0) {
+        this.canvas.clearZone(0, 0, -x, this.canvas.element.height);
+    } else if (x > this.game.size - this.camera.scaleWidth) {
+        var cleanX = this.camera.x(this.game.size);
+        this.canvas.clearZone(cleanX, 0, this.canvas.element.width - cleanX, this.canvas.element.height);
+    }
+
+    if (y < 0) {
+        this.canvas.clearZone(0, 0, this.canvas.element.width, -y);
+    } else if (y > this.game.size - this.camera.scaleHeight) {
+        var cleanY = this.camera.y(this.game.size);
+
+        this.canvas.clearZone(0, cleanY, this.canvas.element.width, this.canvas.element.height - cleanY);
     }
 };
 
