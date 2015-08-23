@@ -6,7 +6,7 @@
 function Renderer(game)
 {
     this.game       = game;
-    this.camera     = new Camera({x: game.size/2, y:  game.size/2});
+    this.camera     = new Camera({x: this.game.size/2, y: this.game.size/2}, this.game.size);
     this.canvas     = new Canvas(0, 0, document.getElementById('render'));
     this.background = new Canvas();
     this.map        = new Canvas();
@@ -99,6 +99,7 @@ Renderer.prototype.draw = function(step)
     }
 
     this.camera.updateScene();
+    this.camera.updateMap();
     this.drawMap();
 
     for (i = this.game.avatars.items.length - 1; i >= 0; i--) {
@@ -122,14 +123,13 @@ Renderer.prototype.draw = function(step)
         }
     }
 
-    var x      = this.canvas.round(this.camera.xMin * this.camera.scale),
-        y      = this.canvas.round(this.camera.yMin * this.camera.scale),
-        width  = this.camera.width,
-        height = this.camera.height;
+    var x = this.camera.x(0),
+        y = this.camera.y(0);
 
-    this.cleanBorder(x, y);
-    this.canvas.drawImageSizeToAt(this.map.element, x, y, width, height, 0, 0, width, height);
-    this.canvas.drawImageSizeToAt(this.background.element, x, y, width, height, 0, 0, width, height);
+    this.cleanBorder();
+    this.canvas.drawImageTo(this.map.element, x, y);
+    this.canvas.drawImageTo(this.background.element, x, y);
+
 
     for (i = this.game.bonusManager.bonuses.items.length - 1; i >= 0; i--) {
         this.drawBonus(this.game.bonusManager.bonuses.items[i]);
@@ -155,25 +155,30 @@ Renderer.prototype.draw = function(step)
 
 /**
  * Clean map border
- *
- * @param {Number} x
- * @param {Number} y
  */
-Renderer.prototype.cleanBorder = function(x, y)
+Renderer.prototype.cleanBorder = function()
 {
-    if (x < 0) {
-        this.canvas.clearZone(0, 0, -x, this.canvas.element.height);
-    } else if (x > this.game.size - this.camera.scaleWidth) {
-        var cleanX = this.camera.x(this.game.size);
-        this.canvas.clearZone(cleanX, 0, this.canvas.element.width - cleanX, this.canvas.element.height);
+    var left = this.camera.getMapLeft(),
+        top  = this.camera.getMapTop();
+
+    if (left) {
+        this.canvas.clearZone(0, 0, left, this.canvas.element.height);
+    } else {
+        var right = this.camera.getMapRight();
+
+        if (right) {
+            this.canvas.clearZone(this.canvas.element.width - right, 0, right, this.canvas.element.height);
+        }
     }
 
-    if (y < 0) {
-        this.canvas.clearZone(0, 0, this.canvas.element.width, -y);
-    } else if (y > this.game.size - this.camera.scaleHeight) {
-        var cleanY = this.camera.y(this.game.size);
+    if (top) {
+        this.canvas.clearZone(0, 0, this.canvas.element.width, top);
+    } else {
+        var bottom = this.camera.getMapBottom();
 
-        this.canvas.clearZone(0, cleanY, this.canvas.element.width, this.canvas.element.height - cleanY);
+        if (bottom) {
+            this.canvas.clearZone(0, this.canvas.element.height - bottom, this.canvas.element.width, bottom);
+        }
     }
 };
 

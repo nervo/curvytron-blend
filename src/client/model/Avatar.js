@@ -68,6 +68,18 @@ Avatar.prototype.setLocal = function()
 };
 
 /**
+ * Set position
+ *
+ * @param {Number} x
+ * @param {Number} y
+ */
+Avatar.prototype.setPosition = function(x, y)
+{
+    BaseAvatar.prototype.setPosition.call(this, x, y);
+    this.emit('position', this);
+};
+
+/**
  * Set position (from server)
  *
  * @param {Number} x
@@ -75,7 +87,7 @@ Avatar.prototype.setLocal = function()
  */
 Avatar.prototype.setPositionFromServer = function(x, y)
 {
-    BaseAvatar.prototype.setPosition.call(this, x, y);
+    this.setPosition(x, y);
 
     this.changed = true;
 
