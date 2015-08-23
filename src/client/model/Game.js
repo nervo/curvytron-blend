@@ -90,7 +90,7 @@ Game.prototype.onStart = function()
  */
 Game.prototype.clearTrails = function()
 {
-    this.renderer.clearBackground();
+    this.trails.clear();
 };
 
 /**
@@ -145,10 +145,14 @@ Game.prototype.onDie = function(event)
  */
 Game.prototype.getTrail = function(avatar, radius, color)
 {
-    var id = OrphanTrail.prototype.getId(avatar, radius, color);
+    var id = Trail.prototype.getId(avatar, radius, color);
 
     if (!this.trails.indexExists(id)) {
-        this.trails.add(new OrphanTrail(avatar, radius, color));
+        var trail = new Trail(avatar, radius, color);
+
+        this.trails.add(trail);
+
+        return trail;
     }
 
     return this.trails.getById(id);

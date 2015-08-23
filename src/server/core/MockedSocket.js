@@ -1,11 +1,13 @@
 /**
  * Mocked socket
  */
-function MockedSocket(timeToReady)
+function MockedSocket(timeToJoin)
 {
     this.events = {};
 
-    setTimeout(this.ready.bind(this), timeToReady);
+    this.join = this.join.bind(this);
+
+    setTimeout(this.join, (Math.random() * 3 + 2) * 1000);
 }
 
 /**
@@ -32,11 +34,11 @@ MockedSocket.prototype.ping = function() {};
 MockedSocket.prototype.send = function() {};
 
 /**
- * Emit ready
+ * Emit join
  */
-MockedSocket.prototype.ready = function()
+MockedSocket.prototype.join = function()
 {
-    this.emit('ready', null, function () {});
+    this.emit('join', null, function () {});
 };
 
 /**

@@ -15,7 +15,6 @@ function GameController()
     this.onSpawn        = this.onSpawn.bind(this);
     this.onDie          = this.onDie.bind(this);
     this.onPosition     = this.onPosition.bind(this);
-    this.onAngle        = this.onAngle.bind(this);
     this.onPoint        = this.onPoint.bind(this);
     this.onProperty     = this.onProperty.bind(this);
     this.onBonusStack   = this.onBonusStack.bind(this);
@@ -174,8 +173,7 @@ GameController.prototype.attachAvatarEvents = function(avatar)
     avatar.on('die', this.onDie);
     avatar.on('spawn', this.onSpawn);
     avatar.on('position', this.onPosition);
-    avatar.on('angle', this.onAngle);
-    avatar.on('point', this.onPoint);
+    avatar.on('point:important', this.onPoint);
     avatar.on('property', this.onProperty);
     avatar.bonusStack.on('change', this.onBonusStack);
 };
@@ -190,7 +188,7 @@ GameController.prototype.detachAvatarEvents = function(avatar)
     avatar.removeListener('die', this.onDie);
     avatar.removeListener('spawn', this.onSpawn);
     avatar.removeListener('position', this.onPosition);
-    avatar.removeListener('point', this.onPoint);
+    avatar.removeListener('point:important', this.onPoint);
     avatar.removeListener('property', this.onProperty);
     avatar.bonusStack.removeListener('change', this.onBonusStack);
 };
@@ -231,6 +229,7 @@ GameController.prototype.sumUp = function(client)
 
     for (var point, k = this.game.world.bodies.items.length - 1; k >= 0; k--) {
         body = this.game.world.bodies.items[k];
+
         events.push(['point', [
             this.compressor.compress(body.x),
             this.compressor.compress(body.y),
@@ -328,9 +327,7 @@ GameController.prototype.onMove = function(client, data)
  */
 GameController.prototype.onPoint = function(data)
 {
-    if (data.important) {
-        this.socketGroup.addEvent('avatar:point', data.avatar.id);
-    }
+    this.socketGroup.addEvent('avatar:point', data.id);
 };
 
 /**
@@ -344,19 +341,6 @@ GameController.prototype.onPosition = function(avatar)
         avatar.id,
         this.compressor.compress(avatar.x),
         this.compressor.compress(avatar.y)
-    ]);
-};
-
-/**
- * On angle
- *
- * @param {Avatar} avatar
- */
-GameController.prototype.onAngle = function(avatar)
-{
-    this.socketGroup.addEvent('angle', [
-        avatar.id,
-        this.compressor.compress(avatar.angle)
     ]);
 };
 
@@ -379,8 +363,7 @@ GameController.prototype.onDie = function(data)
 {
     this.socketGroup.addEvent('die', [
         data.avatar.id,
-        data.killer ? data.killer.id : null,
-        data.old
+        this.compressor.compress(data.avatar.angle)
     ]);
 };
 
@@ -437,11 +420,7 @@ GameController.prototype.onBonusStack = function(data)
         data.bonus.constructor.name,
         data.bonus.duration
     ]);
-
-    // TODO: Send to spectators?
 };
-
-// Game events:
 
 /**
  * On game start

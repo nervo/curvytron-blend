@@ -8,7 +8,6 @@ function Renderer(game)
     this.game       = game;
     this.camera     = new Camera({x: this.game.size/2, y: this.game.size/2}, this.game.size);
     this.canvas     = new Canvas(0, 0, document.getElementById('render'));
-    this.background = new Canvas();
     this.map        = new Canvas();
     this.animations = new Collection([], 'id', true);
     this.mapChanged = true;
@@ -62,7 +61,6 @@ Renderer.prototype.onResize = function()
 
     this.camera.setDimension(width, height, scale);
     this.canvas.setDimension(width, height, scale);
-    this.background.setDimensionWithContent(zoom, zoom, scale);
     this.map.setDimensionWithContent(zoom, zoom, scale);
 
     for (var i = this.game.avatars.items.length - 1; i >= 0; i--) {
@@ -112,23 +110,16 @@ Renderer.prototype.draw = function(step)
         }
     }
 
-    for (i = this.game.trails.items.length - 1; i >= 0; i--) {
-        trail  = this.game.trails.items[i];
-        points = trail.getLastSegment();
-
-        if (points) {
-            this.drawTrail(points, trail.width, trail.color);
-        } else {
-            this.game.trails.remove(trail);
-        }
-    }
-
     var x = this.camera.x(0),
         y = this.camera.y(0);
 
     this.cleanBorder();
     this.canvas.drawImageTo(this.map.element, x, y);
-    this.canvas.drawImageTo(this.background.element, x, y);
+    this.canvas.setLineCap('round');
+
+    for (i = this.game.trails.items.length - 1; i >= 0; i--) {
+        this.drawTrail(this.game.trails.items[i]);
+    }
 
 
     for (i = this.game.bonusManager.bonuses.items.length - 1; i >= 0; i--) {
@@ -193,22 +184,28 @@ Renderer.prototype.updateAvatar = function(avatar, step)
     if (avatar.alive) {
         avatar.update(this.frame ? step : 0);
     }
-
-    var points = avatar.trail.getLastSegment();
-
-    if (points) {
-        this.drawTrail(points, avatar.width, avatar.color);
-    }
 };
 
 /**
  * Draw tail
  *
- * @param {Avatar} avatar
+ * @param {Trail} trail
  */
-Renderer.prototype.drawTrail = function(points, width, color)
+Renderer.prototype.drawTrail = function(trail)
 {
-    this.background.drawLineScaled(points, width, color, 'round');
+    if (trail.isEmpty()) {
+        return;
+    }
+
+    this.canvas.setStroke(trail.color);
+    this.canvas.setLineWidth(trail.width * this.canvas.scale);
+
+    for (var segment, i = trail.segments.length - 1; i >= 0; i--) {
+        segment = trail.segments[i];
+        if (this.camera.isBoxVisible(segment.left, segment.right, segment.top, segment.bottom)) {
+            this.canvas.drawLineInCamera(this.camera, segment.Xs, segment.Ys);
+        }
+    }
 };
 
 /**
@@ -291,12 +288,4 @@ Renderer.prototype.drawAnimation = function(now, animation)
 Renderer.prototype.drawArrow = function(avatar)
 {
     this.effect.drawImageScaledAngle(avatar.arrow.element, avatar.x - 5, avatar.y - 5, 10, 10, avatar.angle);
-};
-
-/**
- * Clear background with color
- */
-Renderer.prototype.clearBackground = function()
-{
-    this.background.clear();
 };

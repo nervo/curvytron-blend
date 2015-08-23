@@ -16,7 +16,6 @@ function GameRepository ()
     this.onBonusClear   = this.onBonusClear.bind(this);
     this.onBonusStack   = this.onBonusStack.bind(this);
     this.onPosition     = this.onPosition.bind(this);
-    this.onAngle        = this.onAngle.bind(this);
     this.onPoint        = this.onPoint.bind(this);
     this.onAvatarPoint  = this.onAvatarPoint.bind(this);
     this.onSpawn        = this.onSpawn.bind(this);
@@ -131,7 +130,7 @@ GameRepository.prototype.detachEvents = function()
  */
 GameRepository.prototype.move = function(move)
 {
-    this.client.addEvent('move', move);
+    this.client.addEvent('move', move, null ,true);
 };
 
 /**
@@ -191,6 +190,17 @@ GameRepository.prototype.onPosition = function(e)
             this.compressor.decompress(e.detail[1]),
             this.compressor.decompress(e.detail[2])
         );
+
+        if (avatar.printing) {
+            var trail = this.game.getTrail(avatar.id, avatar.radius, avatar.color);
+
+            if (avatar.turning && avatar.isTimeToDraw()) {
+                trail.add(avatar.x, avatar.y);
+                avatar.addPoint();
+            } else {
+                trail.update(avatar.x, avatar.y);
+            }
+        }
     }
 };
 
@@ -207,7 +217,7 @@ GameRepository.prototype.onPoint = function(e)
         color  = e.detail[3],
         avatar = e.detail[4];
 
-    this.game.getTrail(avatar, radius, color).addPoint(x, y);
+    this.game.getTrail(avatar, radius, color).add(x, y);
 };
 
 /**
@@ -220,21 +230,8 @@ GameRepository.prototype.onAvatarPoint = function(e)
     var avatar = this.game.avatars.getById(e.detail);
 
     if (avatar) {
-        avatar.addPoint(avatar.x, avatar.y);
-    }
-};
-
-/**
- * On angle
- *
- * @param {Event} e
- */
-GameRepository.prototype.onAngle = function(e)
-{
-    var avatar = this.game.avatars.getById(e.detail[0]);
-
-    if (avatar) {
-        avatar.setAngle(this.compressor.decompress(e.detail[1]));
+        this.game.getTrail(avatar.id, avatar.radius, avatar.color).add(avatar.x, avatar.y);
+        avatar.addPoint();
     }
 };
 
@@ -264,6 +261,7 @@ GameRepository.prototype.onDie = function(e)
     var avatar = this.game.avatars.getById(e.detail[0]);
 
     if (avatar) {
+        avatar.setAngle(this.compressor.decompress(e.detail[1]));
         avatar.die();
         this.sound.play('death');
     }

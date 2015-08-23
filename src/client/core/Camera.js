@@ -112,7 +112,22 @@ Camera.prototype.isVisible = function(x, y)
 };
 
 /**
- * Get relative x position
+ * Is box visible
+ *
+ * @param {Number} left
+ * @param {Number} right
+ * @param {Number} top
+ * @param {Number} bottom
+ *
+ * @return {Boolean}
+ */
+Camera.prototype.isBoxVisible = function(left, right, top, bottom)
+{
+    return left <= this.sceneRight && right >= this.sceneLeft && top <= this.sceneBottom && bottom >= this.sceneTop;
+};
+
+/**
+ * Get relative x position (rounded)
  *
  * @param {Number} x
  *
@@ -124,7 +139,7 @@ Camera.prototype.x = function(x)
 };
 
 /**
- * Get relative y position
+ * Get relative y position (rounded)
  *
  * @param {Number} y
  *
@@ -133,6 +148,30 @@ Camera.prototype.x = function(x)
 Camera.prototype.y = function(y)
 {
     return this.round((y - this.sceneTop) * this.scale);
+};
+
+/**
+ * Get relative x position
+ *
+ * @param {Number} x
+ *
+ * @return {Number}
+ */
+Camera.prototype.xPosition = function(x)
+{
+    return (x - this.sceneLeft) * this.scale;
+};
+
+/**
+ * Get relative y position
+ *
+ * @param {Number} y
+ *
+ * @return {Number}
+ */
+Camera.prototype.yPosition = function(y)
+{
+    return (y - this.sceneTop) * this.scale;
 };
 
 /**

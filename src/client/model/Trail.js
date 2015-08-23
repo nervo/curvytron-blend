@@ -1,17 +1,23 @@
 /**
  * Trail
+ *
+ * @param {Number} avatar
+ * @param {Number} radius
+ * @param {String} color
  */
-function Trail()
+function Trail(avatar, radius, color)
 {
-    BaseTrail.call(this);
-
-    this.current    = [];
-    this.segments   = [];
+    this.id         = this.getId(avatar, radius, color);
+    this.avatar     = avatar;
+    this.radius     = radius;
+    this.width      = radius * 2;
+    this.color      = color;
+    this.current    = new TrailSegment();
+    this.segments   = [this.current];
+    this.lastX      = 0;
+    this.lastY      = 0;
     this.clearAsked = false;
 }
-
-Trail.prototype = Object.create(BaseTrail.prototype);
-Trail.prototype.constructor = Trail;
 
 /**
  * Distance tolerance
@@ -21,41 +27,37 @@ Trail.prototype.constructor = Trail;
 Trail.prototype.tolerance = 1;
 
 /**
- * Get last segment
- *
- * @return {Array}
- */
-Trail.prototype.getLastSegment = function()
-{
-    if (this.segments.length) {
-        return this.segments.shift();
-    }
-
-    if (this.current.length < 2) {
-        return false;
-    }
-
-    var points = this.current.slice(0);
-
-    this.current.splice(0, this.current.length - 1);
-
-    return points;
-};
-
-/**
  * Add point
  *
  * @param {Number} x
  * @param {Number} y
  */
-Trail.prototype.addPoint = function(x, y)
+Trail.prototype.add = function(x, y)
 {
     if (this.isFar(x, y)) {
         this.clear();
     }
 
-    BaseTrail.prototype.addPoint.call(this, x, y);
-    this.current.push([x, y]);
+    this.lastX = x;
+    this.lastY = y;
+    this.current.add(x, y);
+};
+
+/**
+ * Update head
+ *
+ * @param {Number} x
+ * @param {Number} y
+ */
+Trail.prototype.update = function(x, y)
+{
+    if (this.isFar(x, y)) {
+        this.clear();
+    }
+
+    this.lastX = x;
+    this.lastY = y;
+    this.current.setHead(x, y);
 };
 
 /**
@@ -68,7 +70,7 @@ Trail.prototype.addPoint = function(x, y)
  */
 Trail.prototype.isFar = function(x, y)
 {
-    if (this.lastX === null) {
+    if (this.lastX === null || this.lastY === null) {
         return false;
     }
 
@@ -80,10 +82,32 @@ Trail.prototype.isFar = function(x, y)
  */
 Trail.prototype.clear = function()
 {
-    if (this.current.length > 1) {
-        this.segments.push(this.current.splice(0));
+    if (!this.current.isEmpty()) {
+        this.current = new TrailSegment();
+        this.segments.push(this.current);
     }
+};
 
-    BaseTrail.prototype.clear.call(this);
-    this.current.length = 0;
+/**
+ * Get id from variables
+ *
+ * @param {Number} avatar
+ * @param {Number} radius
+ * @param {String} color
+ *
+ * @return {String}
+ */
+Trail.prototype.getId = function(avatar, radius, color)
+{
+    return avatar.toString() + '-' + radius.toString() + '-' + color;
+};
+
+/**
+ * Is empty
+ *
+ * @return {Boolean}
+ */
+Trail.prototype.isEmpty = function()
+{
+    return this.segments < 2 && this.current.isEmpty();
 };

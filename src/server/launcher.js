@@ -6,11 +6,12 @@ try {
 } catch (error) {
     config = {
         port: 8080,
-        inspector: { enabled: false }
+        inspector: { enabled: false },
+        bots: 0
     };
 }
 
-var server = new Server({ port: config.port });
+var server = new Server({ port: config.port, bots: config.bots });
 
 if (config.inspector.enabled) {
     try {

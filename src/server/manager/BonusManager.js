@@ -30,9 +30,9 @@ BonusManager.prototype.bonusTypes = [
     BonusEnemyFast,
     BonusEnemyBig,
     BonusEnemyInverse,
-    BonusEnemyStraightAngle,
+    //BonusEnemyStraightAngle,
     //BonusGameBorderless,
-    BonusAllColor,
+    //BonusAllColor,
     BonusGameClear
 ];
 

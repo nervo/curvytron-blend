@@ -78,6 +78,36 @@ Canvas.prototype.setFill = function(color)
 };
 
 /**
+ * Set stroke color
+ *
+ * @param {String} color
+ */
+Canvas.prototype.setStroke = function(color)
+{
+    this.context.strokeStyle = color;
+};
+
+/**
+ * Set line cap
+ *
+ * @param {String} style
+ */
+Canvas.prototype.setLineCap = function(style)
+{
+    this.context.lineCap = style;
+};
+
+/**
+ * Set line width
+ *
+ * @param {Number} width
+ */
+Canvas.prototype.setLineWidth = function(width)
+{
+    this.context.lineWidth = width;
+};
+
+/**
  * Set dimension
  *
  * @param {Number} width
@@ -337,11 +367,33 @@ Canvas.prototype.drawLineScaled = function(points, width, color, style)
 };
 
 /**
+ * Draw line in camera
+ *
+ * @param {Camera} camera
+ * @param {Array} Xs
+ * @param {Array} Ys
+ */
+Canvas.prototype.drawLineInCamera = function(camera, Xs, Ys)
+{
+    var length = Xs.length;
+
+    this.context.beginPath();
+    this.context.moveTo(camera.xPosition(Xs[0]), camera.yPosition(Ys[0]));
+
+    for (var i = 1; i < length; i++) {
+        this.context.lineTo(camera.xPosition(Xs[i]), camera.yPosition(Ys[i]));
+    }
+
+    this.context.stroke();
+};
+
+/**
  * Draw full vertical line
  *
  * @param {Number} y
  */
-Canvas.prototype.drawHorizontalLine = function(y) {
+Canvas.prototype.drawHorizontalLine = function(y)
+{
     this.context.fillRect(0, y, this.element.width, 1);
 };
 
@@ -350,7 +402,8 @@ Canvas.prototype.drawHorizontalLine = function(y) {
  *
  * @param {Number} x
  */
-Canvas.prototype.drawVerticalLine = function(x) {
+Canvas.prototype.drawVerticalLine = function(x)
+{
     this.context.fillRect(x , 0, 1, this.element.height);
 };
 

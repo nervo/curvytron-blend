@@ -11,6 +11,7 @@ function Avatar(player)
     this.printManager = new PrintManager(this);
     this.body         = null;
     this.bodyCount    = 0;
+    this.isTurning    = false;
 }
 
 Avatar.prototype = Object.create(BaseAvatar.prototype);
@@ -35,7 +36,7 @@ Avatar.prototype.update = function(step)
         this.updatePosition(step);
 
         if (this.printing && this.isTimeToDraw()) {
-            this.addPoint(this.x, this.y);
+            this.addPoint(this.x, this.y, false);
         }
     }
 };
@@ -52,20 +53,6 @@ Avatar.prototype.getBody = function()
     }
 
     return this.body;
-};
-
-/**
- * Is time to draw?
- *
- * @return {Boolean}
- */
-Avatar.prototype.isTimeToDraw = function()
-{
-    if (this.trail.lastX === null) {
-        return true;
-    }
-
-    return this.getDistance(this.trail.lastX, this.trail.lastY, this.x, this.y) > this.radius;
 };
 
 /**
@@ -120,6 +107,12 @@ Avatar.prototype.setAngularVelocity = function(angularVelocity)
 {
     if (this.angularVelocity !== angularVelocity) {
         BaseAvatar.prototype.setAngularVelocity.call(this, angularVelocity);
+        var turning = this.angularVelocity !== 0;
+
+        if (this.turning !== turning) {
+            this.turning = turning;
+            this.emit('property', {avatar: this, property: 'turning', value: turning});
+        }
     }
 };
 
@@ -180,7 +173,12 @@ Avatar.prototype.setColor = function(color)
 Avatar.prototype.addPoint = function(x, y, important)
 {
     BaseAvatar.prototype.addPoint.call(this, x, y);
+
     this.emit('point', {avatar: this, x: x, y: y, important: important});
+
+    if (important) {
+        this.emit('point:important', this);
+    }
 };
 
 /**
@@ -190,8 +188,10 @@ Avatar.prototype.addPoint = function(x, y, important)
  */
 Avatar.prototype.setPrinting = function(printing)
 {
-    BaseAvatar.prototype.setPrinting.call(this, printing);
-    this.emit('property', {avatar: this, property: 'printing', value: this.printing});
+    if (BaseAvatar.prototype.setPrinting.call(this, printing)) {
+        this.addPoint(this.x, this.y, true);
+        this.emit('property', {avatar: this, property: 'printing', value: this.printing});
+    }
 };
 
 /**
@@ -213,6 +213,7 @@ Avatar.prototype.spawn = function()
 Avatar.prototype.die = function(killer, old)
 {
     BaseAvatar.prototype.die.call(this);
+    this.addPoint(this.x, this.y, false);
     this.printManager.stop();
     this.emit('die', {avatar: this, killer: killer, old: old});
 };

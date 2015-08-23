@@ -4,16 +4,14 @@
  * @param {Avatar} avatar
  * @param {Number} x
  * @param {Number} y
- * @param {Boolean} important
  */
-function AvatarBody(avatar, x, y, important)
+function AvatarBody(avatar, x, y)
 {
     Body.call(this, x, y, avatar.radius, avatar.id);
 
-    this.important = important;
-    this.color     = avatar.color;
-    this.num       = avatar.bodyCount++;
-    this.birth     = new Date().getTime();
+    this.color = avatar.color;
+    this.num   = avatar.bodyCount++;
+    this.birth = new Date().getTime();
 }
 
 AvatarBody.prototype = Object.create(Body.prototype);

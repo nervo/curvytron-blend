@@ -12,7 +12,6 @@ function BaseAvatar(name, color)
     this.name            = name;
     this.defaultColor    = color;
     this.color           = color;
-    this.trail           = new Trail();
     this.bonusStack      = new BonusStack(this);
     this.x               = 0;
     this.y               = 0;
@@ -22,6 +21,8 @@ function BaseAvatar(name, color)
     this.angularVelocity = 0;
     this.alive           = false;
     this.printing        = false;
+    this.lastPointX      = null;
+    this.lastPointY      = null;
 
     this.spawn = this.spawn.bind(this);
 }
@@ -34,7 +35,7 @@ BaseAvatar.prototype.constructor = BaseAvatar;
  *
  * @type {Number}
  */
-BaseAvatar.prototype.velocity = 16;
+BaseAvatar.prototype.velocity = 10;
 
 /**
  * Turn velocity
@@ -103,7 +104,22 @@ BaseAvatar.prototype.setPosition = function(x, y)
  */
 BaseAvatar.prototype.addPoint = function(x, y)
 {
-    this.trail.addPoint(x, y);
+    this.lastPointX = x;
+    this.lastPointY = y;
+};
+
+/**
+ * Is time to draw?
+ *
+ * @return {Boolean}
+ */
+BaseAvatar.prototype.isTimeToDraw = function()
+{
+    if (this.lastPointX === null || this.lastPointY === null) {
+        return true;
+    }
+
+    return this.getDistance(this.lastPointX, this.lastPointY, this.x, this.y) > this.radius;
 };
 
 /**
@@ -284,7 +300,6 @@ BaseAvatar.prototype.spawn = function()
 BaseAvatar.prototype.die = function()
 {
     this.alive = false;
-    this.addPoint(this.x, this.y);
     this.bonusStack.clear();
 };
 
@@ -300,8 +315,10 @@ BaseAvatar.prototype.setPrinting = function(printing)
     if (this.printing !== printing) {
         this.printing = printing;
 
-        this.addPoint(this.x, this.y, true);
+        return true;
     }
+
+    return false;
 };
 
 /**

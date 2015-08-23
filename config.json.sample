@@ -7,5 +7,6 @@
         "username": "curvytron",
         "password": "curvytron",
         "database": "curvytron"
-    }
+    },
+    "bots": 0
 }
