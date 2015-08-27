@@ -71,7 +71,7 @@ Game.prototype.clearFrame = function()
  *
  * @param {Number} step
  */
-Game.prototype.onFrame = function(step)
+Game.prototype.update = function(step)
 {
     this.renderer.draw(step);
 };

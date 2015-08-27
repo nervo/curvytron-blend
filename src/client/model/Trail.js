@@ -12,7 +12,7 @@ function Trail(avatar, radius, color)
     this.radius     = radius;
     this.width      = radius * 2;
     this.color      = color;
-    this.current    = new TrailSegment();
+    this.current    = new TrailSegment(this);
     this.segments   = [this.current];
     this.lastX      = 0;
     this.lastY      = 0;
@@ -83,7 +83,7 @@ Trail.prototype.isFar = function(x, y)
 Trail.prototype.clear = function()
 {
     if (!this.current.isEmpty()) {
-        this.current = new TrailSegment();
+        this.current = new TrailSegment(this);
         this.segments.push(this.current);
     }
 };
