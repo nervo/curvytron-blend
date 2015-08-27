@@ -46,6 +46,7 @@ Game.prototype.respawnTime = 5000;
  */
 Game.prototype.update = function(step)
 {
+    console.time('avatars:' + this.avatars.items.length);
     for (var avatar, border, position, body, i = this.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.avatars.items[i];
 
@@ -77,6 +78,7 @@ Game.prototype.update = function(step)
             }
         }
     }
+    console.timeEnd('avatars:' + this.avatars.items.length);
 };
 
 /**
@@ -182,7 +184,7 @@ Game.prototype.setSize = function()
  */
 Game.prototype.onStart = function()
 {
-    this.emit('game:start', {game: this});
+    this.emit('start', {game: this});
     this.world.activate();
     BaseGame.prototype.onStart.call(this);
 };
@@ -193,7 +195,7 @@ Game.prototype.onStart = function()
 Game.prototype.onStop = function()
 {
     BaseGame.prototype.onStop.call(this);
-    this.emit('game:stop', {game: this});
+    this.emit('stop', {game: this});
 };
 
 /**

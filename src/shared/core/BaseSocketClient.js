@@ -16,6 +16,8 @@ function BaseSocketClient(socket, interval)
     this.connected = true;
     this.callCount = 0;
 
+    console.log(this.interval);
+
     this.flush     = this.flush.bind(this);
     this.onMessage = this.onMessage.bind(this);
     this.onClose   = this.onClose.bind(this);

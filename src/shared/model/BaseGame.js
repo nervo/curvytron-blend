@@ -26,7 +26,7 @@ BaseGame.prototype.constructor = BaseGame;
  *
  * @type {Number}
  */
-BaseGame.prototype.framerate = 1/30 * 1000;
+BaseGame.prototype.framerate = 1/60 * 1000;
 
 /**
  * Map size factor per player
@@ -166,7 +166,9 @@ BaseGame.prototype.clearFrame = function()
  */
 BaseGame.prototype.onFrame = function(step)
 {
+    //console.time('frame');
     this.update(step);
+    //console.timeEnd('frame');
 };
 
 /**

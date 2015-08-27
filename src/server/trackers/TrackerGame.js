@@ -21,8 +21,8 @@ function GameTracker (inspector, game)
     this.sendFPS = this.sendFPS.bind(this);
 
     this.game.on('round:new', this.onRound);
-    this.game.on('game:start', this.onStart);
-    this.game.on('game:stop', this.onStop);
+    this.game.on('start', this.onStart);
+    this.game.on('stop', this.onStop);
     this.game.on('end', this.onEnd);
 }
 

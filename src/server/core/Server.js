@@ -59,7 +59,7 @@ Server.prototype.authorizationHandler = function(request, socket, head)
  */
 Server.prototype.onSocketConnection = function(socket, ip)
 {
-    var client = new SocketClient(socket, 1, ip);
+    var client = new SocketClient(socket, 20, ip);
     this.clients.add(client);
 
     client.on('close', this.onSocketDisconnection);
