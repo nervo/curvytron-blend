@@ -53,7 +53,7 @@ GameRepository.prototype.onLoad = function()
 {
     this.game.bonusManager.off('load', this.onLoad);
     this.emit('start');
-    this.client.addEvent('ready', null, this.onReady);
+    this.client.addEvent({name: 'ready'}, this.onReady);
     this.game.start();
 };
 
@@ -130,7 +130,7 @@ GameRepository.prototype.detachEvents = function()
  */
 GameRepository.prototype.move = function(move)
 {
-    this.client.addEvent('move', move, null ,true);
+    this.client.addEvent({name: 'move', data: move});
 };
 
 /**
@@ -138,7 +138,7 @@ GameRepository.prototype.move = function(move)
  */
 GameRepository.prototype.join = function()
 {
-    this.client.addEvent('join');
+    this.client.addEvent({name: 'join'});
 };
 
 /**
@@ -149,7 +149,7 @@ GameRepository.prototype.join = function()
  */
 GameRepository.prototype.setName = function(name, callback)
 {
-    this.client.addEvent('name', name, callback);
+    this.client.addEvent({name: 'name', data: name}, callback);
 };
 
 /**
@@ -159,7 +159,7 @@ GameRepository.prototype.setName = function(name, callback)
  */
 GameRepository.prototype.setColor = function(callback)
 {
-    this.client.addEvent('color', null, callback);
+    this.client.addEvent({name: 'color'}, callback);
 };
 
 /**
@@ -274,12 +274,7 @@ GameRepository.prototype.onDie = function(e)
  */
 GameRepository.prototype.onBonusPop = function(e)
 {
-    var bonus = new MapBonus(
-        e.detail[0],
-        this.compressor.decompress(e.detail[1]),
-        this.compressor.decompress(e.detail[2]),
-        e.detail[3]
-    );
+    var bonus = new MapBonus(e.detail.id, e.detail.x, e.detail.y, e.detail.name);
 
     this.game.bonusManager.add(bonus);
     this.sound.play('bonus-pop');

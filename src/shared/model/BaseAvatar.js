@@ -358,17 +358,3 @@ BaseAvatar.prototype.clear = function()
         this.body.radius = BaseAvatar.prototype.radius;
     }
 };
-
-/**
- * Serialize
- *
- * @return {Object}
- */
-BaseAvatar.prototype.serialize = function()
-{
-    return {
-        id: this.id,
-        name: this.name,
-        color: this.color
-    };
-};

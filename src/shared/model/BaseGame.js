@@ -111,6 +111,7 @@ BaseGame.prototype.stop = function()
  */
 BaseGame.prototype.loop = function()
 {
+    //console.time('game');
     this.newFrame();
 
     var now  = new Date().getTime(),
@@ -120,6 +121,7 @@ BaseGame.prototype.loop = function()
 
     this.onFrame(step);
     this.fps.onFrame();
+    //console.timeEnd('game');
 };
 
 /**

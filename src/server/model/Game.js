@@ -46,7 +46,6 @@ Game.prototype.respawnTime = 5000;
  */
 Game.prototype.update = function(step)
 {
-    console.time('avatars:' + this.avatars.items.length);
     for (var avatar, border, position, body, i = this.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.avatars.items[i];
 
@@ -78,7 +77,6 @@ Game.prototype.update = function(step)
             }
         }
     }
-    console.timeEnd('avatars:' + this.avatars.items.length);
 };
 
 /**

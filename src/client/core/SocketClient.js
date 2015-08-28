@@ -29,7 +29,6 @@ SocketClient.prototype.onOpen = function(e)
 {
     console.info('Connected.');
     this.connected = true;
-    this.start();
     this.emit('connected');
 };
 
@@ -41,12 +40,7 @@ SocketClient.prototype.onOpen = function(e)
 SocketClient.prototype.onClose = function(e)
 {
     console.info('Disconnected.');
-
     this.connected = false;
-    this.id        = null;
-
-    this.stop();
-
     this.emit('disconnected');
 };
 

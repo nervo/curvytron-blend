@@ -21,10 +21,10 @@ BonusManager.prototype.constructor = BonusManager;
  *
  * @type {Object}
  */
-BonusManager.prototype.assets = {};
+BonusManager.prototype.assets = [];
 
 /**
- * Bonuses position on the sprite
+ * Sprite position
  *
  * @type {Array}
  */

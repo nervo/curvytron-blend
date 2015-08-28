@@ -43,9 +43,11 @@ Profile.prototype.setName = function(name)
  */
 Profile.prototype.setColor = function(color)
 {
-    this.color.value            = color;
-    this.color.style.background = color;
-    this.join.style.background  = color;
+    var hex = this.rbgToHex(color);
+
+    this.color.value            = hex;
+    this.color.style.background = hex;
+    this.join.style.background  = hex;
 };
 
 /**
@@ -78,4 +80,16 @@ Profile.prototype.onSubmit = function(event)
 {
     event.preventDefault();
     this.emit('join');
+};
+
+/**
+ * Convert color from RBG array to Hexadecimal string
+ *
+ * @param {Array} color
+ *
+ * @return {String}
+ */
+Profile.prototype.rbgToHex = function(color)
+{
+    return '#' + color[0].toString(16) + color[1].toString(16) + color[2].toString(16);
 };
