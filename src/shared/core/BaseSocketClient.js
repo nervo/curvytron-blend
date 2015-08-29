@@ -142,8 +142,6 @@ BaseSocketClient.prototype.onMessage = function (e)
  */
 BaseSocketClient.prototype.processMessage = function(message)
 {
-    console.log('processMessage', message);
-
     if (typeof(message.id) !== 'undefined') {
         return this.playCallback(message.id, message.data);
     }

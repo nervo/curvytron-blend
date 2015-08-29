@@ -8,11 +8,14 @@ function BaseBinaryEncoder ()
         new LatencyHandler(),
         new ReadyCallbackResponseHandler(),
         new ColorCallbackResponseHandler(),
+        new NameCallbackResponseHandler(),
         new SimpleCallbackHandler('color'),
         new SimpleCallbackHandler('ready'),
+        new NameCallbackHandler(),
         new SimpleHandler('end'),
         new SimpleHandler('start'),
-        new SimpleHandler('stop')
+        new SimpleHandler('stop'),
+        new SimpleHandler('join')
     ], 'name');
 
     for (var i = this.handlers.items.length - 1; i >= 0; i--) {
@@ -29,7 +32,6 @@ function BaseBinaryEncoder ()
  */
 BaseBinaryEncoder.prototype.encode = function(events)
 {
-    console.log('encode', events);
     var length     = events.length,
         buffers    = [],
         byteLength = 0;
@@ -66,7 +68,7 @@ BaseBinaryEncoder.prototype.decode = function(buffer)
         count, childBuffer, event;
 
     while (cursor < byteLength) {
-        count       = new Uint16Array(buffer, cursor, cursor + 1)[0];
+        count       = new Uint16Array(buffer, cursor, 1)[0];
         cursor     += 2;
         childBuffer = buffer.slice(cursor, cursor + count);
         event       = this.decodeEvent(childBuffer);
