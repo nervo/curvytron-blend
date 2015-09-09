@@ -16,7 +16,7 @@ BaseHandler.prototype.byteLength = 2;
  *
  * @type {Number}
  */
-BaseHandler.prototype.precision = 10;
+BaseHandler.prototype.precision = 100;
 
 /**
  * Encode

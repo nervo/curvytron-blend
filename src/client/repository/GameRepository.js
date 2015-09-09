@@ -5,10 +5,9 @@ function GameRepository ()
 {
     EventEmitter.call(this);
 
-    this.client     = new SocketClient();
-    this.compressor = new Compressor();
-    this.sound      = new SoundManager();
-    this.game       = null;
+    this.client = new SocketClient();
+    this.sound  = new SoundManager();
+    this.game   = null;
 
     this.onConnect      = this.onConnect.bind(this);
     this.onDisconnect   = this.onDisconnect.bind(this);
@@ -85,7 +84,6 @@ GameRepository.prototype.attachEvents = function()
 {
     this.client.on('property', this.onProperty);
     this.client.on('position', this.onPosition);
-    this.client.on('angle', this.onAngle);
     this.client.on('avatar:point', this.onAvatarPoint);
     this.client.on('point', this.onPoint);
     this.client.on('die', this.onDie);
@@ -108,7 +106,6 @@ GameRepository.prototype.detachEvents = function()
 {
     this.client.off('property', this.onProperty);
     this.client.off('position', this.onPosition);
-    this.client.off('angle', this.onAngle);
     this.client.off('point', this.onPoint);
     this.client.off('die', this.onDie);
     this.client.off('spawn', this.onSpawn);
@@ -169,10 +166,10 @@ GameRepository.prototype.setColor = function(callback)
  */
 GameRepository.prototype.onProperty = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id);
 
     if (avatar) {
-        avatar.set(e.detail[1], e.detail[2]);
+        avatar.set(e.detail.property, e.detail.value);
     }
 };
 
@@ -183,13 +180,10 @@ GameRepository.prototype.onProperty = function(e)
  */
 GameRepository.prototype.onPosition = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id);
 
     if (avatar) {
-        avatar.setPositionFromServer(
-            this.compressor.decompress(e.detail[1]),
-            this.compressor.decompress(e.detail[2])
-        );
+        avatar.setPositionFromServer(e.detail.x, e.detail.y, e.detail.angle);
 
         if (avatar.printing) {
             var trail = this.game.getTrail(avatar.id, avatar.radius, avatar.color);
@@ -232,6 +226,8 @@ GameRepository.prototype.onAvatarPoint = function(e)
     if (avatar) {
         this.game.getTrail(avatar.id, avatar.radius, avatar.color).add(avatar.x, avatar.y);
         avatar.addPoint();
+    } else {
+        console.error('Could not find avatar "%s"', e.detail);
     }
 };
 
@@ -337,7 +333,7 @@ GameRepository.prototype.onBorderless = function(e)
  */
 GameRepository.prototype.onAvatarAdd = function(e)
 {
-    var avatar = new Avatar(e.detail[0], e.detail[1], e.detail[2]);
+    var avatar = new Avatar(e.detail.id, e.detail.name, this.rbgToHex(e.detail.color));
 
     if (this.game.addAvatar(avatar) && e.type === 'avatar:me') {
         avatar.setLocal();
@@ -368,4 +364,16 @@ GameRepository.prototype.onEnd = function()
     this.game.end();
     this.sound.play('win');
     this.emit('end');
+};
+
+/**
+ * Convert color from RBG array to Hexadecimal string
+ *
+ * @param {Array} color
+ *
+ * @return {String}
+ */
+GameRepository.prototype.rbgToHex = function(color)
+{
+    return '#' + color[0].toString(16) + color[1].toString(16) + color[2].toString(16);
 };

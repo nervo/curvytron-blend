@@ -1,43 +1,43 @@
 /**
- * BonusPop event handler
+ * Position event handler
  */
-function BonusPopHandler ()
+function PositionHandler ()
 {
     BaseHandler.call(this);
 }
 
-BonusPopHandler.prototype = Object.create(BaseHandler.prototype);
-BonusPopHandler.prototype.constructor = BonusPopHandler;
+PositionHandler.prototype = Object.create(BaseHandler.prototype);
+PositionHandler.prototype.constructor = PositionHandler;
 
 /**
  * Event name
  *
  * @type {String}
  */
-BonusPopHandler.prototype.name = 'bonus:pop';
+PositionHandler.prototype.name = 'position';
 
 /**
  * Byte length
  *
  * @type {Number}
  */
-BonusPopHandler.prototype.byteLength = BaseHandler.prototype.byteLength + 2 + 2 + 4;
+PositionHandler.prototype.byteLength = BaseHandler.prototype.byteLength + 2 + 4 + 2;
 
 /**
  * {@inheritdoc}
  */
-BonusPopHandler.prototype.encode = function(event)
+PositionHandler.prototype.encode = function(event)
 {
     var buffer       = BaseHandler.prototype.encode.call(this, event),
         cursor       = BaseHandler.prototype.byteLength,
         idView       = new Uint16Array(buffer, cursor, 1),
-        nameView     = new Uint8Array(buffer, cursor += 2, 2),
-        positionView = new Uint16Array(buffer, cursor += 2, 2);
+        positionView = new Uint16Array(buffer, cursor += 2, 2),
+        angleView    = new Uint16Array(buffer, cursor += 4, 1);
 
     idView[0]       = event.data.id;
-    nameView[0]     = BaseBonusManager.prototype.bonusTypes.indexOf(event.data.name);
     positionView[0] = this.compress(event.data.x);
     positionView[1] = this.compress(event.data.y);
+    angleView[0]    = this.compress(event.data.angle);
 
     return buffer;
 };
@@ -45,19 +45,19 @@ BonusPopHandler.prototype.encode = function(event)
 /**
  * {@inheritdoc}
  */
-BonusPopHandler.prototype.decode = function (buffer)
+PositionHandler.prototype.decode = function (buffer)
 {
     var event        = BaseHandler.prototype.decode.call(this, buffer),
         cursor       = BaseHandler.prototype.byteLength,
         idView       = new Uint16Array(buffer, cursor, 1),
-        nameView     = new Uint8Array(buffer, cursor += 2, 2),
-        positionView = new Uint16Array(buffer, cursor += 2, 2);
+        positionView = new Uint16Array(buffer, cursor += 2, 2),
+        angleView    = new Uint16Array(buffer, cursor += 4, 1);
 
     event.data = {
         id: idView[0],
         x: this.decompress(positionView[0]),
         y: this.decompress(positionView[1]),
-        name: BaseBonusManager.prototype.bonusTypes[nameView[0]]
+        angle: this.decompress(angleView[0])
     };
 
     return event;

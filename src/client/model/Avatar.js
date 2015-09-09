@@ -46,8 +46,10 @@ Avatar.prototype.arrowSize = 200;
 Avatar.prototype.update = function(step)
 {
     if (!this.changed && this.alive) {
+        console.log('no new from server', this.velocity, this.velocityX, this.velocityY, this.angularVelocity, this.x, this.y, this.angle);
         this.updateAngle(step);
         this.updatePosition(step);
+        console.log('updated', this.velocity, this.velocityX, this.velocityY, this.angularVelocity, this.x, this.y, this.angle);
     }
 
     if (this.viewChanged) {
@@ -85,10 +87,12 @@ Avatar.prototype.setPosition = function(x, y)
  *
  * @param {Number} x
  * @param {Number} y
+ * @param {Number} angle
  */
-Avatar.prototype.setPositionFromServer = function(x, y)
+Avatar.prototype.setPositionFromServer = function(x, y, angle)
 {
     this.setPosition(x, y);
+    this.setAngle(angle);
     this.changed = true;
 };
 

@@ -32,6 +32,7 @@ Avatar.prototype.warmupBeforePrint = 3000;
 Avatar.prototype.update = function(step)
 {
     if (this.alive) {
+        console.log('server', this.velocity, this.velocityX, this.velocityY, this.angularVelocity, this.x, this.y, this.angle);
         this.updateAngle(step);
         this.updatePosition(step);
 
@@ -82,19 +83,6 @@ Avatar.prototype.setVelocity = function(velocity)
     if (this.velocity !== velocity) {
         BaseAvatar.prototype.setVelocity.call(this, velocity);
         this.emit('property', {avatar: this, property: 'velocity', value: this.velocity});
-    }
-};
-
-/**
- * Set angle
- *
- * @param {Array} point
- */
-Avatar.prototype.setAngle = function(angle)
-{
-    if (this.angle !== angle) {
-        BaseAvatar.prototype.setAngle.call(this, angle);
-        this.emit('angle', this);
     }
 };
 

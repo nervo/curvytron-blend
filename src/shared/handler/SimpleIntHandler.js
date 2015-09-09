@@ -1,32 +1,27 @@
 /**
- * Latency event handler
+ * Simple int event handler
  */
-function LatencyHandler ()
+function SimpleIntHandler (name)
 {
     BaseHandler.call(this);
+
+    this.name = name;
 }
 
-LatencyHandler.prototype = Object.create(BaseHandler.prototype);
-LatencyHandler.prototype.constructor = LatencyHandler;
-
-/**
- * Event name
- *
- * @type {String}
- */
-LatencyHandler.prototype.name = 'latency';
+SimpleIntHandler.prototype = Object.create(BaseHandler.prototype);
+SimpleIntHandler.prototype.constructor = SimpleIntHandler;
 
 /**
  * Byte length
  *
  * @type {Number}
  */
-LatencyHandler.prototype.byteLength = BaseHandler.prototype.byteLength + 2;
+SimpleIntHandler.prototype.byteLength = BaseHandler.prototype.byteLength + 2;
 
 /**
  * {@inheritdoc}
  */
-LatencyHandler.prototype.encode = function(event)
+SimpleIntHandler.prototype.encode = function(event)
 {
     var buffer = BaseHandler.prototype.encode.call(this, event);
 
@@ -38,7 +33,7 @@ LatencyHandler.prototype.encode = function(event)
 /**
  * {@inheritdoc}
  */
-LatencyHandler.prototype.decode = function (buffer)
+SimpleIntHandler.prototype.decode = function (buffer)
 {
     var event = BaseHandler.prototype.decode.call(this, buffer);
 

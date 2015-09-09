@@ -4,18 +4,31 @@
 function BaseBinaryEncoder ()
 {
     this.handlers = new Collection([
+        new AvatarAddHandler('avatar:me'),
+        new AvatarAddHandler(),
         new BonusPopHandler(),
-        new LatencyHandler(),
-        new ReadyCallbackResponseHandler(),
+        new BooleanPropertyHandler('invincible'),
+        new BooleanPropertyHandler('printing'),
+        new BooleanPropertyHandler('turning'),
+        new IntPropertyHandler('velocity'),
+        new IntPropertyHandler('radius'),
         new ColorCallbackResponseHandler(),
+        new MoveHandler(),
+        new NameCallbackHandler(),
         new NameCallbackResponseHandler(),
+        new PositionHandler(),
+        new ReadyCallbackResponseHandler(),
         new SimpleCallbackHandler('color'),
         new SimpleCallbackHandler('ready'),
-        new NameCallbackHandler(),
+        new SimpleHandler('clear'),
         new SimpleHandler('end'),
+        new SimpleHandler('join'),
         new SimpleHandler('start'),
         new SimpleHandler('stop'),
-        new SimpleHandler('join')
+        new SimpleIntHandler('avatar:point'),
+        new SimpleIntHandler('bonus:clear'),
+        new SimpleIntHandler('latency'),
+        new SimpleIntHandler('spawn')
     ], 'name');
 
     for (var i = this.handlers.items.length - 1; i >= 0; i--) {

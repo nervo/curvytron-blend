@@ -39,7 +39,7 @@ function Ticker (game, clients)
  *
  * @type {Number}
  */
-Ticker.prototype.tickrate = 1/60 * 1000;
+Ticker.prototype.tickrate = 1/10 * 1000;
 
 /**
  * Start loop
@@ -214,7 +214,7 @@ Ticker.prototype.onAvatarAdd = function(data)
     };
 
     this.attachAvatarEvents(data);
-    //data.player.client.addEvent(event);
+    data.player.client.addEvent({name: 'avatar:me', data: event.data});
     this.addEvent(event);
 };
 
@@ -248,8 +248,9 @@ Ticker.prototype.onPosition = function(avatar)
         name: 'position',
         data: {
             id: avatar.id,
-            x: /*this.compressor.compress(*/avatar.x/*)*/,
-            y: /*this.compressor.compress(*/avatar.y/*)*/
+            x: avatar.x,
+            y: avatar.y,
+            angle: avatar.angle
         }
     });
 };
@@ -275,7 +276,7 @@ Ticker.prototype.onDie = function(data)
         name: 'die',
         data: {
             id: data.avatar.id,
-            angle: /*this.compressor.compress(*/data.avatar.angle/*)*/
+            angle: data.avatar.angle
         }
     });
 };
@@ -291,8 +292,8 @@ Ticker.prototype.onBonusPop = function(bonus)
         name: 'bonus:pop',
         data: {
             id: bonus.id,
-            x: /*this.compressor.compress(*/bonus.x/*)*/,
-            y: /*this.compressor.compress(*/bonus.y/*)*/,
+            x: bonus.x,
+            y: bonus.y,
             name: bonus.constructor.name
         }
     });
@@ -316,10 +317,9 @@ Ticker.prototype.onBonusClear = function(bonus)
 Ticker.prototype.onProperty = function(data)
 {
     this.addNamedEvent('property:' + data.property + ':' + data.avatar.id, {
-        name: 'property',
+        name: 'property:' + data.property,
         data: {
             id: data.avatar.id,
-            property: data.property,
             value: data.value
         }
     });
@@ -401,12 +401,15 @@ Ticker.prototype.onEnd = function(data)
  */
 Ticker.prototype.sumUp = function(client)
 {
-    var properties = {
-            angle: 'angle',
-            radius: 'radius',
-            color: 'color',
-            printing: 'printing'
-        },
+    var properties = [
+            'velocity',
+            'turning',
+            'printing',
+            'radius',
+            'invincible',
+            'inverse',
+            'color'
+        ],
         events = [];
 
     for (var avatar, i = this.game.avatars.items.length - 1; i >= 0; i--) {
@@ -414,18 +417,17 @@ Ticker.prototype.sumUp = function(client)
 
         events.push({name: 'avatar:add', data: {id: avatar.id, name: avatar.name, color: avatar.color}});
         events.push({name: 'spawn', data: avatar.id});
-        events.push({name: 'position', data: {id: avatar.id, x: /*this.compressor.compress(*/avatar.x/*)*/, y:/*this.compressor.compress(*/avatar.y/*)*/}});
+        events.push({name: 'position', data: {id: avatar.id, x: avatar.x, y: avatar.y, angle: avatar.angle}});
 
-        for (var property in properties) {
-            if (properties.hasOwnProperty(property)) {
-                events.push({name: 'property', data: {id: avatar.id, property: property, value: avatar[properties[property]]}});
-            }
+        for (var property, p = properties.length - 1; p >= 0; p--) {
+            property = properties[p];
+            events.push({name: 'property:' + property, data: {id: avatar.id, value: avatar[property]}});
         }
     }
 
     for (var bonus, j = this.game.bonusManager.bonuses.items.length - 1; j >= 0; j--) {
         bonus = this.game.bonusManager.bonuses.items[j];
-        events.push({name: 'bonus:pop', data: {id: bonus.id, x: /*this.compressor.compress(*/bonus.x/*)*/, y:/*this.compressor.compress(*/bonus.y/*)*/, name: bonus.constructor.name}});
+        events.push({name: 'bonus:pop', data: {id: bonus.id, x: bonus.x, y:bonus.y, name: bonus.constructor.name}});
     }
 
     for (var point, k = this.game.world.bodies.items.length - 1; k >= 0; k--) {
@@ -434,9 +436,9 @@ Ticker.prototype.sumUp = function(client)
         events.push({
             name: 'point',
             data: {
-                x: /*this.compressor.compress(*/body.x/*)*/,
-                y: /*this.compressor.compress(*/body.y/*)*/,
-                radius: /*this.compressor.compress(*/body.radius/*)*/,
+                x: body.x,
+                y: body.y,
+                radius: body.radius,
                 color: body.color,
                 data: body.data
             }

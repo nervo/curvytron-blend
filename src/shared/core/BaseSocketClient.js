@@ -3,12 +3,12 @@
  *
  * @param {Object} socket
  */
-function BaseSocketClient(socket)
+function BaseSocketClient(socket, encoder)
 {
     EventEmitter.call(this);
 
     this.socket    = socket;
-    this.encoder   = new BinaryEncoder();
+    this.encoder   = encoder;
     this.callbacks = {};
     this.connected = true;
     this.callCount = 0;

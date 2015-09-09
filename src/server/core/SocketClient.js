@@ -4,9 +4,9 @@
  * @param {Socket} socket
  * @param {String} ip
  */
-function SocketClient(socket, ip)
+function SocketClient(socket, encoder, ip)
 {
-    BaseSocketClient.call(this, socket);
+    BaseSocketClient.call(this, socket, encoder);
 
     this.ip         = ip;
     this.id         = null;

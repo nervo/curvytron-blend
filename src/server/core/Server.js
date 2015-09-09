@@ -10,6 +10,7 @@ function Server(config)
     this.server     = new http.Server(this.app);
     this.clients    = new Collection([], 'id', true);
     this.controller = new GameController();
+    this.encoder    = new BinaryEncoder();
 
     this.authorizationHandler  = this.authorizationHandler.bind(this);
     this.onSocketConnection    = this.onSocketConnection.bind(this);
@@ -25,7 +26,7 @@ function Server(config)
     console.info('Listening on port %s', config.port);
 
     for (var i = 0; i < config.bots; i++) {
-        this.onSocketConnection(new MockedSocket(), '192.168.0.' + i);
+        this.addClient(new SocketClientMock(this.encoder, '192.168.0.' + i));
     }
 }
 
@@ -59,14 +60,7 @@ Server.prototype.authorizationHandler = function(request, socket, head)
  */
 Server.prototype.onSocketConnection = function(socket, ip)
 {
-    var client = new SocketClient(socket, 20, ip);
-    this.clients.add(client);
-
-    client.on('close', this.onSocketDisconnection);
-    this.controller.attach(client);
-    this.emit('client', client);
-
-    console.info('Client %s connected.', client.id);
+    this.addClient(new SocketClient(socket, this.encoder, ip));
 };
 
 /**
@@ -80,6 +74,22 @@ Server.prototype.onSocketDisconnection = function(client)
 
     this.clients.remove(client);
 };
+
+/**
+ * Add client
+ *
+ * @param {SocketClient} client
+ */
+Server.prototype.addClient = function(client)
+{
+    this.clients.add(client);
+
+    client.on('close', this.onSocketDisconnection);
+    this.controller.attach(client);
+    this.emit('client', client);
+
+    console.info('Client %s connected.', client.id);
+}
 
 /**
  * On error
