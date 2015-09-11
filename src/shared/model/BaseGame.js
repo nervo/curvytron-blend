@@ -26,7 +26,7 @@ BaseGame.prototype.constructor = BaseGame;
  *
  * @type {Number}
  */
-BaseGame.prototype.framerate = 1/60 * 1000;
+BaseGame.prototype.framerate = 1000/15;
 
 /**
  * Map size factor per player
@@ -90,6 +90,7 @@ BaseGame.prototype.removeAvatar = function(avatar)
 BaseGame.prototype.start = function()
 {
     if (!this.frame) {
+        this.rendered = new Date().getTime();
         this.onStart();
         this.loop();
     }

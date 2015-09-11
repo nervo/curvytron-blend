@@ -12,13 +12,6 @@ function BaseHandler ()
 BaseHandler.prototype.byteLength = 2;
 
 /**
- * Float precision
- *
- * @type {Number}
- */
-BaseHandler.prototype.precision = 100;
-
-/**
  * Encode
  *
  * @param {Array} event
@@ -54,9 +47,9 @@ BaseHandler.prototype.decode = function (buffer)
  *
  * @return {Integer}
  */
-BaseHandler.prototype.compress = function(value)
+BaseHandler.prototype.compress = function(value, precision)
 {
-    return (0.5 + value * this.precision) | 0;
+    return (0.5 + value * precision) | 0;
 };
 
 /**
@@ -66,7 +59,7 @@ BaseHandler.prototype.compress = function(value)
  *
  * @return {Float}
  */
-BaseHandler.prototype.decompress = function(value)
+BaseHandler.prototype.decompress = function(value, precision)
 {
-    return value / this.precision;
+    return value / precision;
 };

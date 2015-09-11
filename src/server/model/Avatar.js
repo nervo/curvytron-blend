@@ -32,7 +32,6 @@ Avatar.prototype.warmupBeforePrint = 3000;
 Avatar.prototype.update = function(step)
 {
     if (this.alive) {
-        console.log('server', this.velocity, this.velocityX, this.velocityY, this.angularVelocity, this.x, this.y, this.angle);
         this.updateAngle(step);
         this.updatePosition(step);
 

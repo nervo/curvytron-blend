@@ -12,6 +12,7 @@ function MapBonus(id, x, y, type)
     BaseBonus.call(this, x, y);
 
     this.id         = id;
+    this.type       = type;
     this.asset      = this.assets[type];
     this.animation  = new BounceIn(600);
     this.drawRadius = 0;

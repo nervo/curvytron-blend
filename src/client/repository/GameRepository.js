@@ -254,10 +254,10 @@ GameRepository.prototype.onSpawn = function(e)
  */
 GameRepository.prototype.onDie = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id);
 
     if (avatar) {
-        avatar.setAngle(this.compressor.decompress(e.detail[1]));
+        avatar.setAngle(e.detail.angle);
         avatar.die();
         this.sound.play('death');
     }
@@ -298,10 +298,22 @@ GameRepository.prototype.onBonusClear = function(e)
  */
 GameRepository.prototype.onBonusStack = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id),
+        bonus;
 
     if (avatar && avatar.local) {
-        avatar.bonusStack[e.detail[1]](new StackedBonus(e.detail[2], e.detail[3], e.detail[4]));
+        if (e.detail.add) {
+            bonus = this.game.bonusManager.bonuses.getById(e.detail.bonus);
+            if (bonus) {
+                avatar.bonusStack.add(new StackedBonus(bonus.id, bonus.type));
+            }
+        } else {
+            bonus = avatar.bonusStack.bonuses.getById(e.detail.bonus);
+
+            if (bonus) {
+                avatar.bonusStack.remove(bonus);
+            }
+        }
     }
 };
 

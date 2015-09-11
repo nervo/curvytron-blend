@@ -10,28 +10,33 @@ function Ticker (game, clients)
     this.clients     = clients;
     this.events      = [];
     this.namedEvents = [];
+    this.rendered    = null;
     this.compressor  = new Compressor();
     this.encoder     = new BinaryEncoder();
+    this.fps         = new FPSLogger();
 
-    this.onStart        = this.onStart.bind(this);
-    this.onStop         = this.onStop.bind(this);
-    this.onEnd          = this.onEnd.bind(this);
-    this.onSpawn        = this.onSpawn.bind(this);
-    this.onDie          = this.onDie.bind(this);
-    this.onPosition     = this.onPosition.bind(this);
-    this.onPoint        = this.onPoint.bind(this);
-    this.onProperty     = this.onProperty.bind(this);
-    this.onBonusStack   = this.onBonusStack.bind(this);
-    this.onBonusPop     = this.onBonusPop.bind(this);
-    this.onBonusClear   = this.onBonusClear.bind(this);
-    this.onAvatarAdd    = this.onAvatarAdd.bind(this);
-    this.onAvatarRemove = this.onAvatarRemove.bind(this);
-    this.onClear        = this.onClear.bind(this);
-    this.onBorderless   = this.onBorderless.bind(this);
-    this.loop           = this.loop.bind(this);
+    this.onStart            = this.onStart.bind(this);
+    this.onStop             = this.onStop.bind(this);
+    this.onEnd              = this.onEnd.bind(this);
+    this.onSpawn            = this.onSpawn.bind(this);
+    this.onDie              = this.onDie.bind(this);
+    this.onPosition         = this.onPosition.bind(this);
+    this.onPoint            = this.onPoint.bind(this);
+    this.onProperty         = this.onProperty.bind(this);
+    this.onBonusStackAdd    = this.onBonusStackAdd.bind(this);
+    this.onBonusStackRemove = this.onBonusStackRemove.bind(this);
+    this.onBonusPop         = this.onBonusPop.bind(this);
+    this.onBonusClear       = this.onBonusClear.bind(this);
+    this.onAvatarAdd        = this.onAvatarAdd.bind(this);
+    this.onAvatarRemove     = this.onAvatarRemove.bind(this);
+    this.onClear            = this.onClear.bind(this);
+    this.onBorderless       = this.onBorderless.bind(this);
+    this.loop               = this.loop.bind(this);
 
     this.attachEvents();
     this.start();
+
+    //this.fps.on('fps', function (frequency) { console.log('tickrate: %s', frequency); });
 }
 
 /**
@@ -39,7 +44,7 @@ function Ticker (game, clients)
  *
  * @type {Number}
  */
-Ticker.prototype.tickrate = 1/10 * 1000;
+Ticker.prototype.tickrate = 1000/15;
 
 /**
  * Start loop
@@ -47,6 +52,8 @@ Ticker.prototype.tickrate = 1/10 * 1000;
 Ticker.prototype.start = function()
 {
     if (!this.frame) {
+        this.rendered = new Date().getTime();
+        this.fps.start();
         this.loop();
     }
 };
@@ -58,15 +65,20 @@ Ticker.prototype.stop = function()
 {
     if (this.frame) {
         this.clearFrame();
+        this.fps.stop();
     }
 };
 
 /**
  * Get new frame
  */
-Ticker.prototype.newFrame = function()
+Ticker.prototype.newFrame = function(step)
 {
-    this.frame = setTimeout(this.loop, this.tickrate);
+    if (step < this.tickrate) {
+        this.frame = setTimeout(this.loop, this.tickrate - step);
+    } else {
+        this.frame = setImmediate(this.loop);
+    }
 };
 
 /**
@@ -74,7 +86,12 @@ Ticker.prototype.newFrame = function()
  */
 Ticker.prototype.clearFrame = function()
 {
-    clearTimeout(this.frame);
+    if (this.frame instanceof immediateObject) {
+        clearImmediate(this.frame);
+    } else {
+        clearTimeout(this.frame);
+    }
+
     this.frame = null;
 };
 
@@ -84,8 +101,15 @@ Ticker.prototype.clearFrame = function()
 Ticker.prototype.loop = function()
 {
     //console.time('tick');
-    this.newFrame();
+    //
+    var now  = new Date().getTime(),
+        step = now - this.rendered;
+
+    this.rendered = now;
+
     this.flush();
+    this.fps.onFrame(step);
+    this.newFrame(step);
     //console.timeEnd('tick');
 };
 
@@ -152,7 +176,8 @@ Ticker.prototype.attachAvatarEvents = function(avatar)
     avatar.on('position', this.onPosition);
     avatar.on('point:important', this.onPoint);
     avatar.on('property', this.onProperty);
-    avatar.bonusStack.on('change', this.onBonusStack);
+    avatar.bonusStack.on('add', this.onBonusStackAdd);
+    avatar.bonusStack.on('remove', this.onBonusStackRemove);
 };
 
 /**
@@ -167,7 +192,8 @@ Ticker.prototype.detachAvatarEvents = function(avatar)
     avatar.removeListener('position', this.onPosition);
     avatar.removeListener('point:important', this.onPoint);
     avatar.removeListener('property', this.onProperty);
-    avatar.bonusStack.removeListener('change', this.onBonusStack);
+    avatar.bonusStack.removeListener('add', this.onBonusStackAdd);
+    avatar.bonusStack.removeListener('remove', this.onBonusStackRemove);
 };
 
 /**
@@ -330,19 +356,38 @@ Ticker.prototype.onProperty = function(data)
  *
  * @param {Object} data
  */
-Ticker.prototype.onBonusStack = function(data)
+Ticker.prototype.onBonusStackAdd = function(data)
+{
+    this.onBonusStack(data, true);
+};
+
+/**
+ * On bonus stack remove
+ *
+ * @param {Object} data
+ */
+Ticker.prototype.onBonusStackRemove = function(data)
+{
+    this.onBonusStack(data, false);
+};
+
+/**
+ * On bonus stack
+ *
+ * @param {Object} data
+ * @param {Boolean} add
+ */
+Ticker.prototype.onBonusStack = function(data, add)
 {
     data.avatar.player.client.addEvent({
         name:'bonus:stack',
         data: {
             id: data.avatar.id,
-            method: data.method,
-            bonusId: data.bonus.id,
-            bonusName: data.bonus.constructor.name,
-            bonusDuration: data.bonus.duration
+            bonus: data.bonus.id,
+            add: add
         }
     });
-};
+}
 
 /**
  * On game start

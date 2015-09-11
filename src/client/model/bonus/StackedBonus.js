@@ -3,14 +3,13 @@
  *
  * @param {Number} id
  * @param {String} type
- * @param {Number} duration
  */
-function StackedBonus(id, type, duration)
+function StackedBonus(id, type)
 {
     EventEmitter.call(this);
 
     this.id       = id;
-    this.duration = duration;
+    this.duration = this.durations[type];
     this.asset    = this.assets[type];
     this.changed  = true;
 
@@ -20,6 +19,26 @@ function StackedBonus(id, type, duration)
 
 StackedBonus.prototype = Object.create(EventEmitter.prototype);
 StackedBonus.prototype.constructor = StackedBonus;
+
+/**
+ * Durations
+ *
+ * @type {Object}
+ */
+StackedBonus.prototype.durations = {
+    BonusEnemyBig: BonusEnemyBig.prototype.duration,
+    BonusEnemyFast: BonusEnemyFast.prototype.duration,
+    BonusEnemyInverse: BonusEnemyInverse.prototype.duration,
+    BonusEnemySlow: BonusEnemySlow.prototype.duration,
+    BonusGameClear: BonusGameClear.prototype.duration,
+    BonusSelfFast: BonusSelfFast.prototype.duration,
+    BonusSelfMaster: BonusSelfMaster.prototype.duration,
+    BonusSelfSlow: BonusSelfSlow.prototype.duration,
+    BonusSelfSmall: BonusSelfSmall.prototype.duration,
+    BonusEnemyStraightAngle: BonusEnemyStraightAngle.prototype.duration,
+    BonusGameBorderless: BonusGameBorderless.prototype.duration,
+    BonusAllColor: BonusAllColor.prototype.duration
+};
 
 /**
  * Assets

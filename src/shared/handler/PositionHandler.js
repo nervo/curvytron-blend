@@ -35,9 +35,9 @@ PositionHandler.prototype.encode = function(event)
         angleView    = new Uint16Array(buffer, cursor += 4, 1);
 
     idView[0]       = event.data.id;
-    positionView[0] = this.compress(event.data.x);
-    positionView[1] = this.compress(event.data.y);
-    angleView[0]    = this.compress(event.data.angle);
+    positionView[0] = this.compress(event.data.x, 100);
+    positionView[1] = this.compress(event.data.y, 100);
+    angleView[0]    = this.compress(event.data.angle, 1000);
 
     return buffer;
 };
@@ -55,9 +55,9 @@ PositionHandler.prototype.decode = function (buffer)
 
     event.data = {
         id: idView[0],
-        x: this.decompress(positionView[0]),
-        y: this.decompress(positionView[1]),
-        angle: this.decompress(angleView[0])
+        x: this.decompress(positionView[0], 100),
+        y: this.decompress(positionView[1], 100),
+        angle: this.decompress(angleView[0], 1000)
     };
 
     return event;

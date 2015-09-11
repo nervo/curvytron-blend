@@ -46,10 +46,8 @@ Avatar.prototype.arrowSize = 200;
 Avatar.prototype.update = function(step)
 {
     if (!this.changed && this.alive) {
-        console.log('no new from server', this.velocity, this.velocityX, this.velocityY, this.angularVelocity, this.x, this.y, this.angle);
         this.updateAngle(step);
         this.updatePosition(step);
-        console.log('updated', this.velocity, this.velocityX, this.velocityY, this.angularVelocity, this.x, this.y, this.angle);
     }
 
     if (this.viewChanged) {

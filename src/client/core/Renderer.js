@@ -103,8 +103,8 @@ Renderer.prototype.draw = function(step)
     for (i = this.game.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.game.avatars.items[i];
         if ((!subjectIsPlayer || avatar.id !== this.camera.subject.id) && (avatar.alive || avatar.changed)) {
-            this.updateAvatar(avatar, step);
             if (this.camera.isVisible(avatar.x, avatar.y)) {
+                this.updateAvatar(avatar, step);
                 avatars.push(avatar);
             }
         }
@@ -183,7 +183,7 @@ Renderer.prototype.cleanBorder = function()
 Renderer.prototype.updateAvatar = function(avatar, step)
 {
     if (avatar.alive) {
-        avatar.update(this.frame ? step : 0);
+        avatar.update(step);
     }
 };
 
