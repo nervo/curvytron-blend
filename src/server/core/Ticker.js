@@ -437,53 +437,70 @@ Ticker.prototype.onEnd = function(data)
  */
 Ticker.prototype.sumUp = function(client)
 {
-    var properties = [
-            'velocity',
-            'turning',
-            'printing',
-            'radius',
-            'invincible',
-            'inverse',
-            'color'
-        ],
-        events = [];
+    var avatars = [];
 
     for (var avatar, i = this.game.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.game.avatars.items[i];
 
-        events.push({name: 'avatar:add', data: {id: avatar.id, name: avatar.name, color: avatar.color}});
-        events.push({name: 'spawn', data: avatar.id});
-        events.push({name: 'position', data: {id: avatar.id, x: avatar.x, y: avatar.y, angle: avatar.angle}});
-
-        for (var property, p = properties.length - 1; p >= 0; p--) {
-            property = properties[p];
-            events.push({name: 'property:' + property, data: {id: avatar.id, value: avatar[property]}});
-        }
+        avatars.push({
+            name: 'sumup:avatar',
+            data: {
+                id: avatar.id,
+                x: avatar.x,
+                y: avatar.y,
+                color: avatar.color,
+                angle: avatar.angle,
+                velocity: avatar.velocity,
+                radius: avatar.radius,
+                alive: avatar.alive,
+                turning: avatar.turning,
+                printing: avatar.printing,
+                invincible: avatar.invincible,
+                inverse: avatar.inverse,
+                name: avatar.name
+            }
+        });
     }
+
+    client.sendEvents(avatars);
+
+    var bonuses = [];
 
     for (var bonus, j = this.game.bonusManager.bonuses.items.length - 1; j >= 0; j--) {
         bonus = this.game.bonusManager.bonuses.items[j];
-        events.push({name: 'bonus:pop', data: {id: bonus.id, x: bonus.x, y:bonus.y, name: bonus.constructor.name}});
+        bonuses.push({
+            name: 'bonus:pop',
+            data: {
+                id: bonus.id,
+                x: bonus.x,
+                y:bonus.y,
+                name: bonus.constructor.name
+            }
+        });
     }
+
+    client.sendEvents(bonuses);
+
+    var points = [];
 
     for (var point, k = this.game.world.bodies.items.length - 1; k >= 0; k--) {
         body = this.game.world.bodies.items[k];
 
-        events.push({
-            name: 'point',
+        points.push({
+            name: 'sumup:point',
             data: {
                 x: body.x,
                 y: body.y,
                 radius: body.radius,
                 color: body.color,
-                data: body.data
+                avatar: body.data
             }
         });
     }
 
-    if (this.game.borderless) {
-        events.push({name: 'borderless', data: true});
-    }
+    client.sendEvents(points);
 
-    client.sendEvents(events);
+    /*if (this.game.borderless) {
+        events.push({name: 'borderless', data: true});
+    }*/
 };

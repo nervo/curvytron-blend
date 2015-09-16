@@ -29,9 +29,12 @@ function BaseBinaryEncoder ()
         new SimpleHandler('start'),
         new SimpleHandler('stop'),
         new SimpleIntHandler('avatar:point'),
+        new SimpleIntHandler('avatar:remove'),
         new SimpleIntHandler('bonus:clear'),
         new SimpleIntHandler('latency'),
-        new SimpleIntHandler('spawn')
+        new SimpleIntHandler('spawn'),
+        new SumUpAvatarHandler(),
+        new SumUpPointHandler()
     ], 'name');
 
     for (var i = this.handlers.items.length - 1; i >= 0; i--) {

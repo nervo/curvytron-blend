@@ -15,7 +15,8 @@ function GameRepository ()
     this.onBonusClear   = this.onBonusClear.bind(this);
     this.onBonusStack   = this.onBonusStack.bind(this);
     this.onPosition     = this.onPosition.bind(this);
-    this.onPoint        = this.onPoint.bind(this);
+    this.onSumUpPoint   = this.onSumUpPoint.bind(this);
+    this.onSumUpAvatar  = this.onSumUpAvatar.bind(this);
     this.onAvatarPoint  = this.onAvatarPoint.bind(this);
     this.onSpawn        = this.onSpawn.bind(this);
     this.onDie          = this.onDie.bind(this);
@@ -85,7 +86,6 @@ GameRepository.prototype.attachEvents = function()
     this.client.on('property', this.onProperty);
     this.client.on('position', this.onPosition);
     this.client.on('avatar:point', this.onAvatarPoint);
-    this.client.on('point', this.onPoint);
     this.client.on('die', this.onDie);
     this.client.on('spawn', this.onSpawn);
     this.client.on('bonus:pop', this.onBonusPop);
@@ -97,6 +97,8 @@ GameRepository.prototype.attachEvents = function()
     this.client.on('avatar:me', this.onAvatarAdd);
     this.client.on('avatar:add', this.onAvatarAdd);
     this.client.on('avatar:remove', this.onAvatarRemove);
+    this.client.on('sumup:point', this.onSumUpPoint);
+    this.client.on('sumup:avatar', this.onSumUpAvatar);
 };
 
 /**
@@ -106,7 +108,6 @@ GameRepository.prototype.detachEvents = function()
 {
     this.client.off('property', this.onProperty);
     this.client.off('position', this.onPosition);
-    this.client.off('point', this.onPoint);
     this.client.off('die', this.onDie);
     this.client.off('spawn', this.onSpawn);
     this.client.off('bonus:pop', this.onBonusPop);
@@ -118,6 +119,8 @@ GameRepository.prototype.detachEvents = function()
     this.client.off('avatar:me', this.onAvatarAdd);
     this.client.off('avatar:add', this.onAvatarAdd);
     this.client.off('avatar:remove', this.onAvatarRemove);
+    this.client.off('sumup:point', this.onSumUpPoint);
+    this.client.off('sumup:avatar', this.onSumUpAvatar);
 };
 
 /**
@@ -199,19 +202,38 @@ GameRepository.prototype.onPosition = function(e)
 };
 
 /**
- * On point
+ * On sumup point
  *
  * @param {Event} e
  */
-GameRepository.prototype.onPoint = function(e)
+GameRepository.prototype.onSumUpPoint = function(e)
 {
-    var x      = this.compressor.decompress(e.detail[0]),
-        y      = this.compressor.decompress(e.detail[1]),
-        radius = this.compressor.decompress(e.detail[2]),
-        color  = e.detail[3],
-        avatar = e.detail[4];
+    this.game
+        .getTrail(e.detail.avatar, e.detail.radius, this.rbgToHex(e.detail.color))
+        .add(e.detail.x, e.detail.y);
+};
 
-    this.game.getTrail(avatar, radius, color).add(x, y);
+/**
+ * On sumup avatar
+ *
+ * @param {Event} e
+ */
+GameRepository.prototype.onSumUpAvatar = function(e)
+{
+    var avatar = new Avatar(e.detail.id, e.detail.name, this.rbgToHex(e.detail.color));
+
+    if (this.game.addAvatar(avatar)) {
+        if (e.detail.alive) {
+            avatar.spawn();
+        }
+        avatar.setPositionFromServer(e.detail.x, e.detail.y, e.detail.angle);
+        avatar.setVelocity(e.detail.velocity);
+        avatar.setRadius(e.detail.radius);
+        avatar.setTurning(e.detail.turning);
+        avatar.setPrinting(e.detail.printing);
+        avatar.setInvincible(e.detail.invincible);
+        avatar.setInverse(e.detail.inverse);
+    }
 };
 
 /**
