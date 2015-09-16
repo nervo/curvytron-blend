@@ -36,7 +36,9 @@ function Ticker (game, clients)
     this.attachEvents();
     this.start();
 
-    //this.fps.on('fps', function (frequency) { console.log('tickrate: %s', frequency); });
+    this.fps.on('fps', function (frequency) {
+        console.log('tickrate: %s', frequency);
+    });
 }
 
 /**
@@ -44,7 +46,7 @@ function Ticker (game, clients)
  *
  * @type {Number}
  */
-Ticker.prototype.tickrate = 1000/15;
+Ticker.prototype.tickrate = 1000/30;
 
 /**
  * Start loop
@@ -74,11 +76,7 @@ Ticker.prototype.stop = function()
  */
 Ticker.prototype.newFrame = function(step)
 {
-    if (step < this.tickrate) {
-        this.frame = setTimeout(this.loop, this.tickrate - step);
-    } else {
-        this.frame = setImmediate(this.loop);
-    }
+    this.frame = setTimeout(this.loop, this.tickrate);
 };
 
 /**
@@ -86,12 +84,7 @@ Ticker.prototype.newFrame = function(step)
  */
 Ticker.prototype.clearFrame = function()
 {
-    if (this.frame instanceof immediateObject) {
-        clearImmediate(this.frame);
-    } else {
-        clearTimeout(this.frame);
-    }
-
+    clearTimeout(this.frame);
     this.frame = null;
 };
 
@@ -100,17 +93,14 @@ Ticker.prototype.clearFrame = function()
  */
 Ticker.prototype.loop = function()
 {
-    //console.time('tick');
-    //
+    this.newFrame();
+
     var now  = new Date().getTime(),
         step = now - this.rendered;
 
-    this.rendered = now;
-
     this.flush();
     this.fps.onFrame(step);
-    this.newFrame(step);
-    //console.timeEnd('tick');
+    this.rendered = now;
 };
 
 /**
@@ -270,6 +260,7 @@ Ticker.prototype.onPoint = function(data)
  */
 Ticker.prototype.onPosition = function(avatar)
 {
+    console.time('onPosition');
     this.addNamedEvent('position:' + avatar.id, {
         name: 'position',
         data: {
@@ -387,7 +378,7 @@ Ticker.prototype.onBonusStack = function(data, add)
             add: add
         }
     });
-}
+};
 
 /**
  * On game start

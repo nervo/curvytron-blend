@@ -64,7 +64,7 @@ AvatarAddHandler.prototype.decode = function (buffer)
         color: [
             colorView[0],
             colorView[1],
-            colorView[2],
+            colorView[2]
         ],
         name: String.fromCharCode.apply(null, textView)
     };

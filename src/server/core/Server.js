@@ -89,7 +89,7 @@ Server.prototype.addClient = function(client)
     this.emit('client', client);
 
     console.info('Client %s connected.', client.id);
-}
+};
 
 /**
  * On error

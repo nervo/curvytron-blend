@@ -38,7 +38,7 @@ BonusStackHandler.prototype.durations = [
     BonusSelfSmall.prototype.duration,
     BonusEnemyStraightAngle.prototype.duration,
     BonusGameBorderless.prototype.duration,
-    BonusAllColor.prototype.duration,
+    BonusAllColor.prototype.duration
 ];
 
 /**

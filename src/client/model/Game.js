@@ -12,6 +12,10 @@ function Game()
 
     window.addEventListener('error', this.stop);
     window.addEventListener('resize', this.renderer.onResize);
+
+    this.fps.on('fps', function (event) {
+        console.log('game: %s', event.detail);
+    }.bind(this));
 }
 
 Game.prototype = Object.create(BaseGame.prototype);
@@ -53,7 +57,7 @@ Game.prototype.removeAvatar = function(avatar)
 /**
  * Get new frame
  */
-Game.prototype.newFrame = function()
+Game.prototype.newFrame = function(step)
 {
     this.frame = window.requestAnimationFrame(this.loop);
 };
@@ -63,7 +67,8 @@ Game.prototype.newFrame = function()
  */
 Game.prototype.clearFrame = function()
 {
-    this.frame = window.cancelAnimationFrame(this.frame);
+    window.cancelAnimationFrame(this.frame);
+    this.frame = null;
 };
 
 /**

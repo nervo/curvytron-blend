@@ -87,12 +87,13 @@ Renderer.prototype.setAvatarScale = function(avatar)
  */
 Renderer.prototype.draw = function(step)
 {
-    var avatars         = [],
+    var now             = new Date().getTime(),
+        avatars         = [],
         subjectIsPlayer = this.camera.subject instanceof Avatar,
         i, points, avatar, bonus, trail;
 
     if (subjectIsPlayer) {
-        this.updateAvatar(this.camera.subject, step);
+        this.updateAvatar(this.camera.subject, now);
         avatars.push(this.camera.subject);
     }
 
@@ -104,7 +105,7 @@ Renderer.prototype.draw = function(step)
         avatar = this.game.avatars.items[i];
         if ((!subjectIsPlayer || avatar.id !== this.camera.subject.id) && (avatar.alive || avatar.changed)) {
             if (this.camera.isVisible(avatar.x, avatar.y)) {
-                this.updateAvatar(avatar, step);
+                this.updateAvatar(avatar, now);
                 avatars.push(avatar);
             }
         }
@@ -132,7 +133,7 @@ Renderer.prototype.draw = function(step)
     }
 
     if (!this.animations.isEmpty()) {
-        var now = new Date().getTime(), animation;
+        var animation;
 
         for (i = this.animations.items.length - 1; i >= 0; i--) {
             animation = this.animations.items[i];
@@ -178,12 +179,12 @@ Renderer.prototype.cleanBorder = function()
  * Update avatar
  *
  * @param {Avatar} avatar
- * @param {Number} step
+ * @param {Number} now
  */
-Renderer.prototype.updateAvatar = function(avatar, step)
+Renderer.prototype.updateAvatar = function(avatar, now)
 {
     if (avatar.alive) {
-        avatar.update(step);
+        avatar.update(now);
     }
 };
 

@@ -17,6 +17,7 @@ function Avatar(id, name, color)
     this.changed     = false;
     this.viewChanged = false;
     this.turning     = false;
+    this.lastTick    = null;
 
     this.drawArrow();
 }
@@ -41,11 +42,12 @@ Avatar.prototype.arrowSize = 200;
 /**
  * Update
  *
- * @param {Number} step
+ * @param {Number} now
  */
-Avatar.prototype.update = function(step)
+Avatar.prototype.update = function(now)
 {
     if (!this.changed && this.alive) {
+        var step = now - this.lastTick;
         this.updateAngle(step);
         this.updatePosition(step);
     }
@@ -77,6 +79,7 @@ Avatar.prototype.setLocal = function()
 Avatar.prototype.setPosition = function(x, y)
 {
     BaseAvatar.prototype.setPosition.call(this, x, y);
+    this.lastTick = new Date().getTime();
     this.emit('position', this);
 };
 
@@ -91,7 +94,7 @@ Avatar.prototype.setPositionFromServer = function(x, y, angle)
 {
     this.setPosition(x, y);
     this.setAngle(angle);
-    this.changed = true;
+    this.changed  = true;
 };
 
 /**

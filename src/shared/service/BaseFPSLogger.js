@@ -31,6 +31,8 @@ BaseFPSLogger.prototype.log = function()
 {
     this.frequency = this.frames;
     this.frames    = 0;
+
+    this.emit('fps', this.frequency);
 };
 
 /**

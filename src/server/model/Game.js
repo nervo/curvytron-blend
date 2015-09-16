@@ -14,9 +14,9 @@ function Game()
     this.onDie   = this.onDie.bind(this);
     this.onPoint = this.onPoint.bind(this);
 
-    /*this.fps.on('fps', function (frequency) {
-        console.log('game (%s - %s - %s): %s', this.avatars.items.length, this.size, this.world.islands.ids.length, frequency);
-    }.bind(this));*/
+    this.fps.on('fps', function (frequency) {
+        console.log('game: %s', frequency);
+    }.bind(this));
 }
 
 Game.prototype = Object.create(BaseGame.prototype);
@@ -42,49 +42,6 @@ Game.prototype.spawnAngleMargin = 0.2;
  * @type {Number}
  */
 Game.prototype.respawnTime = 5000;
-
-/**
- * Animation loop
- */
-Game.prototype.loop = function()
-{
-    //console.time('game');
-
-    var now  = new Date().getTime(),
-        step = now - this.rendered;
-
-    this.rendered = now;
-
-    this.onFrame(step);
-    this.fps.onFrame(step);
-    this.newFrame(step);
-    //console.timeEnd('game');
-};
-
-/**
- * Get new frame
- */
-Game.prototype.newFrame = function(step)
-{
-    if (step < this.framerate) {
-        this.frame = setTimeout(this.loop, this.framerate - step );
-    } else {
-        this.frame = setImmediate(this.loop);
-    }
-};
-
-/**
- * Clear frame
- */
-Game.prototype.clearFrame = function()
-{
-    if (this.frame instanceof immediateObject) {
-        clearImmediate(this.frame);
-    } else {
-        clearTimeout(this.frame);
-    }
-    this.frame = null;
-};
 
 /**
  * Update
