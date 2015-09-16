@@ -26,7 +26,7 @@ BaseGame.prototype.constructor = BaseGame;
  *
  * @type {Number}
  */
-BaseGame.prototype.framerate = 1000/30;
+BaseGame.prototype.framerate = 1000/60;
 
 /**
  * Map size factor per player

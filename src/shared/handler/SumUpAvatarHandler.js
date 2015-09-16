@@ -36,14 +36,14 @@ SumUpAvatarHandler.prototype.encode = function(event)
         nameView     = new Uint16Array(buffer, cursor += 2, textLength);
 
     idView[0]       = event.data.id;
-    positionView[0] = this.compress(event.data.x, 100);
-    positionView[1] = this.compress(event.data.y, 100);
+    positionView[0] = this.compress(event.data.x);
+    positionView[1] = this.compress(event.data.y);
     colorView[0]    = event.data.color[0];
     colorView[1]    = event.data.color[1];
     colorView[2]    = event.data.color[2];
-    angleView[0]    = this.compress(event.data.angle, 1000);
-    velocityView[0] = this.compress(event.data.velocity, 100);
-    radiusView[0]   = this.compress(event.data.radius, 100);
+    angleView[0]    = this.compress(event.data.angle);
+    velocityView[0] = this.compress(event.data.velocity);
+    radiusView[0]   = this.compress(event.data.radius);
     statusView[0]   = event.data.alive ? 1 : 0;
     statusView[1]   = event.data.turning ? 1 : 0;
     statusView[2]   = event.data.printing ? 1 : 0;
@@ -77,11 +77,12 @@ SumUpAvatarHandler.prototype.decode = function (buffer)
 
     event.data = {
         id: idView[0],
-        x: this.decompress(positionView[0], 100),
-        y: this.decompress(positionView[1], 100),
+        x: this.decompress(positionView[0]),
+        y: this.decompress(positionView[1]),
         color: [colorView[0], colorView[1], colorView[2]],
-        angle: this.decompress(angleView[0], 1000),
-        radius: this.decompress(radiusView[0], 100),
+        angle: this.decompress(angleView[0]),
+        velocity: this.decompress(velocityView[0]),
+        radius: this.decompress(radiusView[0]),
         alive: statusView[0] === 1,
         turning: statusView[1] === 1,
         printing: statusView[2] === 1,

@@ -123,6 +123,14 @@ BaseAvatar.prototype.isTimeToDraw = function()
 };
 
 /**
+ * Is turning?
+ */
+BaseAvatar.prototype.isTurning = function(turning)
+{
+    return this.angularVelocity !== 0;
+};
+
+/**
  * Update angular velocity
  *
  * @param {Number} factor
@@ -175,10 +183,16 @@ BaseAvatar.prototype.update = function(step) {};
 BaseAvatar.prototype.updateAngle = function(step)
 {
     if (this.angularVelocity) {
-        if (this.directionInLoop) {
-            this.setAngle(this.angle + this.angularVelocity * step);
-        } else {
-            this.setAngle(this.angle + this.angularVelocity);
+        var diff  = this.directionInLoop ? this.angularVelocity * step : this.angularVelocity,
+            angle = (this.angle + diff) % (2 * Math.PI);
+
+        if (angle < 0) {
+            angle += 2 * Math.PI;
+        }
+
+        this.setAngle(angle);
+
+        if (!this.directionInLoop) {
             this.updateAngularVelocity(0);
         }
     }
@@ -209,6 +223,7 @@ BaseAvatar.prototype.setVelocity = function(velocity)
     if (this.velocity !== velocity) {
         this.velocity = velocity;
         this.updateVelocities();
+        this.updateBaseAngularVelocity();
     }
 };
 
@@ -221,8 +236,6 @@ BaseAvatar.prototype.updateVelocities = function()
 
     this.velocityX = Math.cos(this.angle) * velocity;
     this.velocityY = Math.sin(this.angle) * velocity;
-
-    this.updateBaseAngularVelocity();
 };
 
 /**
@@ -232,7 +245,19 @@ BaseAvatar.prototype.updateBaseAngularVelocity = function()
 {
     if (this.directionInLoop) {
         var ratio = this.velocity / BaseAvatar.prototype.velocity;
-        this.angularVelocityBase = ratio * BaseAvatar.prototype.angularVelocityBase + Math.log(1/ratio)/1000;
+        this.setBaseAngularVelocity(ratio * BaseAvatar.prototype.angularVelocityBase + Math.log(1/ratio)/1000);
+    }
+};
+
+/**
+ * Set base angular velocity
+ *
+ * @param {Number} baseAngulerVelocity
+ */
+BaseAvatar.prototype.setBaseAngularVelocity = function(baseAngulerVelocity)
+{
+    if (this.angularVelocityBase !== baseAngulerVelocity) {
+        this.angularVelocityBase = baseAngulerVelocity;
         this.updateAngularVelocity();
     }
 };

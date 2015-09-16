@@ -36,8 +36,8 @@ BonusPopHandler.prototype.encode = function(event)
 
     idView[0]       = event.data.id;
     nameView[0]     = BaseBonusManager.prototype.bonusTypes.indexOf(event.data.name);
-    positionView[0] = this.compress(event.data.x, 100);
-    positionView[1] = this.compress(event.data.y, 100);
+    positionView[0] = this.compress(event.data.x);
+    positionView[1] = this.compress(event.data.y);
 
     return buffer;
 };
@@ -55,8 +55,8 @@ BonusPopHandler.prototype.decode = function (buffer)
 
     event.data = {
         id: idView[0],
-        x: this.decompress(positionView[0], 100),
-        y: this.decompress(positionView[1], 100),
+        x: this.decompress(positionView[0]),
+        y: this.decompress(positionView[1]),
         name: BaseBonusManager.prototype.bonusTypes[nameView[0]]
     };
 

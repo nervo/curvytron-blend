@@ -35,10 +35,6 @@ function Ticker (game, clients)
 
     this.attachEvents();
     this.start();
-
-    this.fps.on('fps', function (frequency) {
-        console.log('tickrate: %s', frequency);
-    });
 }
 
 /**
@@ -451,9 +447,10 @@ Ticker.prototype.sumUp = function(client)
                 color: avatar.color,
                 angle: avatar.angle,
                 velocity: avatar.velocity,
+                //angularVelocity: avatar.angularVelocity,
                 radius: avatar.radius,
                 alive: avatar.alive,
-                turning: avatar.turning,
+                //turning: avatar.turning,
                 printing: avatar.printing,
                 invincible: avatar.invincible,
                 inverse: avatar.inverse,

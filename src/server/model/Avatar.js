@@ -11,7 +11,6 @@ function Avatar(player)
     this.printManager = new PrintManager(this);
     this.body         = null;
     this.bodyCount    = 0;
-    this.isTurning    = false;
 }
 
 Avatar.prototype = Object.create(BaseAvatar.prototype);
@@ -86,21 +85,14 @@ Avatar.prototype.setVelocity = function(velocity)
 };
 
 /**
- * Set angular velocity
+ * Update angular velocity
  *
- * @param {Number} velocity
+ * @param {Number} factor
  */
-Avatar.prototype.setAngularVelocity = function(angularVelocity)
+Avatar.prototype.updateAngularVelocity = function(factor)
 {
-    if (this.angularVelocity !== angularVelocity) {
-        BaseAvatar.prototype.setAngularVelocity.call(this, angularVelocity);
-        var turning = this.angularVelocity !== 0;
-
-        if (this.turning !== turning) {
-            this.turning = turning;
-            this.emit('property', {avatar: this, property: 'turning', value: turning});
-        }
-    }
+    BaseAvatar.prototype.updateAngularVelocity.call(this, factor);
+    this.emit('property', {avatar: this, property: 'move', value: factor});
 };
 
 /**

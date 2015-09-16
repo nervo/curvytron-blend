@@ -8,8 +8,10 @@ function GameController()
     this.game    = new Game();
     this.clients = new Collection();
     this.ticker  = new Ticker(this.game, this.clients);
+    this.monitor = new Monitor();
 
     this.unloadGame = this.unloadGame.bind(this);
+    this.onFPS      = this.onFPS.bind(this);
 
     this.callbacks = {
         onLeave: function () { controller.onLeave(this); },
@@ -35,6 +37,9 @@ function GameController()
             }
         }
     };
+
+    this.game.fps.on('fps', this.onFPS);
+    this.ticker.fps.on('fps', this.onFPS);
 
     this.game.addListener('end', this.unloadGame);
     this.game.start();
@@ -204,4 +209,15 @@ GameController.prototype.isNameAvailable = function(name)
     return this.clients.match(function () {
         return this.player.name.toLowerCase() === name.toLowerCase();
     }) === null;
+};
+
+/**
+ * On FPS
+ */
+GameController.prototype.onFPS = function()
+{
+    this.monitor.keys.tickrate  = this.ticker.fps.frequency;
+    this.monitor.keys.framerate = this.game.fps.frequency;
+
+    this.monitor.dump();
 };

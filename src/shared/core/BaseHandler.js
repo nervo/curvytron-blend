@@ -47,9 +47,9 @@ BaseHandler.prototype.decode = function (buffer)
  *
  * @return {Integer}
  */
-BaseHandler.prototype.compress = function(value, precision)
+BaseHandler.prototype.compress = function(value)
 {
-    return (0.5 + value * precision) | 0;
+    return (0.5 + value * 100) | 0;
 };
 
 /**
@@ -59,7 +59,7 @@ BaseHandler.prototype.compress = function(value, precision)
  *
  * @return {Float}
  */
-BaseHandler.prototype.decompress = function(value, precision)
+BaseHandler.prototype.decompress = function(value)
 {
-    return value / precision;
+    return value / 100;
 };

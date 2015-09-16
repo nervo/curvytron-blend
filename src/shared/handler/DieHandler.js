@@ -32,7 +32,7 @@ DieHandler.prototype.encode = function(event)
         angleView = new Uint16Array(buffer, cursor += 2, 1);
 
     idView[0]     = event.data.id;
-    angleView[0] = this.compress(event.data.angle, 100);
+    angleView[0] = this.compress(event.data.angle);
 
     return buffer;
 };
@@ -49,7 +49,7 @@ DieHandler.prototype.decode = function (buffer)
 
     event.data = {
         id: idView[0],
-        angle: this.decompress(angleView[0], 100)
+        angle: this.decompress(angleView[0])
     };
 
     return event;

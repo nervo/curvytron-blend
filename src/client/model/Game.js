@@ -12,10 +12,6 @@ function Game()
 
     window.addEventListener('error', this.stop);
     window.addEventListener('resize', this.renderer.onResize);
-
-    this.fps.on('fps', function (event) {
-        console.log('game: %s', event.detail);
-    }.bind(this));
 }
 
 Game.prototype = Object.create(BaseGame.prototype);
@@ -78,7 +74,9 @@ Game.prototype.clearFrame = function()
  */
 Game.prototype.update = function(step)
 {
+    //console.time('------ frame ------');
     this.renderer.draw(step);
+    //console.timeEnd('------ frame ------');
 };
 
 /**

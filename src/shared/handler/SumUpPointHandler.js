@@ -33,9 +33,9 @@ SumUpPointHandler.prototype.encode = function(event)
         colorView    = new Uint16Array(buffer, cursor += 2, 3),
         avatarView   = new Uint16Array(buffer, cursor += 6, 1);
 
-    positionView[0] = this.compress(event.data.x, 100);
-    positionView[1] = this.compress(event.data.y, 100);
-    radiusView[0]   = this.compress(event.data.radius, 100);
+    positionView[0] = this.compress(event.data.x);
+    positionView[1] = this.compress(event.data.y);
+    radiusView[0]   = this.compress(event.data.radius);
     colorView[0]    = event.data.color[0];
     colorView[1]    = event.data.color[1];
     colorView[2]    = event.data.color[2];
@@ -57,9 +57,9 @@ SumUpPointHandler.prototype.decode = function (buffer)
         avatarView   = new Uint16Array(buffer, cursor += 6, 1);
 
     event.data = {
-        x: this.decompress(positionView[0], 100),
-        y: this.decompress(positionView[1], 100),
-        radius: this.decompress(radiusView[0], 100),
+        x: this.decompress(positionView[0]),
+        y: this.decompress(positionView[1]),
+        radius: this.decompress(radiusView[0]),
         color: [colorView[0], colorView[1], colorView[2]],
         avatar: avatarView[0]
     };

@@ -13,10 +13,6 @@ function Game()
     this.onSpawn = this.onSpawn.bind(this);
     this.onDie   = this.onDie.bind(this);
     this.onPoint = this.onPoint.bind(this);
-
-    this.fps.on('fps', function (frequency) {
-        console.log('game: %s', frequency);
-    }.bind(this));
 }
 
 Game.prototype = Object.create(BaseGame.prototype);

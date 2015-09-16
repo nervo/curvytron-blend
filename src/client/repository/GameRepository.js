@@ -191,7 +191,7 @@ GameRepository.prototype.onPosition = function(e)
         if (avatar.printing) {
             var trail = this.game.getTrail(avatar.id, avatar.radius, avatar.color);
 
-            if (avatar.turning && avatar.isTimeToDraw()) {
+            if (avatar.isTurning() && avatar.isTimeToDraw()) {
                 trail.add(avatar.x, avatar.y);
                 avatar.addPoint();
             } else {
@@ -228,8 +228,9 @@ GameRepository.prototype.onSumUpAvatar = function(e)
         }
         avatar.setPositionFromServer(e.detail.x, e.detail.y, e.detail.angle);
         avatar.setVelocity(e.detail.velocity);
+        //avatar.setAngularVelocity(e.detail.angularVelocity);
         avatar.setRadius(e.detail.radius);
-        avatar.setTurning(e.detail.turning);
+        //avatar.setTurning(e.detail.turning);
         avatar.setPrinting(e.detail.printing);
         avatar.setInvincible(e.detail.invincible);
         avatar.setInverse(e.detail.inverse);

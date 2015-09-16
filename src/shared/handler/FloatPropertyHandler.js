@@ -1,5 +1,5 @@
 /**
- * Simple int event handler
+ * Simple float event handler
  */
 function FloatPropertyHandler (property)
 {
@@ -24,7 +24,7 @@ FloatPropertyHandler.prototype.encode = function(event)
     var buffer    = BasePropertyHandler.prototype.encode.call(this, event),
         valueView = new Uint16Array(buffer, BasePropertyHandler.prototype.byteLength, 1);
 
-    valueView[0] = this.compress(event.data.value, 100);
+    valueView[0] = this.compress(event.data.value);
 
     return buffer;
 };
@@ -37,7 +37,7 @@ FloatPropertyHandler.prototype.decode = function (buffer)
     var event     = BasePropertyHandler.prototype.decode.call(this, buffer),
         valueView = new Uint16Array(buffer, BasePropertyHandler.prototype.byteLength, 1);
 
-    event.data.value = this.decompress(valueView[0], 100);
+    event.data.value = this.decompress(valueView[0]);
 
     return event;
 };
