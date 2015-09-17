@@ -17,11 +17,11 @@ Avatar.prototype = Object.create(BaseAvatar.prototype);
 Avatar.prototype.constructor = Avatar;
 
 /**
- * Warmup before avatars start to print
+ * Invincibility warmup
  *
  * @type {Number}
  */
-Avatar.prototype.warmupBeforePrint = 3000;
+Avatar.prototype.warmup = 3000;
 
 /**
  * Update
@@ -179,7 +179,8 @@ Avatar.prototype.setPrinting = function(printing)
 Avatar.prototype.spawn = function()
 {
     BaseAvatar.prototype.spawn.call(this);
-    setTimeout(this.printManager.start, this.warmupBeforePrint);
+    this.printManager.start();
+    new BonusSelfStart().applyTo(this);
     this.emit('spawn', this);
 };
 
