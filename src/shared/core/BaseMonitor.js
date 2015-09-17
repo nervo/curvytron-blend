@@ -13,7 +13,6 @@ BaseMonitor.prototype.dump = function()
 {
     this.clear();
 
-
     for (var key in this.keys) {
         if (this.keys.hasOwnProperty(key)) {
             this.writeKey(key);

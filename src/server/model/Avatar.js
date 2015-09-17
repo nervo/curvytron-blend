@@ -33,10 +33,6 @@ Avatar.prototype.update = function(step)
     if (this.alive) {
         this.updateAngle(step);
         this.updatePosition(step);
-
-        if (this.printing && this.isTimeToDraw()) {
-            this.addPoint(this.x, this.y, false);
-        }
     }
 };
 
@@ -144,20 +140,11 @@ Avatar.prototype.setColor = function(color)
 
 /**
  * Add point
- *
- * @param {Float} x
- * @param {Float} y
- * @param {Boolean} important
  */
-Avatar.prototype.addPoint = function(x, y, important)
+Avatar.prototype.addPoint = function()
 {
-    BaseAvatar.prototype.addPoint.call(this, x, y);
-
-    this.emit('point', {avatar: this, x: x, y: y, important: important});
-
-    if (important) {
-        this.emit('point:important', this);
-    }
+    BaseAvatar.prototype.addPoint.call(this);
+    this.emit('point', {avatar: this, x: this.x, y: this.y});
 };
 
 /**
@@ -168,7 +155,6 @@ Avatar.prototype.addPoint = function(x, y, important)
 Avatar.prototype.setPrinting = function(printing)
 {
     if (BaseAvatar.prototype.setPrinting.call(this, printing)) {
-        this.addPoint(this.x, this.y, true);
         this.emit('property', {avatar: this, property: 'printing', value: this.printing});
     }
 };
@@ -193,7 +179,6 @@ Avatar.prototype.spawn = function()
 Avatar.prototype.die = function(killer, old)
 {
     BaseAvatar.prototype.die.call(this);
-    this.addPoint(this.x, this.y, false);
     this.printManager.stop();
     this.emit('die', {avatar: this, killer: killer, old: old});
 };

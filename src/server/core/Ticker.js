@@ -21,7 +21,7 @@ function Ticker (game, clients)
     this.onSpawn            = this.onSpawn.bind(this);
     this.onDie              = this.onDie.bind(this);
     this.onPosition         = this.onPosition.bind(this);
-    this.onPoint            = this.onPoint.bind(this);
+    //this.onPoint            = this.onPoint.bind(this);
     this.onProperty         = this.onProperty.bind(this);
     this.onBonusStackAdd    = this.onBonusStackAdd.bind(this);
     this.onBonusStackRemove = this.onBonusStackRemove.bind(this);
@@ -160,7 +160,7 @@ Ticker.prototype.attachAvatarEvents = function(avatar)
     avatar.on('die', this.onDie);
     avatar.on('spawn', this.onSpawn);
     avatar.on('position', this.onPosition);
-    avatar.on('point:important', this.onPoint);
+    //avatar.on('point', this.onPoint);
     avatar.on('property', this.onProperty);
     avatar.bonusStack.on('add', this.onBonusStackAdd);
     avatar.bonusStack.on('remove', this.onBonusStackRemove);
@@ -176,7 +176,7 @@ Ticker.prototype.detachAvatarEvents = function(avatar)
     avatar.removeListener('die', this.onDie);
     avatar.removeListener('spawn', this.onSpawn);
     avatar.removeListener('position', this.onPosition);
-    avatar.removeListener('point:important', this.onPoint);
+    //avatar.removeListener('point', this.onPoint);
     avatar.removeListener('property', this.onProperty);
     avatar.bonusStack.removeListener('add', this.onBonusStackAdd);
     avatar.bonusStack.removeListener('remove', this.onBonusStackRemove);
@@ -244,10 +244,10 @@ Ticker.prototype.onAvatarRemove = function(data)
  *
  * @param {Object} data
  */
-Ticker.prototype.onPoint = function(data)
+/*Ticker.prototype.onPoint = function(data)
 {
     this.addEvent({name: 'avatar:point', data: data.id});
-};
+};*/
 
 /**
  * On position

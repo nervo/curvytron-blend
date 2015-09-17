@@ -150,7 +150,7 @@ Game.prototype.onDie = function(data)
 Game.prototype.onPoint = function(data)
 {
     if (this.world.active) {
-        this.world.addBody(new AvatarBody(data.avatar, data.x, data.y, data.important));
+        this.world.addBody(new AvatarBody(data.avatar, data.x, data.y));
     }
 };
 

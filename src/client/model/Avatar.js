@@ -112,7 +112,8 @@ Avatar.prototype.setMove = function(move)
  */
 Avatar.prototype.addPoint = function()
 {
-    BaseAvatar.prototype.addPoint.call(this, this.x, this.y);
+    BaseAvatar.prototype.addPoint.call(this);
+    this.emit('point', this);
 };
 
 /**

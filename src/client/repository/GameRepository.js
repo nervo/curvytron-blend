@@ -187,17 +187,6 @@ GameRepository.prototype.onPosition = function(e)
 
     if (avatar) {
         avatar.setPositionFromServer(e.detail.x, e.detail.y, e.detail.angle);
-
-        if (avatar.printing) {
-            var trail = this.game.getTrail(avatar.id, avatar.radius, avatar.color);
-
-            if (avatar.isTurning() && avatar.isTimeToDraw()) {
-                trail.add(avatar.x, avatar.y);
-                avatar.addPoint();
-            } else {
-                trail.update(avatar.x, avatar.y);
-            }
-        }
     }
 };
 
@@ -247,8 +236,10 @@ GameRepository.prototype.onAvatarPoint = function(e)
     var avatar = this.game.avatars.getById(e.detail);
 
     if (avatar) {
-        this.game.getTrail(avatar.id, avatar.radius, avatar.color).add(avatar.x, avatar.y);
-        avatar.addPoint();
+        this.game
+            .getTrail(avatar.id, avatar.radius, avatar.color)
+            .add(avatar.x, avatar.y);
+        //avatar.addPoint();
     } else {
         console.error('Could not find avatar "%s"', e.detail);
     }

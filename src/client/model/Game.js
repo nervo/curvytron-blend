@@ -8,7 +8,8 @@ function Game()
     this.renderer = new Renderer(this);
     this.trails   = new Collection();
 
-    this.onDie = this.onDie.bind(this);
+    this.onDie   = this.onDie.bind(this);
+    this.onPoint = this.onPoint.bind(this);
 
     window.addEventListener('error', this.stop);
     window.addEventListener('resize', this.renderer.onResize);
@@ -26,6 +27,7 @@ Game.prototype.addAvatar = function(avatar)
 {
     if (BaseGame.prototype.addAvatar.call(this, avatar)) {
         avatar.on('die', this.onDie);
+        avatar.on('point', this.onPoint);
         this.renderer.setAvatarScale(avatar);
 
         return true;
@@ -43,6 +45,7 @@ Game.prototype.removeAvatar = function(avatar)
 {
     if (BaseGame.prototype.removeAvatar.call(this, avatar)) {
         avatar.off('die', this.onDie);
+        avatar.off('point', this.onPoint);
 
         return true;
     }
@@ -74,9 +77,7 @@ Game.prototype.clearFrame = function()
  */
 Game.prototype.update = function(step)
 {
-    //console.time('------ frame ------');
     this.renderer.draw(step);
-    //console.timeEnd('------ frame ------');
 };
 
 /**
@@ -135,6 +136,23 @@ Game.prototype.setBorderless = function(borderless)
 Game.prototype.onDie = function(event)
 {
     this.renderer.explode(event.detail);
+};
+
+/**
+ * On avatar point
+ *
+ * @param {Event} event
+ */
+Game.prototype.onPoint = function(event)
+{
+    var avatar = event.detail,
+        trail  = this.getTrail(avatar.id, avatar.radius, avatar.color);
+
+    if (avatar.isTurning()) {
+        trail.add(avatar.x, avatar.y);
+    } else {
+        trail.update(avatar.x, avatar.y);
+    }
 };
 
 /**
