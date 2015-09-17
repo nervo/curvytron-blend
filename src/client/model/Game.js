@@ -145,14 +145,10 @@ Game.prototype.onDie = function(event)
  */
 Game.prototype.onPoint = function(event)
 {
-    var avatar = event.detail,
-        trail  = this.getTrail(avatar.id, avatar.radius, avatar.color);
+    var avatar = event.detail;
 
-    if (avatar.isTurning()) {
-        trail.add(avatar.x, avatar.y);
-    } else {
-        trail.update(avatar.x, avatar.y);
-    }
+    this.getTrail(avatar.id, avatar.radius, avatar.color)
+        .addPoint(avatar.x, avatar.y, avatar.angle);
 };
 
 /**

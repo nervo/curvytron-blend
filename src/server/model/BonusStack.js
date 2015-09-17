@@ -43,7 +43,7 @@ BonusStack.prototype.apply = function(property, value)
 {
     switch (property) {
         case 'radius':
-            this.target.setRadius(Avatar.prototype.radius * Math.pow(2, value));
+            this.target.setRadius(BaseAvatar.prototype.radius * Math.pow(2, value));
             break;
         case 'velocity':
             this.target.setVelocity(value);

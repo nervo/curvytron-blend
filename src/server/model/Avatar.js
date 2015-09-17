@@ -24,6 +24,13 @@ Avatar.prototype.constructor = Avatar;
 Avatar.prototype.warmup = 3000;
 
 /**
+ * Minimum radius
+ *
+ * @type {Number}
+ */
+Avatar.prototype.minimumRadius = BaseAvatar.prototype.radius / 10;
+
+/**
  * Update
  *
  * @param {Number} step
@@ -94,10 +101,12 @@ Avatar.prototype.updateAngularVelocity = function(factor)
 /**
  * Set radius
  *
- * @param {Float} radius
+ * @param {Number} radius
  */
 Avatar.prototype.setRadius = function(radius)
 {
+    radius = Math.max(radius, this.minimumRadius);
+
     if (this.radius !== radius) {
         BaseAvatar.prototype.setRadius.call(this, radius);
         this.body.radius = this.radius;
@@ -189,6 +198,11 @@ Avatar.prototype.die = function(killer, old)
 Avatar.prototype.clear = function()
 {
     BaseAvatar.prototype.clear.call(this);
+
     this.printManager.stop();
     this.bodyCount = 0;
+
+    if (this.body) {
+        this.body.radius = this.radius;
+    }
 };

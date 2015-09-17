@@ -19,7 +19,7 @@ function PrintManager(avatar)
  *
  * @type {Number}
  */
-PrintManager.prototype.holeDistance  = 5;
+PrintManager.prototype.holeDistance = 6;
 
 /**
  * Print distance

@@ -8,7 +8,6 @@ function GameController()
     this.game    = new Game();
     this.clients = new Collection();
     this.ticker  = new Ticker(this.game, this.clients);
-    this.monitor = new Monitor();
 
     this.unloadGame = this.unloadGame.bind(this);
     this.onFPS      = this.onFPS.bind(this);
@@ -216,8 +215,9 @@ GameController.prototype.isNameAvailable = function(name)
  */
 GameController.prototype.onFPS = function()
 {
-    this.monitor.keys.tickrate  = this.ticker.fps.frequency;
-    this.monitor.keys.framerate = this.game.fps.frequency;
-
-    this.monitor.dump();
+    monitor.setKeys({
+        tickrate: this.ticker.fps.frequency,
+        framerate: this.game.fps.frequency,
+        players: this.game.avatars.count()
+    });
 };

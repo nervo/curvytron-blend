@@ -117,12 +117,9 @@ Renderer.prototype.draw = function(step)
     this.cleanBorder();
     this.canvas.drawImageTo(this.map.element, x, y);
 
-    //var trailTitle = 'trails: ' + this.game.trails.items.length;
-    //console.time(trailTitle);
     for (i = this.game.trails.items.length - 1; i >= 0; i--) {
         this.drawTrail(this.game.trails.items[i]);
     }
-    //console.timeEnd(trailTitle);
 
     for (i = this.game.bonusManager.bonuses.items.length - 1; i >= 0; i--) {
         this.drawBonus(this.game.bonusManager.bonuses.items[i]);
@@ -199,13 +196,9 @@ Renderer.prototype.drawTrail = function(trail)
         return;
     }
 
-    //var title = 'segments: ' + trail.segments.length;
-
-    //console.time(title);
     for (var segment, i = trail.segments.length - 1; i >= 0; i--) {
         segment = trail.segments[i];
         if (this.camera.isBoxVisible(segment.left, segment.right, segment.top, segment.bottom)) {
-            //this.canvas.drawLineInCamera(this.camera, segment.Xs, segment.Ys);
             this.canvas.drawImageTo(
                 segment.draw(this.camera.scale),
                 this.camera.x(segment.left),
@@ -213,7 +206,6 @@ Renderer.prototype.drawTrail = function(trail)
             );
         }
     }
-    //console.timeEnd(title);
 };
 
 /**

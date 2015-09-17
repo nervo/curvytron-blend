@@ -23,7 +23,6 @@ function BaseAvatar(name, color)
     this.printing        = false;
     this.lastPointX      = null;
     this.lastPointY      = null;
-    this.monitor     = new Monitor();
 
     this.spawn = this.spawn.bind(this);
 }
@@ -96,20 +95,9 @@ BaseAvatar.prototype.setPosition = function(x, y)
     this.x = x;
     this.y = y;
 
-    console.log('position', this.printing, this.isTimeToDraw());
-
     if (this.printing && this.isTimeToDraw()) {
-        this.monitor.keys.source = 'position';
-        this.monitor.dump();
         this.addPoint();
     }
-
-    this.monitor.keys.x          = this.x;
-    this.monitor.keys.y          = this.y;
-    this.monitor.keys.printing   = this.printing;
-    this.monitor.keys.turning    = this.isTurning();
-    this.monitor.keys.timeToDraw = this.isTimeToDraw();
-    this.monitor.dump();
 };
 
 /**
@@ -119,10 +107,6 @@ BaseAvatar.prototype.addPoint = function()
 {
     this.lastPointX = this.x;
     this.lastPointY = this.y;
-
-    this.monitor.keys.lastX = this.lastPointX;
-    this.monitor.keys.lastY = this.lastPointY;
-    this.monitor.dump();
 };
 
 /**
@@ -136,10 +120,7 @@ BaseAvatar.prototype.isTimeToDraw = function()
         return true;
     }
 
-    this.monitor.keys.distance = this.getDistance(this.lastPointX, this.lastPointY, this.x, this.y);
-    this.monitor.dump();
-
-    return this.getDistance(this.lastPointX, this.lastPointY, this.x, this.y) >= this.radius * 2;
+    return this.getDistance(this.lastPointX, this.lastPointY, this.x, this.y) > this.radius;
 };
 
 /**
@@ -289,7 +270,7 @@ BaseAvatar.prototype.setBaseAngularVelocity = function(baseAngulerVelocity)
  */
 BaseAvatar.prototype.setRadius = function(radius)
 {
-    this.radius = Math.max(radius, BaseAvatar.prototype.radius/8);
+    this.radius = radius;
 };
 
 /**
@@ -348,8 +329,6 @@ BaseAvatar.prototype.die = function()
     this.bonusStack.clear();
 
     if (this.printing) {
-        this.monitor.keys.source = 'die';
-        this.monitor.dump();
         this.addPoint();
     }
 };
@@ -365,9 +344,6 @@ BaseAvatar.prototype.setPrinting = function(printing)
 
     if (this.printing !== printing) {
         this.printing = printing;
-
-        this.monitor.keys.source = 'printing';
-        this.monitor.dump();
         this.addPoint();
 
         return true;
@@ -393,8 +369,8 @@ BaseAvatar.prototype.clear = function()
 {
     this.bonusStack.clear();
 
-    this.x                   = this.radius;
-    this.y                   = this.radius;
+    this.x                   = 0;
+    this.y                   = 0;
     this.angle               = 0;
     this.velocityX           = 0;
     this.velocityY           = 0;
@@ -408,8 +384,4 @@ BaseAvatar.prototype.clear = function()
     this.invincible          = BaseAvatar.prototype.invincible;
     this.directionInLoop     = BaseAvatar.prototype.directionInLoop;
     this.angularVelocityBase = BaseAvatar.prototype.angularVelocityBase;
-
-    if (this.body) {
-        this.body.radius = BaseAvatar.prototype.radius;
-    }
 };

@@ -199,7 +199,7 @@ GameRepository.prototype.onSumUpPoint = function(e)
 {
     this.game
         .getTrail(e.detail.avatar, e.detail.radius, this.rbgToHex(e.detail.color))
-        .add(e.detail.x, e.detail.y);
+        .addPoint(e.detail.x, e.detail.y);
 };
 
 /**
@@ -217,12 +217,11 @@ GameRepository.prototype.onSumUpAvatar = function(e)
         }
         avatar.setPositionFromServer(e.detail.x, e.detail.y, e.detail.angle);
         avatar.setVelocity(e.detail.velocity);
-        //avatar.setAngularVelocity(e.detail.angularVelocity);
         avatar.setRadius(e.detail.radius);
-        //avatar.setTurning(e.detail.turning);
         avatar.setPrinting(e.detail.printing);
         avatar.setInvincible(e.detail.invincible);
         avatar.setInverse(e.detail.inverse);
+        avatar.updateAngularVelocity(e.detail.move);
     }
 };
 
@@ -239,7 +238,6 @@ GameRepository.prototype.onAvatarPoint = function(e)
         this.game
             .getTrail(avatar.id, avatar.radius, avatar.color)
             .add(avatar.x, avatar.y);
-        //avatar.addPoint();
     } else {
         console.error('Could not find avatar "%s"', e.detail);
     }

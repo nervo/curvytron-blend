@@ -22,7 +22,7 @@ SumUpAvatarHandler.prototype.encode = function(event)
     var textLength = event.data.name.length,
         cursor     = BaseHandler.prototype.byteLength;
 
-    this.byteLength = cursor + 2 + 4 + 6 + 2 + 2 + 2 + 6 + 2 + textLength * 2;
+    this.byteLength = cursor + 2 + 4 + 6 + 2 + 2 + 2 + 2 + 4 + 2 + textLength * 2;
 
     var buffer       = BaseHandler.prototype.encode.call(this, event),
         idView       = new Uint16Array(buffer, cursor, 1),
@@ -31,8 +31,9 @@ SumUpAvatarHandler.prototype.encode = function(event)
         angleView    = new Uint16Array(buffer, cursor += 6, 1),
         velocityView = new Uint16Array(buffer, cursor += 2, 1),
         radiusView   = new Uint16Array(buffer, cursor += 2, 1),
-        statusView   = new Uint8Array(buffer, cursor += 2, 6),
-        countView    = new Uint16Array(buffer, cursor += 6, 1),
+        moveView     = new Int16Array(buffer, cursor += 2, 1),
+        statusView   = new Uint8Array(buffer, cursor += 2, 4),
+        countView    = new Uint16Array(buffer, cursor += 4, 1),
         nameView     = new Uint16Array(buffer, cursor += 2, textLength);
 
     idView[0]       = event.data.id;
@@ -44,11 +45,11 @@ SumUpAvatarHandler.prototype.encode = function(event)
     angleView[0]    = this.compress(event.data.angle);
     velocityView[0] = this.compress(event.data.velocity);
     radiusView[0]   = this.compress(event.data.radius);
+    moveView[0]     = event.data.move;
     statusView[0]   = event.data.alive ? 1 : 0;
-    statusView[1]   = event.data.turning ? 1 : 0;
-    statusView[2]   = event.data.printing ? 1 : 0;
-    statusView[3]   = event.data.invincible ? 1 : 0;
-    statusView[4]   = event.data.inverse ? 1 : 0;
+    statusView[1]   = event.data.printing ? 1 : 0;
+    statusView[2]   = event.data.invincible ? 1 : 0;
+    statusView[3]   = event.data.inverse ? 1 : 0;
     countView[0]    = textLength;
 
     for (var i = 0; i < textLength; i++) {
@@ -71,8 +72,9 @@ SumUpAvatarHandler.prototype.decode = function (buffer)
         angleView    = new Uint16Array(buffer, cursor += 6, 1),
         velocityView = new Uint16Array(buffer, cursor += 2, 1),
         radiusView   = new Uint16Array(buffer, cursor += 2, 1),
-        statusView   = new Uint8Array(buffer, cursor += 2, 6),
-        countView    = new Uint16Array(buffer, cursor += 6, 1),
+        moveView     = new Int16Array(buffer, cursor += 2, 1),
+        statusView   = new Uint8Array(buffer, cursor += 2, 4),
+        countView    = new Uint16Array(buffer, cursor += 4, 1),
         nameView     = new Uint16Array(buffer, cursor += 2, countView[0]);
 
     event.data = {
@@ -83,8 +85,8 @@ SumUpAvatarHandler.prototype.decode = function (buffer)
         angle: this.decompress(angleView[0]),
         velocity: this.decompress(velocityView[0]),
         radius: this.decompress(radiusView[0]),
+        move: moveView[0],
         alive: statusView[0] === 1,
-        turning: statusView[1] === 1,
         printing: statusView[2] === 1,
         invincible: statusView[3] === 1,
         inverse: statusView[4] === 1,
