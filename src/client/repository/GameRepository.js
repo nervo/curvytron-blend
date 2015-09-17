@@ -199,7 +199,7 @@ GameRepository.prototype.onSumUpPoint = function(e)
 {
     this.game
         .getTrail(e.detail.avatar, e.detail.radius, this.rbgToHex(e.detail.color))
-        .addPoint(e.detail.x, e.detail.y);
+        .addPoint(e.detail.x, e.detail.y, 0);
 };
 
 /**

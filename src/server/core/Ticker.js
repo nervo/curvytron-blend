@@ -41,7 +41,7 @@ function Ticker (game, clients)
  *
  * @type {Number}
  */
-Ticker.prototype.tickrate = 1000/60;
+Ticker.prototype.tickrate = 1000/30;
 
 /**
  * Start loop

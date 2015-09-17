@@ -34,7 +34,7 @@ Trail.prototype.addPoint = function(x, y, angle)
         this.clear();
     }
 
-    if (this.follow() && !this.isFar()) {
+    if (this.follow(angle) && !this.isFar(x, y)) {
         this.current.setHead(x, y);
     } else {
         this.current.add(x, y);

@@ -182,6 +182,11 @@ Renderer.prototype.updateAvatar = function(avatar, now)
 {
     if (avatar.alive) {
         avatar.update(now);
+
+        if (avatar.printing) {
+            this.game.getTrail(avatar.id, avatar.radius, avatar.color)
+                .current.setHead(avatar.x, avatar.y);
+        }
     }
 };
 
