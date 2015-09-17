@@ -12,10 +12,10 @@ function BaseGame()
     this.fps          = new FPSLogger();
     this.rendered     = null;
 
-    this.start    = this.start.bind(this);
-    this.stop     = this.stop.bind(this);
-    this.loop     = this.loop.bind(this);
-    this.onFrame  = this.onFrame.bind(this);
+    this.start  = this.start.bind(this);
+    this.stop   = this.stop.bind(this);
+    this.loop   = this.loop.bind(this);
+    this.update = this.update.bind(this);
 }
 
 BaseGame.prototype = Object.create(EventEmitter.prototype);
@@ -26,7 +26,7 @@ BaseGame.prototype.constructor = BaseGame;
  *
  * @type {Number}
  */
-BaseGame.prototype.framerate = 1/30 * 1000;
+BaseGame.prototype.framerate = 1000/60;
 
 /**
  * Map size factor per player
@@ -90,6 +90,7 @@ BaseGame.prototype.removeAvatar = function(avatar)
 BaseGame.prototype.start = function()
 {
     if (!this.frame) {
+        this.rendered = new Date().getTime();
         this.onStart();
         this.loop();
     }
@@ -116,10 +117,9 @@ BaseGame.prototype.loop = function()
     var now  = new Date().getTime(),
         step = now - this.rendered;
 
+    this.update(step);
+    this.fps.onFrame(step);
     this.rendered = now;
-
-    this.onFrame(step);
-    this.fps.onFrame();
 };
 
 /**
@@ -145,7 +145,7 @@ BaseGame.prototype.onStop = function()
 /**
  * Get new frame
  */
-BaseGame.prototype.newFrame = function()
+BaseGame.prototype.newFrame = function(step)
 {
     this.frame = setTimeout(this.loop, this.framerate);
 };
@@ -157,16 +157,6 @@ BaseGame.prototype.clearFrame = function()
 {
     clearTimeout(this.frame);
     this.frame = null;
-};
-
-/**
- * On frame
- *
- * @param {Number} step
- */
-BaseGame.prototype.onFrame = function(step)
-{
-    this.update(step);
 };
 
 /**

@@ -87,12 +87,13 @@ Renderer.prototype.setAvatarScale = function(avatar)
  */
 Renderer.prototype.draw = function(step)
 {
-    var avatars         = [],
+    var now             = new Date().getTime(),
+        avatars         = [],
         subjectIsPlayer = this.camera.subject instanceof Avatar,
         i, points, avatar, bonus, trail;
 
     if (subjectIsPlayer) {
-        this.updateAvatar(this.camera.subject, step);
+        this.updateAvatar(this.camera.subject, now);
         avatars.push(this.camera.subject);
     }
 
@@ -103,8 +104,8 @@ Renderer.prototype.draw = function(step)
     for (i = this.game.avatars.items.length - 1; i >= 0; i--) {
         avatar = this.game.avatars.items[i];
         if ((!subjectIsPlayer || avatar.id !== this.camera.subject.id) && (avatar.alive || avatar.changed)) {
-            this.updateAvatar(avatar, step);
             if (this.camera.isVisible(avatar.x, avatar.y)) {
+                this.updateAvatar(avatar, now);
                 avatars.push(avatar);
             }
         }
@@ -115,12 +116,13 @@ Renderer.prototype.draw = function(step)
 
     this.cleanBorder();
     this.canvas.drawImageTo(this.map.element, x, y);
-    this.canvas.setLineCap('round');
 
+    //var trailTitle = 'trails: ' + this.game.trails.items.length;
+    //console.time(trailTitle);
     for (i = this.game.trails.items.length - 1; i >= 0; i--) {
         this.drawTrail(this.game.trails.items[i]);
     }
-
+    //console.timeEnd(trailTitle);
 
     for (i = this.game.bonusManager.bonuses.items.length - 1; i >= 0; i--) {
         this.drawBonus(this.game.bonusManager.bonuses.items[i]);
@@ -131,7 +133,7 @@ Renderer.prototype.draw = function(step)
     }
 
     if (!this.animations.isEmpty()) {
-        var now = new Date().getTime(), animation;
+        var animation;
 
         for (i = this.animations.items.length - 1; i >= 0; i--) {
             animation = this.animations.items[i];
@@ -177,12 +179,12 @@ Renderer.prototype.cleanBorder = function()
  * Update avatar
  *
  * @param {Avatar} avatar
- * @param {Number} step
+ * @param {Number} now
  */
-Renderer.prototype.updateAvatar = function(avatar, step)
+Renderer.prototype.updateAvatar = function(avatar, now)
 {
     if (avatar.alive) {
-        avatar.update(this.frame ? step : 0);
+        avatar.update(now);
     }
 };
 
@@ -197,15 +199,21 @@ Renderer.prototype.drawTrail = function(trail)
         return;
     }
 
-    this.canvas.setStroke(trail.color);
-    this.canvas.setLineWidth(trail.width * this.canvas.scale);
+    //var title = 'segments: ' + trail.segments.length;
 
+    //console.time(title);
     for (var segment, i = trail.segments.length - 1; i >= 0; i--) {
         segment = trail.segments[i];
         if (this.camera.isBoxVisible(segment.left, segment.right, segment.top, segment.bottom)) {
-            this.canvas.drawLineInCamera(this.camera, segment.Xs, segment.Ys);
+            //this.canvas.drawLineInCamera(this.camera, segment.Xs, segment.Ys);
+            this.canvas.drawImageTo(
+                segment.draw(this.camera.scale),
+                this.camera.x(segment.left),
+                this.camera.y(segment.top)
+            );
         }
     }
+    //console.timeEnd(title);
 };
 
 /**

@@ -334,36 +334,43 @@ Canvas.prototype.drawLine = function(points, width, color, style)
 /**
  * Draw line scaled
  *
- * @param {Array} points
- * @param {Number} width
- * @param {String} color
- * @param {String} style
+ * @param {Array} Xs
+ * @param {Array} Ys
  */
-Canvas.prototype.drawLineScaled = function(points, width, color, style)
+Canvas.prototype.drawLineScaled = function(Xs, Ys)
 {
-    var length = points.length;
+    var length = Xs.length;
 
-    if (!length) {
-        return;
+    this.context.beginPath();
+    this.context.moveTo(Xs[0] * this.scale, Ys[0] * this.scale);
+
+    for (var i = 1; i < length; i++) {
+        this.context.lineTo(Xs[i] * this.scale, Ys[i] * this.scale);
     }
 
-    if (length === 1) {
-        return this.drawCircle(points[0][0] * this.scale, points[0][1] * this.scale, width / 2 * this.scale);
+    this.context.stroke();
+};
+
+/**
+ * Draw line scaled
+ *
+ * @param {Array} Xs
+ * @param {Array} Ys
+ * @param {Number} left
+ * @param {Number} top
+ */
+Canvas.prototype.drawLineScaledMargin = function(Xs, Ys, left, top)
+{
+    var length = Xs.length;
+
+    this.context.beginPath();
+    this.context.moveTo((Xs[0] - left) * this.scale, (Ys[0] - top) * this.scale);
+
+    for (var i = 1; i < length; i++) {
+        this.context.lineTo((Xs[i] - left) * this.scale, (Ys[i] - top) * this.scale);
     }
 
-    if (length > 1) {
-        this.context.lineCap     = style;
-        this.context.strokeStyle = color;
-        this.context.lineWidth   = width * this.scale;
-        this.context.beginPath();
-        this.context.moveTo(points[0][0] * this.scale, points[0][1] * this.scale);
-
-        for (var i = 1; i < length; i++) {
-            this.context.lineTo(points[i][0] * this.scale, points[i][1] * this.scale);
-        }
-
-        this.context.stroke();
-    }
+    this.context.stroke();
 };
 
 /**

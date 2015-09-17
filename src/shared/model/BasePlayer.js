@@ -80,31 +80,17 @@ BasePlayer.prototype.reset = function()
 };
 
 /**
- * Serialize
- *
- * @return {Object}
- */
-BasePlayer.prototype.serialize = function()
-{
-    return {
-        client: this.client.id,
-        name: this.name,
-        color: this.color
-    };
-};
-
-/**
  * Get random Color
  *
  * @return {String}
  */
 BasePlayer.prototype.getRandomColor = function()
 {
-    var randomNum = function () { return Math.ceil(Math.random() * 255).toString(16); },
-        color     = '#' + randomNum() + randomNum() + randomNum();
+    var randomNum = function () { return Math.ceil(Math.random() * 255); },
+        color     = [randomNum(), randomNum(), randomNum()];
 
     while (!this.validateColor(color, true)) {
-        color = '#' + randomNum() + randomNum() + randomNum();
+        color = [randomNum(), randomNum(), randomNum()];
     }
 
     return color;
@@ -119,17 +105,23 @@ BasePlayer.prototype.getRandomColor = function()
  */
 BasePlayer.prototype.validateColor = function(color, yiq)
 {
-    if (typeof(color) !== 'string') { return false; }
+    if (!Array.isArray(color) || color.length !== 3) {
+        return false;
+    }
 
-    var matches = color.match(new RegExp('^#([a-fA-F0-9]{2})([a-fA-F0-9]{2})([a-fA-F0-9]{2})$'));
+    for (var i = color.length - 1; i >= 0; i--) {
+        if (color[i] < 0 || color[i] > 255) {
+            return false;
+        }
+    }
 
-    if (matches && yiq) {
-        var ratio = ((parseInt(matches[1], 16) * 299) + (parseInt(matches[2], 16) * 587) + (parseInt(matches[3], 16) * 114)) / 1000 / 255;
+    if (yiq) {
+        var ratio = (color[0] * 299 + color[1] * 587 + color[2] * 114) / 1000 / 255;
 
         return ratio > this.colorRatio;
     }
 
-    return matches ? true : false;
+    return true;
 };
 
 /**

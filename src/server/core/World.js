@@ -24,7 +24,7 @@ function World(size, islands)
  *
  * @type {Number}
  */
-World.prototype.islandGridSize = 40;
+World.prototype.islandGridSize = 20;
 
 /**
  * Get the island responsible for the given point

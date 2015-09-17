@@ -3,14 +3,15 @@
  */
 function SocketClient()
 {
-    var Socket = window.MozWebSocket || window.WebSocket;
+    var Socket = window.MozWebSocket || window.WebSocket,
+        socket = new Socket('ws://' + document.location.host + document.location.pathname, ['websocket']);
 
     this.connected = false;
 
     this.onError = this.onError.bind(this);
     this.onOpen  = this.onOpen.bind(this);
 
-    BaseSocketClient.call(this, new Socket('ws://' + document.location.host + document.location.pathname, ['websocket']));
+    BaseSocketClient.call(this, socket, new BinaryEncoder());
 
     this.socket.addEventListener('open', this.onOpen);
     this.socket.addEventListener('error', this.onError);
@@ -29,7 +30,6 @@ SocketClient.prototype.onOpen = function(e)
 {
     console.info('Connected.');
     this.connected = true;
-    this.start();
     this.emit('connected');
 };
 
@@ -41,12 +41,7 @@ SocketClient.prototype.onOpen = function(e)
 SocketClient.prototype.onClose = function(e)
 {
     console.info('Disconnected.');
-
     this.connected = false;
-    this.id        = null;
-
-    this.stop();
-
     this.emit('disconnected');
 };
 

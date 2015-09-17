@@ -182,7 +182,7 @@ Game.prototype.setSize = function()
  */
 Game.prototype.onStart = function()
 {
-    this.emit('game:start', {game: this});
+    this.emit('start', {game: this});
     this.world.activate();
     BaseGame.prototype.onStart.call(this);
 };
@@ -193,7 +193,7 @@ Game.prototype.onStart = function()
 Game.prototype.onStop = function()
 {
     BaseGame.prototype.onStop.call(this);
-    this.emit('game:stop', {game: this});
+    this.emit('stop', {game: this});
 };
 
 /**

@@ -43,8 +43,8 @@ GameController.prototype.onStart = function()
 GameController.prototype.onReady = function(event)
 {
     this.container.classList.toggle('lobby', true);
-    this.profile.setName(event.detail[0]);
-    this.profile.setColor(event.detail[1]);
+    this.profile.setName(event.detail.name);
+    this.profile.setColor(event.detail.color);
 };
 
 /**

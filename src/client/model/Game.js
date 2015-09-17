@@ -53,7 +53,7 @@ Game.prototype.removeAvatar = function(avatar)
 /**
  * Get new frame
  */
-Game.prototype.newFrame = function()
+Game.prototype.newFrame = function(step)
 {
     this.frame = window.requestAnimationFrame(this.loop);
 };
@@ -63,7 +63,8 @@ Game.prototype.newFrame = function()
  */
 Game.prototype.clearFrame = function()
 {
-    this.frame = window.cancelAnimationFrame(this.frame);
+    window.cancelAnimationFrame(this.frame);
+    this.frame = null;
 };
 
 /**
@@ -71,9 +72,11 @@ Game.prototype.clearFrame = function()
  *
  * @param {Number} step
  */
-Game.prototype.onFrame = function(step)
+Game.prototype.update = function(step)
 {
+    //console.time('------ frame ------');
     this.renderer.draw(step);
+    //console.timeEnd('------ frame ------');
 };
 
 /**

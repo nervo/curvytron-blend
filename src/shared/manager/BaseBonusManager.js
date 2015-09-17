@@ -17,6 +17,26 @@ BaseBonusManager.prototype = Object.create(EventEmitter.prototype);
 BaseBonusManager.prototype.constructor = BaseBonusManager;
 
 /**
+ * Bonuses position on the sprite
+ *
+ * @type {Array}
+ */
+BaseBonusManager.prototype.bonusTypes = [
+    'BonusEnemyBig',
+    'BonusEnemyFast',
+    'BonusEnemyInverse',
+    'BonusEnemySlow',
+    'BonusGameClear',
+    'BonusSelfFast',
+    'BonusSelfMaster',
+    'BonusSelfSlow',
+    'BonusSelfSmall'/*,
+    'BonusEnemyStraightAngle',
+    'BonusGameBorderless',
+    'BonusAllColor',*/
+];
+
+/**
  * Maximum number of bonus on the map at the same time
  *
  * @type {Number}

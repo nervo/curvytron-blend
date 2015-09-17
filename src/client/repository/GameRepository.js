@@ -5,10 +5,9 @@ function GameRepository ()
 {
     EventEmitter.call(this);
 
-    this.client     = new SocketClient();
-    this.compressor = new Compressor();
-    this.sound      = new SoundManager();
-    this.game       = null;
+    this.client = new SocketClient();
+    this.sound  = new SoundManager();
+    this.game   = null;
 
     this.onConnect      = this.onConnect.bind(this);
     this.onDisconnect   = this.onDisconnect.bind(this);
@@ -16,7 +15,8 @@ function GameRepository ()
     this.onBonusClear   = this.onBonusClear.bind(this);
     this.onBonusStack   = this.onBonusStack.bind(this);
     this.onPosition     = this.onPosition.bind(this);
-    this.onPoint        = this.onPoint.bind(this);
+    this.onSumUpPoint   = this.onSumUpPoint.bind(this);
+    this.onSumUpAvatar  = this.onSumUpAvatar.bind(this);
     this.onAvatarPoint  = this.onAvatarPoint.bind(this);
     this.onSpawn        = this.onSpawn.bind(this);
     this.onDie          = this.onDie.bind(this);
@@ -53,7 +53,7 @@ GameRepository.prototype.onLoad = function()
 {
     this.game.bonusManager.off('load', this.onLoad);
     this.emit('start');
-    this.client.addEvent('ready', null, this.onReady);
+    this.client.addEvent({name: 'ready'}, this.onReady);
     this.game.start();
 };
 
@@ -85,9 +85,7 @@ GameRepository.prototype.attachEvents = function()
 {
     this.client.on('property', this.onProperty);
     this.client.on('position', this.onPosition);
-    this.client.on('angle', this.onAngle);
     this.client.on('avatar:point', this.onAvatarPoint);
-    this.client.on('point', this.onPoint);
     this.client.on('die', this.onDie);
     this.client.on('spawn', this.onSpawn);
     this.client.on('bonus:pop', this.onBonusPop);
@@ -99,6 +97,8 @@ GameRepository.prototype.attachEvents = function()
     this.client.on('avatar:me', this.onAvatarAdd);
     this.client.on('avatar:add', this.onAvatarAdd);
     this.client.on('avatar:remove', this.onAvatarRemove);
+    this.client.on('sumup:point', this.onSumUpPoint);
+    this.client.on('sumup:avatar', this.onSumUpAvatar);
 };
 
 /**
@@ -108,8 +108,6 @@ GameRepository.prototype.detachEvents = function()
 {
     this.client.off('property', this.onProperty);
     this.client.off('position', this.onPosition);
-    this.client.off('angle', this.onAngle);
-    this.client.off('point', this.onPoint);
     this.client.off('die', this.onDie);
     this.client.off('spawn', this.onSpawn);
     this.client.off('bonus:pop', this.onBonusPop);
@@ -121,6 +119,8 @@ GameRepository.prototype.detachEvents = function()
     this.client.off('avatar:me', this.onAvatarAdd);
     this.client.off('avatar:add', this.onAvatarAdd);
     this.client.off('avatar:remove', this.onAvatarRemove);
+    this.client.off('sumup:point', this.onSumUpPoint);
+    this.client.off('sumup:avatar', this.onSumUpAvatar);
 };
 
 /**
@@ -130,7 +130,7 @@ GameRepository.prototype.detachEvents = function()
  */
 GameRepository.prototype.move = function(move)
 {
-    this.client.addEvent('move', move, null ,true);
+    this.client.addEvent({name: 'move', data: move});
 };
 
 /**
@@ -138,7 +138,7 @@ GameRepository.prototype.move = function(move)
  */
 GameRepository.prototype.join = function()
 {
-    this.client.addEvent('join');
+    this.client.addEvent({name: 'join'});
 };
 
 /**
@@ -149,7 +149,7 @@ GameRepository.prototype.join = function()
  */
 GameRepository.prototype.setName = function(name, callback)
 {
-    this.client.addEvent('name', name, callback);
+    this.client.addEvent({name: 'name', data: name}, callback);
 };
 
 /**
@@ -159,7 +159,7 @@ GameRepository.prototype.setName = function(name, callback)
  */
 GameRepository.prototype.setColor = function(callback)
 {
-    this.client.addEvent('color', null, callback);
+    this.client.addEvent({name: 'color'}, callback);
 };
 
 /**
@@ -169,10 +169,10 @@ GameRepository.prototype.setColor = function(callback)
  */
 GameRepository.prototype.onProperty = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id);
 
     if (avatar) {
-        avatar.set(e.detail[1], e.detail[2]);
+        avatar.set(e.detail.property, e.detail.value);
     }
 };
 
@@ -183,18 +183,15 @@ GameRepository.prototype.onProperty = function(e)
  */
 GameRepository.prototype.onPosition = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id);
 
     if (avatar) {
-        avatar.setPositionFromServer(
-            this.compressor.decompress(e.detail[1]),
-            this.compressor.decompress(e.detail[2])
-        );
+        avatar.setPositionFromServer(e.detail.x, e.detail.y, e.detail.angle);
 
         if (avatar.printing) {
             var trail = this.game.getTrail(avatar.id, avatar.radius, avatar.color);
 
-            if (avatar.turning && avatar.isTimeToDraw()) {
+            if (avatar.isTurning() && avatar.isTimeToDraw()) {
                 trail.add(avatar.x, avatar.y);
                 avatar.addPoint();
             } else {
@@ -205,19 +202,39 @@ GameRepository.prototype.onPosition = function(e)
 };
 
 /**
- * On point
+ * On sumup point
  *
  * @param {Event} e
  */
-GameRepository.prototype.onPoint = function(e)
+GameRepository.prototype.onSumUpPoint = function(e)
 {
-    var x      = this.compressor.decompress(e.detail[0]),
-        y      = this.compressor.decompress(e.detail[1]),
-        radius = this.compressor.decompress(e.detail[2]),
-        color  = e.detail[3],
-        avatar = e.detail[4];
+    this.game
+        .getTrail(e.detail.avatar, e.detail.radius, this.rbgToHex(e.detail.color))
+        .add(e.detail.x, e.detail.y);
+};
 
-    this.game.getTrail(avatar, radius, color).add(x, y);
+/**
+ * On sumup avatar
+ *
+ * @param {Event} e
+ */
+GameRepository.prototype.onSumUpAvatar = function(e)
+{
+    var avatar = new Avatar(e.detail.id, e.detail.name, this.rbgToHex(e.detail.color));
+
+    if (this.game.addAvatar(avatar)) {
+        if (e.detail.alive) {
+            avatar.spawn();
+        }
+        avatar.setPositionFromServer(e.detail.x, e.detail.y, e.detail.angle);
+        avatar.setVelocity(e.detail.velocity);
+        //avatar.setAngularVelocity(e.detail.angularVelocity);
+        avatar.setRadius(e.detail.radius);
+        //avatar.setTurning(e.detail.turning);
+        avatar.setPrinting(e.detail.printing);
+        avatar.setInvincible(e.detail.invincible);
+        avatar.setInverse(e.detail.inverse);
+    }
 };
 
 /**
@@ -232,6 +249,8 @@ GameRepository.prototype.onAvatarPoint = function(e)
     if (avatar) {
         this.game.getTrail(avatar.id, avatar.radius, avatar.color).add(avatar.x, avatar.y);
         avatar.addPoint();
+    } else {
+        console.error('Could not find avatar "%s"', e.detail);
     }
 };
 
@@ -258,10 +277,10 @@ GameRepository.prototype.onSpawn = function(e)
  */
 GameRepository.prototype.onDie = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id);
 
     if (avatar) {
-        avatar.setAngle(this.compressor.decompress(e.detail[1]));
+        avatar.setAngle(e.detail.angle);
         avatar.die();
         this.sound.play('death');
     }
@@ -274,12 +293,7 @@ GameRepository.prototype.onDie = function(e)
  */
 GameRepository.prototype.onBonusPop = function(e)
 {
-    var bonus = new MapBonus(
-        e.detail[0],
-        this.compressor.decompress(e.detail[1]),
-        this.compressor.decompress(e.detail[2]),
-        e.detail[3]
-    );
+    var bonus = new MapBonus(e.detail.id, e.detail.x, e.detail.y, e.detail.name);
 
     this.game.bonusManager.add(bonus);
     this.sound.play('bonus-pop');
@@ -307,10 +321,22 @@ GameRepository.prototype.onBonusClear = function(e)
  */
 GameRepository.prototype.onBonusStack = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail[0]);
+    var avatar = this.game.avatars.getById(e.detail.id),
+        bonus;
 
     if (avatar && avatar.local) {
-        avatar.bonusStack[e.detail[1]](new StackedBonus(e.detail[2], e.detail[3], e.detail[4]));
+        if (e.detail.add) {
+            bonus = this.game.bonusManager.bonuses.getById(e.detail.bonus);
+            if (bonus) {
+                avatar.bonusStack.add(new StackedBonus(bonus.id, bonus.type));
+            }
+        } else {
+            bonus = avatar.bonusStack.bonuses.getById(e.detail.bonus);
+
+            if (bonus) {
+                avatar.bonusStack.remove(bonus);
+            }
+        }
     }
 };
 
@@ -342,7 +368,7 @@ GameRepository.prototype.onBorderless = function(e)
  */
 GameRepository.prototype.onAvatarAdd = function(e)
 {
-    var avatar = new Avatar(e.detail[0], e.detail[1], e.detail[2]);
+    var avatar = new Avatar(e.detail.id, e.detail.name, this.rbgToHex(e.detail.color));
 
     if (this.game.addAvatar(avatar) && e.type === 'avatar:me') {
         avatar.setLocal();
@@ -373,4 +399,16 @@ GameRepository.prototype.onEnd = function()
     this.game.end();
     this.sound.play('win');
     this.emit('end');
+};
+
+/**
+ * Convert color from RBG array to Hexadecimal string
+ *
+ * @param {Array} color
+ *
+ * @return {String}
+ */
+GameRepository.prototype.rbgToHex = function(color)
+{
+    return '#' + color[0].toString(16) + color[1].toString(16) + color[2].toString(16);
 };

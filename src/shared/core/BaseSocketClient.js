@@ -2,26 +2,23 @@
  * Base Socket Client
  *
  * @param {Object} socket
- * @param {Number} interval
  */
-function BaseSocketClient(socket, interval)
+function BaseSocketClient(socket, encoder)
 {
     EventEmitter.call(this);
 
     this.socket    = socket;
-    this.interval  = typeof(interval) === 'number' ? interval : 0;
-    this.events    = [];
+    this.encoder   = encoder;
     this.callbacks = {};
-    this.loop      = null;
     this.connected = true;
     this.callCount = 0;
 
-    this.flush     = this.flush.bind(this);
+    this.socket.binaryType = 'arraybuffer';
+
     this.onMessage = this.onMessage.bind(this);
     this.onClose   = this.onClose.bind(this);
 
     this.attachEvents();
-    this.start();
 }
 
 BaseSocketClient.prototype = Object.create(EventEmitter.prototype);
@@ -34,46 +31,7 @@ BaseSocketClient.prototype.onClose = function()
 {
     this.connected = false;
     this.emit('close', this);
-    this.stop();
     this.detachEvents();
-};
-
-
-/**
- * Set interval
- *
- * @param {Number} interval
- */
-BaseSocketClient.prototype.setInterval = function(interval)
-{
-    this.stop();
-    this.flush();
-
-    this.interval = typeof(interval) === 'number' ? interval : 0;
-
-    this.start();
-};
-
-/**
- * Start
- */
-BaseSocketClient.prototype.start = function()
-{
-    if (this.interval && !this.loop) {
-        this.loop = setInterval(this.flush, this.interval);
-        this.flush();
-    }
-};
-
-/**
- * Stop
- */
-BaseSocketClient.prototype.stop = function()
-{
-    if (this.loop) {
-        clearInterval(this.loop);
-        this.loop = null;
-    }
 };
 
 /**
@@ -97,52 +55,16 @@ BaseSocketClient.prototype.detachEvents = function()
 /**
  * Add an event to the list
  *
- * @param {String} name
- * @param {Object} data
+ * @param {Object} event
  * @param {Function} callback
- * @param {Boolean} force
  */
-BaseSocketClient.prototype.addEvent = function (name, data, callback, force)
+BaseSocketClient.prototype.addEvent = function (event, callback)
 {
-    var event = [name];
-
-    if (typeof(data) !== 'undefined') {
-        event[1] = data;
-    }
-
     if (typeof(callback) === 'function') {
-        event[2] = this.indexCallback(callback);
+        event.callback = this.indexCallback(callback);
     }
 
-    if (!this.interval || (typeof(force) !== 'undefined' && force)) {
-        this.sendEvents([event]);
-    } else {
-        this.events.push(event);
-        this.start();
-    }
-};
-
-/**
- * Add an event to the list
- *
- * @param {Array} events
- * @param {Boolean} force
- */
-BaseSocketClient.prototype.addEvents = function (sources, force)
-{
-    var length = sources.length,
-        events = [];
-
-    for (var i = 0; i < length; i++) {
-        events.push(sources[i]);
-    }
-
-    if (!this.interval || force) {
-        this.sendEvents(events);
-    } else {
-        Array.prototype.push.apply(this.events, events);
-        this.start();
-    }
+    this.sendEvents([event]);
 };
 
 /**
@@ -164,40 +86,38 @@ BaseSocketClient.prototype.indexCallback = function(callback)
 /**
  * Add a callback
  *
- * @param {Number} id
+ * @param {Object} message
  * @param {Object} data
  */
-BaseSocketClient.prototype.addCallback = function (id, data)
+BaseSocketClient.prototype.addCallback = function (message, data)
 {
-    var event = [id];
+    var event = {name: message.name + ':callback', id: message.callback};
 
     if (typeof(data) !== 'undefined') {
-        event[1] = data;
+        event.data = data;
     }
 
     this.sendEvents([event]);
 };
 
 /**
- * Send an event
+ * Send events
  *
- * @param {String} name
- * @param {String} data
+ * @param {Array} events
  */
 BaseSocketClient.prototype.sendEvents = function (events)
 {
-    this.socket.send(JSON.stringify(events));
+    this.sendBuffer(this.encoder.encode(events));
 };
 
 /**
- * Send Events
+ * Send buffer
+ *
+ * @param {Buffer} buffer
  */
-BaseSocketClient.prototype.flush = function ()
+BaseSocketClient.prototype.sendBuffer = function (buffer)
 {
-    if (this.events.length > 0) {
-        this.sendEvents(this.events);
-        this.events.length = 0;
-    }
+    this.socket.send(buffer);
 };
 
 /**
@@ -207,23 +127,35 @@ BaseSocketClient.prototype.flush = function ()
  */
 BaseSocketClient.prototype.onMessage = function (e)
 {
-    var data   = JSON.parse(e.data),
-        length = data.length,
-        name, source;
+    var events = this.encoder.decode(e.data),
+        length = events.length;
 
     for (var i = 0; i < length; i++) {
-        source = data[i];
-        name = source[0];
+        this.processMessage(events[i]);
+    }
+};
 
-        if (typeof(name) === 'string') {
-            if (source.length === 3) {
-                this.emit(name, [source[1], this.createCallback(source[2])]);
-            } else {
-                this.emit(name, source[1]);
-            }
-        } else {
-            this.playCallback(name, typeof(source[1]) !== 'undefined' ? source[1] : null);
+/**
+ * Process message
+ *
+ * @param {Object} message
+ */
+BaseSocketClient.prototype.processMessage = function(message)
+{
+    if (typeof(message.id) !== 'undefined') {
+        return this.playCallback(message.id, message.data);
+    }
+
+    if (typeof(message.callback) !== 'undefined') {
+        var detail = {callback: this.createCallback(message)};
+
+        if (typeof(message.data) !== 'undefined') {
+            detail.data = message.data;
         }
+
+        this.emit(message.name, detail);
+    } else {
+        this.emit(message.name, message.data);
     }
 };
 
@@ -244,23 +176,11 @@ BaseSocketClient.prototype.playCallback = function(id, data)
 /**
  * Create callback
  *
- * @param {Number} id
+ * @param {Object} message
  *
  * @return {Function}
  */
-BaseSocketClient.prototype.createCallback = function(id)
+BaseSocketClient.prototype.createCallback = function(message)
 {
-    var client = this;
-
-    return function (data) { client.addCallback(id, data); };
-};
-
-/**
- * Object version of the client
- *
- * @return {Object}
- */
-BaseSocketClient.prototype.serialize = function()
-{
-    return {id: this.id};
+    return function (data) { this.addCallback(message, data); }.bind(this);
 };

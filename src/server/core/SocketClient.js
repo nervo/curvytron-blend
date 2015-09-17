@@ -2,12 +2,11 @@
  * Socket Client
  *
  * @param {Socket} socket
- * @param {Number} interval
  * @param {String} ip
  */
-function SocketClient(socket, interval, ip)
+function SocketClient(socket, encoder, ip)
 {
-    BaseSocketClient.call(this, socket, interval);
+    BaseSocketClient.call(this, socket, encoder);
 
     this.ip         = ip;
     this.id         = null;
@@ -36,7 +35,7 @@ SocketClient.prototype.pingInterval = 1000;
  */
 SocketClient.prototype.onLatency = function(latency)
 {
-    this.addEvent('latency', latency, null, true);
+    this.addEvent({name: 'latency', data: latency});
 };
 
 /**

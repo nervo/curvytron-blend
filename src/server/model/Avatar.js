@@ -11,18 +11,17 @@ function Avatar(player)
     this.printManager = new PrintManager(this);
     this.body         = null;
     this.bodyCount    = 0;
-    this.isTurning    = false;
 }
 
 Avatar.prototype = Object.create(BaseAvatar.prototype);
 Avatar.prototype.constructor = Avatar;
 
 /**
- * Warmup before avatars start to print
+ * Invincibility warmup
  *
  * @type {Number}
  */
-Avatar.prototype.warmupBeforePrint = 3000;
+Avatar.prototype.warmup = 3000;
 
 /**
  * Update
@@ -86,34 +85,14 @@ Avatar.prototype.setVelocity = function(velocity)
 };
 
 /**
- * Set angle
+ * Update angular velocity
  *
- * @param {Array} point
+ * @param {Number} factor
  */
-Avatar.prototype.setAngle = function(angle)
+Avatar.prototype.updateAngularVelocity = function(factor)
 {
-    if (this.angle !== angle) {
-        BaseAvatar.prototype.setAngle.call(this, angle);
-        this.emit('angle', this);
-    }
-};
-
-/**
- * Set angular velocity
- *
- * @param {Number} velocity
- */
-Avatar.prototype.setAngularVelocity = function(angularVelocity)
-{
-    if (this.angularVelocity !== angularVelocity) {
-        BaseAvatar.prototype.setAngularVelocity.call(this, angularVelocity);
-        var turning = this.angularVelocity !== 0;
-
-        if (this.turning !== turning) {
-            this.turning = turning;
-            this.emit('property', {avatar: this, property: 'turning', value: turning});
-        }
-    }
+    BaseAvatar.prototype.updateAngularVelocity.call(this, factor);
+    this.emit('property', {avatar: this, property: 'move', value: factor});
 };
 
 /**
@@ -200,7 +179,8 @@ Avatar.prototype.setPrinting = function(printing)
 Avatar.prototype.spawn = function()
 {
     BaseAvatar.prototype.spawn.call(this);
-    setTimeout(this.printManager.start, this.warmupBeforePrint);
+    this.printManager.start();
+    new BonusSelfStart().applyTo(this);
     this.emit('spawn', this);
 };
 

@@ -17,26 +17,6 @@ BonusManager.prototype = Object.create(BaseBonusManager.prototype);
 BonusManager.prototype.constructor = BonusManager;
 
 /**
- * Bonus types
- *
- * @type {Array}
- */
-BonusManager.prototype.bonusTypes = [
-    BonusSelfSmall,
-    BonusSelfSlow,
-    BonusSelfFast,
-    BonusSelfMaster,
-    BonusEnemySlow,
-    BonusEnemyFast,
-    BonusEnemyBig,
-    BonusEnemyInverse,
-    //BonusEnemyStraightAngle,
-    //BonusGameBorderless,
-    //BonusAllColor,
-    BonusGameClear
-];
-
-/**
  * Start
  */
 BonusManager.prototype.start = function()
@@ -194,7 +174,7 @@ BonusManager.prototype.getRandomBonusType = function()
         bonusType;
 
     for (var i = 0; i < total; i++) {
-        bonusType   = this.bonusTypes[i];
+        bonusType   = eval(this.bonusTypes[i]);
         probability = bonusType.prototype.getProbability(this.game);
 
         if (probability > 0) {
