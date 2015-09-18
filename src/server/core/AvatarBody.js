@@ -2,14 +2,13 @@
  * Avatar body
  *
  * @param {Avatar} avatar
- * @param {Number} x
- * @param {Number} y
  */
-function AvatarBody(avatar, x, y)
+function AvatarBody(avatar)
 {
-    Body.call(this, x, y, avatar.radius, avatar.id);
+    Body.call(this, avatar.x, avatar.y, avatar.radius, avatar.id);
 
     this.color = avatar.color;
+    this.angle = avatar.angle;
     this.num   = avatar.bodyCount++;
     this.birth = new Date().getTime();
 }

@@ -10,7 +10,7 @@ function Game()
 
     this.avatars.index = true;
 
-    this.onSpawn = this.onSpawn.bind(this);
+    this.onRespawn = this.onRespawn.bind(this);
     this.onDie   = this.onDie.bind(this);
     this.onPoint = this.onPoint.bind(this);
 }
@@ -88,11 +88,11 @@ Game.prototype.addAvatar = function (avatar)
 {
     if (BaseGame.prototype.addAvatar.call(this, avatar)) {
         avatar.on('die', this.onDie);
-        avatar.on('spawn', this.onSpawn);
+        avatar.on('respawn', this.onRespawn);
         avatar.on('point', this.onPoint);
         this.emit('avatar:add', avatar);
         avatar.getBody();
-        avatar.spawn();
+        this.onRespawn(avatar);
 
         return true;
     }
@@ -109,7 +109,7 @@ Game.prototype.removeAvatar = function(avatar)
 {
     if (BaseGame.prototype.removeAvatar.call(this, avatar)) {
         avatar.removeListener('die', this.onDie);
-        avatar.removeListener('spawn', this.onSpawn);
+        avatar.removeListener('respawn', this.onRespawn);
         avatar.removeListener('point', this.onPoint);
         this.emit('avatar:remove', avatar);
 
@@ -124,12 +124,12 @@ Game.prototype.removeAvatar = function(avatar)
  *
  * @param {Avatar} avatar
  */
-Game.prototype.onSpawn = function(avatar)
+Game.prototype.onRespawn = function(avatar)
 {
-    var position = this.world.getRandomPosition(avatar.radius, this.spawnMargin);
+    var position = this.world.getRandomPosition(avatar.radius, this.spawnMargin),
+        angle    = this.world.getRandomDirection(position[0], position[1], this.spawnAngleMargin);
 
-    avatar.setPosition(position[0], position[1]);
-    avatar.setAngle(this.world.getRandomDirection(avatar.x, avatar.y, this.spawnAngleMargin));
+    avatar.spawn(position[0], position[1], angle);
 };
 
 /**
@@ -139,18 +139,18 @@ Game.prototype.onSpawn = function(avatar)
  */
 Game.prototype.onDie = function(data)
 {
-    setTimeout(data.avatar.spawn, this.respawnTime);
+    setTimeout(data.avatar.respawn, this.respawnTime);
 };
 
 /**
  * On avatar add point
  *
- * @param {Object} data
+ * @param {Avatar} avatar
  */
-Game.prototype.onPoint = function(data)
+Game.prototype.onPoint = function(avatar)
 {
     if (this.world.active) {
-        this.world.addBody(new AvatarBody(data.avatar, data.x, data.y));
+        this.world.addBody(new AvatarBody(avatar));
     }
 };
 

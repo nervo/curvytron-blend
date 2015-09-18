@@ -8,6 +8,7 @@ function TrailSegment(trail)
     this.trail     = trail;
     this.Xs        = [];
     this.Ys        = [];
+    this.changed   = true;
     this.important = false;
     this.left      = null;
     this.right     = null;

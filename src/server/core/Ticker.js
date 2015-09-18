@@ -156,12 +156,8 @@ Ticker.prototype.detachEvents = function()
  */
 Ticker.prototype.attachAvatarEvents = function(avatar)
 {
-    avatar.on('die', this.onDie);
     avatar.on('spawn', this.onSpawn);
-    avatar.on('position', this.onPosition);
-    avatar.on('property', this.onProperty);
-    avatar.bonusStack.on('add', this.onBonusStackAdd);
-    avatar.bonusStack.on('remove', this.onBonusStackRemove);
+    avatar.on('die', this.onDie);
 };
 
 /**
@@ -171,8 +167,30 @@ Ticker.prototype.attachAvatarEvents = function(avatar)
  */
 Ticker.prototype.detachAvatarEvents = function(avatar)
 {
-    avatar.removeListener('die', this.onDie);
     avatar.removeListener('spawn', this.onSpawn);
+    avatar.removeListener('die', this.onDie);
+};
+
+/**
+ * Attach alive avatar events
+ *
+ * @param {Avatar} avatar
+ */
+Ticker.prototype.attachAliveAvatarEvents = function(avatar)
+{
+    avatar.on('position', this.onPosition);
+    avatar.on('property', this.onProperty);
+    avatar.bonusStack.on('add', this.onBonusStackAdd);
+    avatar.bonusStack.on('remove', this.onBonusStackRemove);
+};
+
+/**
+ * Detach alive avatar events
+ *
+ * @param {Avatar} avatar
+ */
+Ticker.prototype.detachAliveAvatarEvents = function(avatar)
+{
     avatar.removeListener('position', this.onPosition);
     avatar.removeListener('property', this.onProperty);
     avatar.bonusStack.removeListener('add', this.onBonusStackAdd);
@@ -261,7 +279,17 @@ Ticker.prototype.onPosition = function(avatar)
  */
 Ticker.prototype.onSpawn = function(avatar)
 {
-    this.addEvent({name: 'spawn', data: avatar.id});
+    this.attachAliveAvatarEvents(avatar);
+
+    this.addEvent({
+        name: 'spawn',
+        data: {
+            id: avatar.id,
+            x: avatar.x,
+            y: avatar.y,
+            angle: avatar.angle
+        }
+    });
 };
 
 /**
@@ -271,6 +299,8 @@ Ticker.prototype.onSpawn = function(avatar)
  */
 Ticker.prototype.onDie = function(data)
 {
+    this.detachAliveAvatarEvents(data.avatar);
+
     this.addEvent({
         name: 'die',
         data: {
@@ -455,7 +485,7 @@ Ticker.prototype.sumUp = function(client)
             data: {
                 id: bonus.id,
                 x: bonus.x,
-                y:bonus.y,
+                y: bonus.y,
                 name: bonus.constructor.name
             }
         });
@@ -473,6 +503,7 @@ Ticker.prototype.sumUp = function(client)
             data: {
                 x: body.x,
                 y: body.y,
+                angle: body.angle,
                 radius: body.radius,
                 color: body.color,
                 avatar: body.data

@@ -13,18 +13,19 @@ function BaseAvatar(name, color)
     this.defaultColor    = color;
     this.color           = color;
     this.bonusStack      = new BonusStack(this);
-    this.x               = 0;
-    this.y               = 0;
-    this.angle           = 0;
+    this.x               = null;
+    this.y               = null;
+    this.angle           = null;
     this.velocityX       = 0;
     this.velocityY       = 0;
     this.angularVelocity = 0;
-    this.alive           = false;
-    this.printing        = false;
     this.lastPointX      = null;
     this.lastPointY      = null;
+    this.alive           = false;
+    this.printing        = false;
 
-    this.spawn = this.spawn.bind(this);
+    this.respawn = this.respawn.bind(this);
+    this.spawn   = this.spawn.bind(this);
 }
 
 BaseAvatar.prototype = Object.create(EventEmitter.prototype);
@@ -107,6 +108,7 @@ BaseAvatar.prototype.addPoint = function()
 {
     this.lastPointX = this.x;
     this.lastPointY = this.y;
+    this.emit('point', this);
 };
 
 /**
@@ -312,12 +314,31 @@ BaseAvatar.prototype.getDistance = function(fromX, fromY, toX, toY)
 };
 
 /**
- * Spawn
+ * Respawn
  */
-BaseAvatar.prototype.spawn = function()
+BaseAvatar.prototype.respawn = function()
+{
+    this.emit('respawn', this);
+};
+
+/**
+ * Spawn
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} angle
+ */
+BaseAvatar.prototype.spawn = function(x, y, angle)
 {
     this.clear();
+
+    this.x     = x;
+    this.y     = y;
+    this.angle = angle;
     this.alive = true;
+
+    this.updateVelocities();
+    this.updateBaseAngularVelocity();
 };
 
 /**
@@ -369,16 +390,18 @@ BaseAvatar.prototype.clear = function()
 {
     this.bonusStack.clear();
 
-    this.x                   = 0;
-    this.y                   = 0;
-    this.angle               = 0;
+    this.x                   = null;
+    this.y                   = null;
+    this.angle               = null;
     this.velocityX           = 0;
     this.velocityY           = 0;
     this.angularVelocity     = 0;
-    this.velocity            = BaseAvatar.prototype.velocity;
+    this.lastPointX          = null;
+    this.lastPointY          = null;
     this.alive               = false;
     this.printing            = false;
     this.color               = this.defaultColor;
+    this.velocity            = BaseAvatar.prototype.velocity;
     this.radius              = BaseAvatar.prototype.radius;
     this.inverse             = BaseAvatar.prototype.inverse;
     this.invincible          = BaseAvatar.prototype.invincible;

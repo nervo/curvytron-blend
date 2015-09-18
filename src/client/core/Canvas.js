@@ -94,7 +94,8 @@ Canvas.prototype.setStroke = function(color)
  */
 Canvas.prototype.setLineCap = function(style)
 {
-    this.context.lineCap = style;
+    this.context.lineCap  = style;
+    this.context.lineJoin = style;
 };
 
 /**

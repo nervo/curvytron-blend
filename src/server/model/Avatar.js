@@ -51,7 +51,7 @@ Avatar.prototype.update = function(step)
 Avatar.prototype.getBody = function()
 {
     if (!this.body) {
-        this.body = new AvatarBody(this, 0, 0, false);
+        this.body = new AvatarBody(this);
     }
 
     return this.body;
@@ -148,15 +148,6 @@ Avatar.prototype.setColor = function(color)
 };
 
 /**
- * Add point
- */
-Avatar.prototype.addPoint = function()
-{
-    BaseAvatar.prototype.addPoint.call(this);
-    this.emit('point', {avatar: this, x: this.x, y: this.y});
-};
-
-/**
  * Set printing
  *
  * @param {Boolean} printing
@@ -170,11 +161,14 @@ Avatar.prototype.setPrinting = function(printing)
 
 /**
  * Spawn
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} angle
  */
-Avatar.prototype.spawn = function()
+Avatar.prototype.spawn = function(x, y, angle)
 {
-    BaseAvatar.prototype.spawn.call(this);
-    this.printManager.start();
+    BaseAvatar.prototype.spawn.call(this, x, y, angle);
     new BonusSelfStart().applyTo(this);
     this.emit('spawn', this);
 };

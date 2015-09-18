@@ -55,7 +55,11 @@ BonusStack.prototype.apply = function(property, value)
             this.target.setInvincible(value ? true : false);
             break;
         case 'printing':
-            this.target.printManager[value > 0 ? 'start' : 'stop']();
+            if(value > 0) {
+                this.target.printManager.start();
+            } else {
+                this.target.printManager.stop();
+            }
             break;
         case 'color':
             this.target.setColor(value);

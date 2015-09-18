@@ -197,9 +197,9 @@ GameRepository.prototype.onPosition = function(e)
  */
 GameRepository.prototype.onSumUpPoint = function(e)
 {
-    this.game
-        .getTrail(e.detail.avatar, e.detail.radius, this.rbgToHex(e.detail.color))
-        .addPoint(e.detail.x, e.detail.y, 0);
+    var trail = this.game.getTrail(e.detail.avatar, e.detail.radius, this.rbgToHex(e.detail.color));
+
+    trail.addPoint(e.detail.x, e.detail.y, e.detail.angle);
 };
 
 /**
@@ -250,10 +250,10 @@ GameRepository.prototype.onAvatarPoint = function(e)
  */
 GameRepository.prototype.onSpawn = function(e)
 {
-    var avatar = this.game.avatars.getById(e.detail);
+    var avatar = this.game.avatars.getById(e.detail.id);
 
     if (avatar) {
-        avatar.spawn();
+        avatar.spawn(e.detail.x, e.detail.y, e.detail.angle);
         //this.sound.play('death');
     }
 };

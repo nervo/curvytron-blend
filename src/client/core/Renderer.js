@@ -203,6 +203,7 @@ Renderer.prototype.drawTrail = function(trail)
 
     for (var segment, i = trail.segments.length - 1; i >= 0; i--) {
         segment = trail.segments[i];
+
         if (this.camera.isBoxVisible(segment.left, segment.right, segment.top, segment.bottom)) {
             this.canvas.drawImageTo(
                 segment.draw(this.camera.scale),
