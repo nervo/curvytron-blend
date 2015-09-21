@@ -15,12 +15,12 @@ function BaseBinaryEncoder ()
         new DieHandler(),
         new FloatPropertyHandler('radius'),
         new FloatPropertyHandler('velocity'),
-        new SignedIntPropertyHandler('move'),
         new MoveHandler(),
         new NameCallbackHandler(),
         new NameCallbackResponseHandler(),
         new PositionHandler(),
         new ReadyCallbackResponseHandler(),
+        new SignedIntPropertyHandler('move'),
         new SimpleCallbackHandler('color'),
         new SimpleCallbackHandler('ready'),
         new SimpleHandler('clear'),
@@ -32,7 +32,7 @@ function BaseBinaryEncoder ()
         new SimpleIntHandler('avatar:remove'),
         new SimpleIntHandler('bonus:clear'),
         new SimpleIntHandler('latency'),
-        new SimpleIntHandler('spawn'),
+        new SpawnHandler(),
         new SumUpAvatarHandler(),
         new SumUpPointHandler()
     ], 'name');

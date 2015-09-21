@@ -13,18 +13,19 @@ function BaseAvatar(name, color)
     this.defaultColor    = color;
     this.color           = color;
     this.bonusStack      = new BonusStack(this);
-    this.x               = 0;
-    this.y               = 0;
-    this.angle           = 0;
+    this.x               = null;
+    this.y               = null;
+    this.angle           = null;
     this.velocityX       = 0;
     this.velocityY       = 0;
     this.angularVelocity = 0;
-    this.alive           = false;
-    this.printing        = false;
     this.lastPointX      = null;
     this.lastPointY      = null;
+    this.alive           = false;
+    this.printing        = false;
 
-    this.spawn = this.spawn.bind(this);
+    this.respawn = this.respawn.bind(this);
+    this.spawn   = this.spawn.bind(this);
 }
 
 BaseAvatar.prototype = Object.create(EventEmitter.prototype);
@@ -94,18 +95,20 @@ BaseAvatar.prototype.setPosition = function(x, y)
 {
     this.x = x;
     this.y = y;
+
+    if (this.printing && this.isTimeToDraw()) {
+        this.addPoint();
+    }
 };
 
 /**
  * Add point
- *
- * @param {Float} x
- * @param {Float} y
  */
-BaseAvatar.prototype.addPoint = function(x, y)
+BaseAvatar.prototype.addPoint = function()
 {
-    this.lastPointX = x;
-    this.lastPointY = y;
+    this.lastPointX = this.x;
+    this.lastPointY = this.y;
+    this.emit('point', this);
 };
 
 /**
@@ -269,7 +272,7 @@ BaseAvatar.prototype.setBaseAngularVelocity = function(baseAngulerVelocity)
  */
 BaseAvatar.prototype.setRadius = function(radius)
 {
-    this.radius = Math.max(radius, BaseAvatar.prototype.radius/8);
+    this.radius = radius;
 };
 
 /**
@@ -311,12 +314,31 @@ BaseAvatar.prototype.getDistance = function(fromX, fromY, toX, toY)
 };
 
 /**
- * Spawn
+ * Respawn
  */
-BaseAvatar.prototype.spawn = function()
+BaseAvatar.prototype.respawn = function()
+{
+    this.emit('respawn', this);
+};
+
+/**
+ * Spawn
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} angle
+ */
+BaseAvatar.prototype.spawn = function(x, y, angle)
 {
     this.clear();
+
+    this.x     = x;
+    this.y     = y;
+    this.angle = angle;
     this.alive = true;
+
+    this.updateVelocities();
+    this.updateBaseAngularVelocity();
 };
 
 /**
@@ -326,6 +348,10 @@ BaseAvatar.prototype.die = function()
 {
     this.alive = false;
     this.bonusStack.clear();
+
+    if (this.printing) {
+        this.addPoint();
+    }
 };
 
 /**
@@ -339,6 +365,7 @@ BaseAvatar.prototype.setPrinting = function(printing)
 
     if (this.printing !== printing) {
         this.printing = printing;
+        this.addPoint();
 
         return true;
     }
@@ -363,23 +390,21 @@ BaseAvatar.prototype.clear = function()
 {
     this.bonusStack.clear();
 
-    this.x                   = this.radius;
-    this.y                   = this.radius;
-    this.angle               = 0;
+    this.x                   = null;
+    this.y                   = null;
+    this.angle               = null;
     this.velocityX           = 0;
     this.velocityY           = 0;
     this.angularVelocity     = 0;
-    this.velocity            = BaseAvatar.prototype.velocity;
+    this.lastPointX          = null;
+    this.lastPointY          = null;
     this.alive               = false;
     this.printing            = false;
     this.color               = this.defaultColor;
+    this.velocity            = BaseAvatar.prototype.velocity;
     this.radius              = BaseAvatar.prototype.radius;
     this.inverse             = BaseAvatar.prototype.inverse;
     this.invincible          = BaseAvatar.prototype.invincible;
     this.directionInLoop     = BaseAvatar.prototype.directionInLoop;
     this.angularVelocityBase = BaseAvatar.prototype.angularVelocityBase;
-
-    if (this.body) {
-        this.body.radius = BaseAvatar.prototype.radius;
-    }
 };

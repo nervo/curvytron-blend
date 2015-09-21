@@ -13,11 +13,6 @@
   "license": "MIT",
   "authors": [
     {
-      "name": "Johan Dufour",
-      "email": "johan.dufour@gmail.com",
-      "homepage": "https://github.com/lutangar"
-    },
-    {
       "name": "Thomas JARRAND",
       "email": "thomas.jarrand@gmail.com",
       "homepage": "http://thomas.jarrand.fr"
@@ -30,8 +25,8 @@
     "tom32i-key-mapper.js": "~0.1.*",
     "tom32i-option-resolver.js": "~0.0.*",
     "tom32i-asset-loader.js": "~0.0.*",
-    "html5-boilerplate": "~4.3.0",
-    "createjs-soundjs": "0.6.1"
+    "html5-boilerplate": "~4.3.*",
+    "createjs-soundjs": "~0.6.*"
   },
   "ignore": [
     "**/.*",

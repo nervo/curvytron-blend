@@ -32,8 +32,7 @@ BaseBonusManager.prototype.bonusTypes = [
     'BonusSelfSlow',
     'BonusSelfSmall'/*,
     'BonusEnemyStraightAngle',
-    'BonusGameBorderless',
-    'BonusAllColor',*/
+    'BonusGameBorderless'*/
 ];
 
 /**

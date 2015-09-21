@@ -1,5 +1,6 @@
 var config,
-    packageInfo = require('../package.json');
+    packageInfo = require('../package.json'),
+    monitor     = new Monitor();
 
 try {
     config = require('../config.json');

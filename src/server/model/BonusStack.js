@@ -43,7 +43,7 @@ BonusStack.prototype.apply = function(property, value)
 {
     switch (property) {
         case 'radius':
-            this.target.setRadius(Avatar.prototype.radius * Math.pow(2, value));
+            this.target.setRadius(BaseAvatar.prototype.radius * Math.pow(2, value));
             break;
         case 'velocity':
             this.target.setVelocity(value);
@@ -55,7 +55,11 @@ BonusStack.prototype.apply = function(property, value)
             this.target.setInvincible(value ? true : false);
             break;
         case 'printing':
-            this.target.printManager[value > 0 ? 'start' : 'stop']();
+            if(value > 0) {
+                this.target.printManager.start();
+            } else {
+                this.target.printManager.stop();
+            }
             break;
         case 'color':
             this.target.setColor(value);

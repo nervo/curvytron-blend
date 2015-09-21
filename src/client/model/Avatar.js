@@ -92,9 +92,22 @@ Avatar.prototype.setPosition = function(x, y)
  */
 Avatar.prototype.setPositionFromServer = function(x, y, angle)
 {
-    this.changed = true;
     this.setPosition(x, y);
     this.setAngle(angle);
+    this.changed = true;
+};
+
+/**
+ * Spawn
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} angle
+ */
+Avatar.prototype.spawn = function(x, y, angle)
+{
+    BaseAvatar.prototype.spawn.call(this, x, y, angle);
+    this.changed = true;
 };
 
 /**
@@ -105,14 +118,6 @@ Avatar.prototype.setPositionFromServer = function(x, y, angle)
 Avatar.prototype.setMove = function(move)
 {
     this.updateAngularVelocity(move);
-};
-
-/**
- * Add point
- */
-Avatar.prototype.addPoint = function()
-{
-    BaseAvatar.prototype.addPoint.call(this, this.x, this.y);
 };
 
 /**

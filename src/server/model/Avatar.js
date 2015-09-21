@@ -24,6 +24,13 @@ Avatar.prototype.constructor = Avatar;
 Avatar.prototype.warmup = 3000;
 
 /**
+ * Minimum radius
+ *
+ * @type {Number}
+ */
+Avatar.prototype.minimumRadius = BaseAvatar.prototype.radius / 10;
+
+/**
  * Update
  *
  * @param {Number} step
@@ -33,10 +40,6 @@ Avatar.prototype.update = function(step)
     if (this.alive) {
         this.updateAngle(step);
         this.updatePosition(step);
-
-        if (this.printing && this.isTimeToDraw()) {
-            this.addPoint(this.x, this.y, false);
-        }
     }
 };
 
@@ -48,7 +51,7 @@ Avatar.prototype.update = function(step)
 Avatar.prototype.getBody = function()
 {
     if (!this.body) {
-        this.body = new AvatarBody(this, 0, 0, false);
+        this.body = new AvatarBody(this);
     }
 
     return this.body;
@@ -98,10 +101,12 @@ Avatar.prototype.updateAngularVelocity = function(factor)
 /**
  * Set radius
  *
- * @param {Float} radius
+ * @param {Number} radius
  */
 Avatar.prototype.setRadius = function(radius)
 {
+    radius = Math.max(radius, this.minimumRadius);
+
     if (this.radius !== radius) {
         BaseAvatar.prototype.setRadius.call(this, radius);
         this.body.radius = this.radius;
@@ -143,24 +148,6 @@ Avatar.prototype.setColor = function(color)
 };
 
 /**
- * Add point
- *
- * @param {Float} x
- * @param {Float} y
- * @param {Boolean} important
- */
-Avatar.prototype.addPoint = function(x, y, important)
-{
-    BaseAvatar.prototype.addPoint.call(this, x, y);
-
-    this.emit('point', {avatar: this, x: x, y: y, important: important});
-
-    if (important) {
-        this.emit('point:important', this);
-    }
-};
-
-/**
  * Set printing
  *
  * @param {Boolean} printing
@@ -168,18 +155,20 @@ Avatar.prototype.addPoint = function(x, y, important)
 Avatar.prototype.setPrinting = function(printing)
 {
     if (BaseAvatar.prototype.setPrinting.call(this, printing)) {
-        this.addPoint(this.x, this.y, true);
         this.emit('property', {avatar: this, property: 'printing', value: this.printing});
     }
 };
 
 /**
  * Spawn
+ *
+ * @param {Number} x
+ * @param {Number} y
+ * @param {Number} angle
  */
-Avatar.prototype.spawn = function()
+Avatar.prototype.spawn = function(x, y, angle)
 {
-    BaseAvatar.prototype.spawn.call(this);
-    this.printManager.start();
+    BaseAvatar.prototype.spawn.call(this, x, y, angle);
     new BonusSelfStart().applyTo(this);
     this.emit('spawn', this);
 };
@@ -193,7 +182,6 @@ Avatar.prototype.spawn = function()
 Avatar.prototype.die = function(killer, old)
 {
     BaseAvatar.prototype.die.call(this);
-    this.addPoint(this.x, this.y, false);
     this.printManager.stop();
     this.emit('die', {avatar: this, killer: killer, old: old});
 };
@@ -204,6 +192,11 @@ Avatar.prototype.die = function(killer, old)
 Avatar.prototype.clear = function()
 {
     BaseAvatar.prototype.clear.call(this);
+
     this.printManager.stop();
     this.bodyCount = 0;
+
+    if (this.body) {
+        this.body.radius = this.radius;
+    }
 };

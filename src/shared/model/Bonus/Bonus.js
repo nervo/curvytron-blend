@@ -36,10 +36,16 @@ Bonus.prototype.getBody = function()
 Bonus.prototype.applyTo = function(avatar, game)
 {
     this.target = this.getTarget(avatar, game);
+    this.setOff();
+    this.on();
+};
 
+/**
+ * Set off timeout
+ */
+Bonus.prototype.setOff = function()
+{
     if (this.duration) {
         this.timeout = setTimeout(this.off, this.duration);
     }
-
-    this.on();
 };

@@ -12,52 +12,49 @@ function Trail(avatar, radius, color)
     this.radius     = radius;
     this.width      = radius * 2;
     this.color      = color;
+    this.tolerance  = this.width;
     this.current    = new TrailSegment(this);
     this.segments   = [this.current];
-    this.lastX      = 0;
-    this.lastY      = 0;
+    this.lastX      = null;
+    this.lastY      = null;
+    this.lastAngle  = null;
     this.clearAsked = false;
 }
-
-/**
- * Distance tolerance
- *
- * @type {Number}
- */
-Trail.prototype.tolerance = 1;
 
 /**
  * Add point
  *
  * @param {Number} x
  * @param {Number} y
+ * @param {Number} angle
  */
-Trail.prototype.add = function(x, y)
+Trail.prototype.addPoint = function(x, y, angle)
 {
-    if (this.isFar(x, y)) {
+    if (this.lastX !== null && this.isFar(x, y)) {
         this.clear();
     }
 
-    this.lastX = x;
-    this.lastY = y;
-    this.current.add(x, y);
+    if (this.follow(angle) && !this.isFar(x, y)) {
+        this.current.setHead(x, y);
+    } else {
+        this.current.add(x, y);
+    }
+
+    this.lastX     = x;
+    this.lastY     = y;
+    this.lastAngle = angle;
 };
 
 /**
- * Update head
+ * Follow
  *
- * @param {Number} x
- * @param {Number} y
+ * @param {Number} angle
+ *
+ * @return {Boolean}
  */
-Trail.prototype.update = function(x, y)
+Trail.prototype.follow = function(angle)
 {
-    if (this.isFar(x, y)) {
-        this.clear();
-    }
-
-    this.lastX = x;
-    this.lastY = y;
-    this.current.setHead(x, y);
+    return this.lastAngle === angle;
 };
 
 /**
@@ -70,10 +67,6 @@ Trail.prototype.update = function(x, y)
  */
 Trail.prototype.isFar = function(x, y)
 {
-    if (this.lastX === null || this.lastY === null) {
-        return false;
-    }
-
     return Math.abs(this.lastX - x) > this.tolerance || Math.abs(this.lastY - y) > this.tolerance;
 };
 
