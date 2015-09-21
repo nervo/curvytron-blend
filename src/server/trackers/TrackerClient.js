@@ -1,12 +1,11 @@
 /**
  * Client tracker
  *
- * @param {Inspector} inspector
  * @param {Client} client
  */
-function ClientTracker (inspector, client)
+function ClientTracker (client)
 {
-    Tracker.call(this, inspector, client.id);
+    Tracker.call(this, client.id);
 
     this.client = client;
     this.ip     = client.ip;

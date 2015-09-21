@@ -1,14 +1,12 @@
 /**
  * Tracker
  *
- * @param {Inspector} inspector
  * @param {String} id
  */
-function Tracker (inspector, id)
+function Tracker(id)
 {
     EventEmitter.call(this);
 
-    this.inspector = inspector;
     this.id        = id;
     this.creation  = new Date().getTime();
     this.uniqId    = md5(this.creation + '-' + this.id);

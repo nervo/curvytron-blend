@@ -37,8 +37,8 @@ function GameController()
         }
     };
 
-    this.game.fps.on('fps', this.onFPS);
-    this.ticker.fps.on('fps', this.onFPS);
+    //this.game.fps.on('fps', this.onFPS);
+    //this.ticker.fps.on('fps', this.onFPS);
 
     this.game.addListener('end', this.unloadGame);
     this.game.start();

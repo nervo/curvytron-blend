@@ -15,11 +15,11 @@ try {
 var server = new Server({ port: config.port, bots: config.bots });
 
 if (config.inspector.enabled) {
-    try {
+    //try {
       new Inspector(server, config.inspector);
-    } catch (error) {
-        console.error('Inspector error:', error);
-    }
+    //} catch (error) {
+    //    console.error('Inspector error:', error);
+    //}
 }
 
 module.exports = server;
