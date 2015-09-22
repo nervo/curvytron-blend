@@ -29,13 +29,13 @@ elao_apt_repositories:
   - bearstech
   - backports
   - nginx
-  - nodesource_4
+  - nodesource_0_12
   - grafana
 
 elao_apt_preferences:
   - git@backports
   - nginx@nginx
-  - nodejs@nodesource_4
+  - nodejs@nodesource_0_12
   - grafana@grafana
 
 elao_apt_packages:
@@ -98,7 +98,7 @@ elao_logio_config_harvester:
 elao_nginx_config_template: config/http_{{ _env }}.conf.j2
 
 elao_nginx_configs_exclusive: true
-_nginx_configs:
+elao_nginx_configs:
   # Gzip
   - file:     gzip
     template: configs/gzip_{{ _env }}.j2
@@ -107,7 +107,7 @@ _nginx_configs:
     template: configs/server_{{ _env }}.conf.j2
     config:
       - return: 404
-  # App static
+  # Game
   - file:     "{{ _app_host }}.conf"
     template: configs/server_{{ _env }}.conf.j2
     config:
@@ -118,6 +118,27 @@ _nginx_configs:
       - error_log:  "{{ elao_nginx_log_dir }}/app.error.log"
       - include:     conf.d/gzip
       - charset:    "UTF-8"
+      - location /:
+        - proxy_pass: "http://127.0.0.1:8080"
+        - proxy_http_version: "1.1"
+        - proxy_set_header: "Upgrade $http_upgrade"
+        - proxy_set_header: 'Connection "upgrade"'
+        - proxy_set_header: "Host $host"
+        - proxy_set_header: "X-Real-IP $remote_addr"
+        - proxy_set_header: "X-Forwarded-For $proxy_add_x_forwarded_for"
+
+############
+# InfluxDB #
+############
+
+elao_influxdb_databases:
+  - curvytron
+
+elao_influxdb_users:
+ - { database: curvytron, name: curvytron, password: curvytron }
+
+elao_influxdb_privileges:
+ - { database: curvytron, user: curvytron, grant: ALL }
 
 #######
 # Npm #

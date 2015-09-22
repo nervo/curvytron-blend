@@ -3,7 +3,7 @@
 
 ## Setup environment & Install application
 setup:
-	#ansible-galaxy install -r ansible/roles.yml -p ansible/roles -f --ignore-errors
+	ansible-galaxy install -r ansible/roles.yml -p ansible/roles -f --ignore-errors
 	vagrant up --provision
 	vagrant ssh -c 'cd /srv/app && make install'
 
