@@ -13,7 +13,7 @@ function Inspector (server, config)
         password: config.password,
         database: config.database
     });
-    this.tags = {env: 'dev'}
+    this.tags = {env: 'dev'};
 
     this.trackers = new Collection();
 
@@ -149,9 +149,9 @@ Inspector.prototype.set = function(key, value, tags)
             if (this.tags.hasOwnProperty(tag)) {
                 tags[tag] = this.tags[tag];
             }
-        };
+        }
     } else {
-        var tags = this.tags;
+        tags = this.tags;
     }
 
     this.client.writePoint(key, value, tags, {});
