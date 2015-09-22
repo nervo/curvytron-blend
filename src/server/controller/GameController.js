@@ -10,7 +10,6 @@ function GameController()
     this.ticker  = new Ticker(this.game, this.clients);
 
     this.unloadGame = this.unloadGame.bind(this);
-    this.onFPS      = this.onFPS.bind(this);
 
     this.callbacks = {
         onLeave: function () { controller.onLeave(this); },
@@ -36,9 +35,6 @@ function GameController()
             }
         }
     };
-
-    //this.game.fps.on('fps', this.onFPS);
-    //this.ticker.fps.on('fps', this.onFPS);
 
     this.game.addListener('end', this.unloadGame);
     this.game.start();
@@ -208,16 +204,4 @@ GameController.prototype.isNameAvailable = function(name)
     return this.clients.match(function () {
         return this.player.name.toLowerCase() === name.toLowerCase();
     }) === null;
-};
-
-/**
- * On FPS
- */
-GameController.prototype.onFPS = function()
-{
-    monitor.setKeys({
-        tickrate: this.ticker.fps.frequency,
-        framerate: this.game.fps.frequency,
-        players: this.game.avatars.count()
-    });
 };
