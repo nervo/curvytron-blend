@@ -10,8 +10,8 @@ options = {
     :app              => 'blend',
     :aliases          => [],
     :memory           => 1024,
-    :box              => 'elao/debian-7-amd64',
-    :box_version      => '~> 1.0.3',
+    :box              => 'elao/debian-8-amd64',
+    :box_version      => '~> 1.0.0',
     :folders          => {
         '.' => '/srv/app'
     },

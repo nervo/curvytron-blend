@@ -9,6 +9,9 @@ stats/*
 config.json
 *.sublime-*
 
-# VM:
-.vagrant/
-ansible/roles/
+# Vagrant
+/.vagrant/
+
+# Ansible
+ansible.cfg
+/ansible/roles/*.*/
